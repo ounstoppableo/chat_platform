@@ -319,6 +319,7 @@
   npx husky add .husky/commit-msg "npx --no-install commitlint -e $HUSKY_GIT_PARAMS"
   ~~~
 
+#### 为项目添加scss适配
 
 #### 添加react依赖
 
