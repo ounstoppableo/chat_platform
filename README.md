@@ -319,4 +319,12 @@
   npx husky add .husky/commit-msg "npx --no-install commitlint -e $HUSKY_GIT_PARAMS"
   ~~~
 
-  
+
+#### 添加react依赖
+
+##### 添加react-router
+
+
+
+##### 添加redux
+
