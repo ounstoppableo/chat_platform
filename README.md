@@ -321,6 +321,11 @@
 
 #### 为项目添加scss适配
 
+~~~sh
+# 直接下载sass就可以使用
+pnpm i sass -D
+~~~
+
 #### 添加react依赖
 
 ##### 添加react-router
