@@ -16,5 +16,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src') //设置路径别名，需要引用/src下面的文件时只需要在前面添加@即可
     },
     extensions: ['.js', '.ts', '.json'] // 导入时想要省略的扩展名列表
+  },
+  css: {
+    preprocessorOptions: {
+      // 全局样式引入
+      scss: {
+        // 文件路径，注意最后需要添加 ';'
+        additionalData: '@import "@/globalVariable.scss";',
+        javascriptEnabled: true
+      }
+    }
   }
 });

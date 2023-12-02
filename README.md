@@ -326,6 +326,23 @@
 pnpm i sass -D
 ~~~
 
+配置全局变量
+
+~~~ts
+export default defineConfig({
+    css: {
+    preprocessorOptions: {
+      // 全局样式引入
+      scss: {
+        // 文件路径，注意最后需要添加 ';'
+        additionalData: '@import "@/globalVariable.scss";',
+        javascriptEnabled: true
+      }
+    }
+  }
+})
+~~~
+
 #### 添加react依赖
 
 ##### 添加react-router
