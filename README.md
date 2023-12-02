@@ -343,11 +343,80 @@ export default defineConfig({
 })
 ~~~
 
+#### 为项目添加tailwindcss
+
+> tailwindcss提供了许多css的原子类，我们可以通过在html标签内添加属性来引用它们，不必再去一一定义各种类，大大减少了开发成本
+
+~~~sh
+pnpm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+~~~
+
+~~~sh
+npx init tailwindcss
+~~~
+
+~~~js
+//tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{html,js,tsx,jsx}'],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+};
+~~~
+
+~~~tsx
+//main.tsx
+import 'tailwindcss/tailwind.css';
+~~~
+
+~~~ts
+//vite.config.ts
+export default {
+  css: {
+     postcss: {
+         //tailwindcss获取各种预定义类
+         //autoprefixer自动匹配浏览器前缀
+        plugins: [require('tailwindcss'), require('autoprefixer')]
+     }
+  }
+}
+~~~
+
 #### 添加react依赖
 
 ##### 添加react-router
 
+~~~sh
+# 下载依赖
+pnpm install react-router-dom localforage match-sorter sort-by
+~~~
 
+~~~tsx
+import '@/App.scss';
+import routes from '@/routes.tsx';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+const router = createBrowserRouter(routes);
+
+function App() {
+  return <RouterProvider router={router} />;
+}
+
+export default App;
+~~~
+
+~~~tsx
+//routes.tsx
+export default [
+  {
+    path: '/',
+    element: <div>Hello world!</div>
+  }
+];
+~~~
 
 ##### 添加redux
 

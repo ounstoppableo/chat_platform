@@ -27,7 +27,6 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'react', 'prettier'],
   rules: {
-    'prettier/prettier': 'error',
     'arrow-body-style': 'off',
     'prefer-arrow-callback': 'off',
     'react/react-in-jsx-scope': 'off',
@@ -40,6 +39,12 @@ module.exports = {
       { varsIgnorePattern: 'VARIABLE_NAME' }
     ],
     '@typescript-eslint/no-explicit-any': ['off'],
-    'consistent-return': 'error'
+    'consistent-return': 'error',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto'
+      }
+    ]
   }
 };
