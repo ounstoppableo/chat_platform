@@ -2,6 +2,8 @@
 
 本项目旨在搭建一个聊天平台，初步考虑使用websocket技术进行及时通信以及消息共享
 
+技术栈构想是：react（前端）+nodejs（后端）
+
 ### 项目搭建
 
 #### 搭建之初
@@ -530,6 +532,219 @@ export default function Counter() {
   );
 }
 ~~~
+
+#### 集成ant-design
+
+
+
+#### 自动化测试
+
+> 一个完备的项目，进行测试是非常重要的
+
+首先我们需要明确前端有几个测试流程：
+
+- 单元测试（Unit Test）
+
+  即对最小可测试单元进行测试，在前端可以细化到对一个模块进行测试，比如react项目中，可能是对某个tsx文件进行测试
+
+  不过我们需要保证被测试的文件/组件是低耦合的，这也从另一方面保证了我们项目的质量
+
+  > 一个测试代码，一般是以`given-when-then`的形式进行构建的，比如：
+  >
+  > ~~~ts
+  > type TProduct = {
+  >   name: string
+  >   price: number
+  > }
+  > // production code
+  > const computeTotalAmount = (products: TProduct[]) => {
+  >   return products.reduce((total, product) => total + product.price, 0)
+  > }
+  > 
+  > // testing code
+  > it('should return summed up total amount 1000 when there are three products priced 200, 300, 500', () => {
+  >   // given - 准备数据
+  >   const products = [
+  >     { name: 'nike', price: 200 },
+  >     { name: 'adidas', price: 300 },
+  >     { name: 'lining', price: 500 }
+  >   ]
+  > 
+  >   // when - 调用被测函数
+  >   const result = computeTotalAmount(products)
+  > 
+  >   // then - 断言结果
+  >   expect(result).toBe(1000)
+  > })
+  > ~~~
+
+  一个好的单元测试应该有的特点：
+
+  - 只关注输入输出，不关注内部实现
+  - 只测一条分支
+  - 表达力强
+  - 不包含逻辑
+  - 运行速度快
+
+- 集成测试（Integration Test）
+
+  集成测试即某些联合的功能块完成后，进行一个联合测试，在前端可能可以比喻成一个页面中，所有组件都写好了，那么我们就测试组件构成的这个页面
+
+  集成测试不比单元测试，集成测试用的更多的是在耦合度较高的代码中：经过二次封装的函数/组件、多个函数/组件组合而成的函数/组件
+
+- UI测试（UI Test）
+
+  主要就是图文交互测试，看产品是否符合设计稿
+
+- 端到端测试（e2e）
+
+  端到端测试则是最直观的测试了，不管代码如何实现，就管其在浏览器的页面上进行的操作是否符合预期，即代码端->浏览器端
+
+  流行的端到端测试框架：
+
+  - Cypress(推荐)
+  - nightwatch
+  - webdriverIO
+  - playwright
+
+  ![](.\image\QQ截图20231203142217.png)
+
+##### 测试最佳实践
+
+###### 金字塔模型
+
+google的自动化测试分层比例是（金字塔模型）：
+
+- 单元测试（70%）（速度快）
+- 接口测试（20%）
+- UI测试/E2E测试（10%）（速度慢）
+
+###### 奖杯模型
+
+奖杯模式是由kent C.Dodds提出：
+
+- 静态测试（eslint/ts编码时的语法规范）
+- 单元测试（jest）
+- 集成测试（jest）
+- e2e测试（cypress）
+
+这个结构是根据测试所反馈给编码者的自信心来进行划分的，越上层（静态->e2e方向）带来的自信心越大，越底层测试效率更高
+
+###### 适用场景
+
+- 纯代码函数库：大量的单元+少量集成
+- 组件库：大量代码+快照+少量集成+端到端测试
+- 业务系统：大量集成+单元+少量端到端
+
+##### 单元测试
+
+> 单元测试，这里我用的是jest
+
+如何配置vite+react的测试环境？
+
+我们首先需要安装两类依赖：
+
+- jest（由于vite+typescript中配置babel太过冗余，所以选择ts-jest替代babel）
+- RTL(react test library)：`@testing-library/jest-dom`、`@testing-library/react`、`@testing-library/user-event`
+
+~~~sh
+# 安装依赖 jest ts-jest需要保持大版本一致 比如27对27
+pnpm i -D jest @types/jest ts-node ts-jest @testing-library/react @testing-library/user-event identity-obj-proxy @testing-library/jest-dom @types/testing-library__jest-dom jest-environment-jsdom
+~~~
+
+~~~sh
+# 生成jest.config.ts文件，因为这里没有适用babel，所以选择v8
+npx jest --init
+~~~
+
+~~~json
+//package.json文件
+{
+	"scripts": {
+		"test":"jest --config ./jest.config.ts"
+	}
+}
+~~~
+
+~~~ts
+//jest.config.ts文件
+/**
+ * For a detailed explanation regarding each configuration property, visit:
+ * https://jestjs.io/docs/configuration
+ */
+
+import type { Config } from 'jest';
+
+const config: Config = {
+  //测试时忽略的文件
+  testPathIgnorePatterns: ['/node_modules/'],
+
+  //遇到tsx结尾的文件转用ts-jest进行测试
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest'
+  },
+  
+  //一些别名配置，即匹配到这些正则后去给出的文件获取数据
+  moduleNameMapper: {
+    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
+      //这个表示一个虚拟代理
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+      //为了搭配我们项目中@别名能找到src下的文件，正则$1表示获取([^\\.]*)的匹配结果，[^\\.]表示除\和.之外的字符
+    '@/([^\\.]*)$': '<rootDir>/src/$1'
+  },
+  clearMocks: true,
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+
+    //覆盖忽略
+  coveragePathIgnorePatterns: ['\\\\node_modules\\\\'],
+
+  coverageProvider: 'v8',
+
+    //这个必须为jsdom，因为要测试dom环境
+  testEnvironment: 'jsdom',
+
+    //测试路径，设置后就只执行该路径下的测试文件
+  testMatch: ['**/src/__tests__/**/*.[jt]s?(x)']
+};
+
+export default config;
+~~~
+
+###### 一个例子
+
+~~~tsx
+//以之前的一个测试页面写的测试文件
+import { render } from '@testing-library/react';
+import TestView from '@/view/testView/test';
+import { Provider } from 'react-redux';
+import store from '@/redux/store';
+import user from '@testing-library/user-event';
+
+test('点击测试完成', async () => {
+  const { container } = render(
+    <Provider store={store}>
+      <TestView />
+    </Provider>
+  );
+  const incrementButton = await container.querySelector(
+    '[aria-label="Increment value"]'
+  );
+  const decrementButton = await container.querySelector(
+    '[aria-label="Decrement value"]'
+  );
+    
+  //模拟加减按钮操作
+  const span = await container.querySelector('span');
+  expect(span?.innerHTML).toBe('0');
+  await user.click(incrementButton as any);
+  expect(span?.innerHTML).toBe('1');
+  await user.click(decrementButton as any);
+  expect(span?.innerHTML).toBe('0');
+});
+~~~
+
+#### 待做事项
 
 
 
