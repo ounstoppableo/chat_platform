@@ -41,12 +41,11 @@ const handleError = (error: any) => {
 };
 const judgeOkState = async (res: any) => {
   const cloneRes = await res.clone().json();
-
   //TODO:可以在这里管控全局请求
   if (!!cloneRes.code && cloneRes.code !== 200) {
     message.error(`11${cloneRes.msg}${cloneRes.code}`);
   }
-  return res;
+  return cloneRes;
 };
 type requestConfig = {
   method?: 'POST' | 'GET' | 'DELETE' | 'PUT';

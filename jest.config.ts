@@ -7,6 +7,10 @@
 import type { Config } from 'jest';
 
 const config: Config = {
+  //测试代码前执行的环境
+  setupFiles: ['./test/setup.js', 'jest-canvas-mock'],
+  setupFilesAfterEnv: ['./test/setupAfterEnv.ts'],
+
   //测试时忽略的文件
   testPathIgnorePatterns: ['/node_modules/'],
 
@@ -20,7 +24,7 @@ const config: Config = {
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
     //这个表示一个虚拟代理
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
-    //为了搭配我们项目中@别名能找到src下的文件，正则$1表示获取([^\\.]*)的匹配结果，[^\\.]表示除\和.之外的字符
+    //为了搭配我们项目中@别名能找到src下的文件，正则$1表示获取([^\\.]*)的匹配结果，[^\\.]表示除.之外的字符
     '@/([^\\.]*)$': '<rootDir>/src/$1'
   },
   clearMocks: true,
@@ -36,7 +40,7 @@ const config: Config = {
   testEnvironment: 'jsdom',
 
   //测试路径，设置后就只执行该路径下的测试文件
-  testMatch: ['**/src/__tests__/**/*.[jt]s?(x)']
+  testMatch: ['**/src/**/__tests__/**/*.[jt]s?(x)']
 };
 
 export default config;
