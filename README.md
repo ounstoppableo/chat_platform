@@ -676,6 +676,12 @@ npx jest --init
 import type { Config } from 'jest';
 
 const config: Config = {
+  //测试代码前执行的环境
+  //此时jestframework还没有搭建，即使用不了test、describe这些函数
+  setupFiles: ['./test/setup.js', 'jest-canvas-mock'],
+  //此时jestframework已经搭建，可以使用test、describe这些函数了
+  setupFilesAfterEnv: ['./test/setupAfterEnv.ts'],
+    
   //测试时忽略的文件
   testPathIgnorePatterns: ['/node_modules/'],
 
@@ -709,6 +715,26 @@ const config: Config = {
 };
 
 export default config;
+~~~
+
+~~~ts
+//setup.js文件
+//下面这个语句非常重要，关系到setupFilesAfterEnv这个环境是否能使用es6语法
+Object.defineProperty(window, 'TextEncoder', {
+  writable: true,
+  value: util.TextEncoder
+});
+Object.defineProperty(window, 'TextDecoder', {
+  writable: true,
+  value: util.TextDecoder
+});
+~~~
+
+~~~ts
+//setupAfterEnv.ts文件
+//以下是setupAfterEnv的一个使用例子，enableMocks的作用是能在jest环境模拟fetch的使用，这个语句就是让fetch能在所有test函数中使用
+import fetchMock from 'jest-fetch-mock';
+fetchMock.enableMocks();
 ~~~
 
 ###### 一个例子

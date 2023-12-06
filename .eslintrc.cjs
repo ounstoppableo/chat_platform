@@ -45,6 +45,7 @@ module.exports = {
       {
         endOfLine: 'auto'
       }
-    ]
+    ],
+    'react/no-unknown-property': ['off']
   }
 };
