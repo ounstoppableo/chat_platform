@@ -837,6 +837,10 @@ width: fit-content;
 max-width: 100%;
 ~~~
 
+##### 滚动条小坑
+
+当我们使用justify-content:flex-end的时候overflow:auto会失效
+
 #### 待做事项
 
 - [ ] 静态页面搭建

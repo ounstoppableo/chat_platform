@@ -30,7 +30,7 @@ const ChatSpace = () => {
               rand > 0.5 ? 'tw-rounded-tl-none' : 'tw-rounded-tr-none'
             }`}
           >
-            1
+            {i}
           </div>
         </div>
         <div className="tw-w-10">
@@ -52,7 +52,7 @@ const ChatSpace = () => {
       <div className="tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-pl-2">
         全员总群
       </div>
-      <div className="tw-flex-1 tw-flex tw-gap-5 tw-flex-col-reverse tw-px-5 tw-overflow-y-auto tw-pt-4 tw-pb-4">
+      <div className="tw-flex-1 tw-flex tw-gap-5 tw-flex-col tw-px-5 tw-overflow-y-auto tw-pt-4 tw-pb-4">
         {a}
       </div>
       <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg"></div>
