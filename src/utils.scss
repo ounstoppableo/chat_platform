@@ -1,0 +1,16 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@layer utilities {
+    .no-wrap-ellipsis {
+        white-space: nowrap;
+        /* 防止文本换行 */
+        overflow: hidden;
+        /* 隐藏超出容器的部分 */
+        text-overflow: ellipsis;
+        /* 超出部分以省略号显示 */
+    }
+}

@@ -12,6 +12,7 @@
     "test": "jest --config ./jest.config.ts"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@reduxjs/toolkit": "^1.9.7",
     "antd": "^5.12.1",
     "localforage": "^1.10.0",

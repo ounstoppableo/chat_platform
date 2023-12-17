@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from '@/App.tsx';
-import 'tailwindcss/tailwind.css';
+import '@/utils.scss';
 import '@/index.scss';
 import store from '@/redux/store';
 import { Provider } from 'react-redux';

@@ -1,0 +1,30 @@
+{
+  "id": "4364877",
+  "name": "chat-platform",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "18219961",
+      "name": "github",
+      "font_class": "github1",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "34064570",
+      "name": "微信",
+      "font_class": "weixin",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "11741910",
+      "name": "语雀",
+      "font_class": "tubiaozhizuomoban",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    }
+  ]
+}

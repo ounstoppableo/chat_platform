@@ -770,6 +770,73 @@ test('点击测试完成', async () => {
 });
 ~~~
 
+#### 遇到的小坑
+
+##### flex布局下的单行文字省略问题
+
+以下代码预想的效果：
+![](.\image\QQ截图20231217155504.png)
+
+然而真实效果：
+
+![](.\image\QQ截图20231217155654.png)
+
+把22222删除：
+
+![](.\image\QQ截图20231217155848.png)
+
+我们可以直观的看到，22222引起了盒子的变化，里面的内容把其他内容给撑开了，但是头像和日期的宽度明明是写死的，为什么撑开后宽度会消失呢？这或许是tailwind的bug
+
+先不说那个，明明我已经将flex-1给了中间的区域，也就是说中间区域是有宽度的，按理说子内容不应该撑开才对，然而事实却是撑开了
+
+后来我找到解决办法，内容影响外部布局那就把盒子变成BFC就行了，加上overflow:hidden即可解决，但是令人疑惑的一个点就是，明明flex布局也可以形成BFC，为什么却没起作用
+
+~~~react
+<div className="tw-flex tw-flex-col tw-gap-3">
+      <div className="tw-h-16 tw-rounded-lg tw-bg-chatRelationActive tw-flex tw-p-3 tw-gap-3 tw-items-center">
+        <div className="tw-w-10 tw-h-10 tw-rounded-full tw-overflow-hidden">
+          <img
+            src="http://8.130.54.105/assets/avatar.jpeg"
+            alt=""
+            className="tw-w-full tw-h-full tw-object-contain"
+          />
+        </div>
+        <div className="tw-flex-1 tw-flex tw-flex-col">
+            <!-- no-wrap-ellipsis表示基本的单行文字省略效果 -->
+          <div className="no-wrap-ellipsis">全员总群</div>
+          <div className="no-wrap-ellipsis tw-text-textGrayColor tw-text-xs">
+            22222222222222222222222222222222222222222222222222222222222
+          </div>
+        </div>
+        <div className="tw-w-14 tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">
+          12月04日
+        </div>
+      </div>
+</div>
+~~~
+
+##### 文本换行
+
+我们以前用中文充当文本基本都会进行换行，但是使用英文或者数字的时候换行就出现了问题
+
+倘若我们输入一长串数字/字母，中间没有任何空格或标点符号，那么文本就不会自动换行，它会被判断为完整的单词，不会被拆分
+
+但是这种情况不是我们想要的，如果它超出限定的宽度，我们的UI会被破坏，如何解决呢？
+
+~~~css
+/* 这样就可以实现单词未结束，超过宽度强制换行 */
+overflow-wrap: break-word;
+~~~
+
+但还有一个问题，我们通常需要文字宽度自适应，因为我们不知道实际的文本宽度到底有多宽，如何做呢?
+
+~~~css
+/* 宽度自适应文本 */
+width: fit-content;
+/* 设置最大宽度，达到则换行 */
+max-width: 100%;
+~~~
+
 #### 待做事项
 
 - [ ] 静态页面搭建
