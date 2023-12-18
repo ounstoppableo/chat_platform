@@ -15,7 +15,7 @@ const layout = () => {
           <div className="tw-w-64">
             <ChatRelation />
           </div>
-          <div className="tw-flex-1 tw-overflow-hidden">
+          <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
             <ChatSpace />
           </div>
           <div className="tw-w-48">

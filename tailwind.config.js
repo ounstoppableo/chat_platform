@@ -13,10 +13,14 @@ export default {
         chatSpaceHeader: '#5b5e69',
         chatSpaceFooter: '#424654',
         onlineGreen: '#adff2f',
-        messageBackground: '#383c4b'
+        messageBackground: '#383c4b',
+        chatInputActive: '#353845'
       },
       backgroundImage: {
         temple: "url('@/assets/background.jpeg')"
+      },
+      minWidth: {
+        minChatSpace: '450px'
       }
     }
   },

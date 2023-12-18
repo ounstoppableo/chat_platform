@@ -13,4 +13,15 @@
         text-overflow: ellipsis;
         /* 超出部分以省略号显示 */
     }
+    .ban-select {
+        -moz-user-select: none;
+            /*火狐*/
+            -webkit-user-select: none;
+            /*webkit浏览器*/
+            -ms-user-select: none;
+            /*IE10*/
+            -khtml-user-select: none;
+            /*早期浏览器*/
+            user-select: none;
+    }
 }

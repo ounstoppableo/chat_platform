@@ -1,0 +1,11 @@
+.rotateAnimation {
+    animation: rotate 1s ease forwards;
+}
+@keyframes rotate {
+    from {
+        transform:  rotate(45deg);
+    }
+    to {
+        transform: rotate(90deg);
+    }
+}
