@@ -2,7 +2,7 @@ import UserInfo from '@/components/userInfo/userInfo.tsx';
 import ChatRelation from '@/components/chatRelation/chatRelation.tsx';
 import ChatSpace from '@/components/chatSpace/chatSpace.tsx';
 import MemberList from '@/components/memberList/memberList.tsx';
-const layout = () => {
+const Layout = () => {
   return (
     <>
       <div className={`tw-h-screen tw-relative tw-bg-temple tw-bg-cover`}>
@@ -26,4 +26,4 @@ const layout = () => {
     </>
   );
 };
-export default layout;
+export default Layout;

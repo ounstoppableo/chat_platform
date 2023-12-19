@@ -25,7 +25,7 @@ const config: Config = {
     //这个表示一个虚拟代理
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
     //为了搭配我们项目中@别名能找到src下的文件，正则$1表示获取([^\\.]*)的匹配结果，[^\\.]表示除.之外的字符
-    '@/([^\\.]*)$': '<rootDir>/src/$1'
+    '@/([^\\.]*)': '<rootDir>/src/$1'
   },
   clearMocks: true,
   collectCoverage: true,

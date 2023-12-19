@@ -8,7 +8,7 @@ import {
   RocketTwoTone,
   SmileOutlined
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input, UploadProps, message, Upload } from 'antd';
 import emoji from 'emojilib';
 import styles from './chatInput.module.scss';
@@ -90,6 +90,23 @@ const ChatInput = () => {
     onChange: () => {}
   };
 
+  //添加全局点击事件
+  useEffect(() => {
+    const callback = (e: any) => {
+      //实现点击表情选择板外部能关闭选择板
+      if (
+        emjFlag &&
+        !e.target.closest('#emjSelect') &&
+        !e.target.closest('#showEmjSelect')
+      ) {
+        setEmjFlag(!emjFlag);
+      }
+    };
+    document.addEventListener('click', callback);
+    return () => {
+      document.removeEventListener('click', callback);
+    };
+  }, [emjFlag]);
   return (
     <>
       <div
@@ -106,6 +123,7 @@ const ChatInput = () => {
         />
       </div>
       <div
+        id="showEmjSelect"
         onClick={handleEmj}
         className="tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive tw-cursor-pointer ban-select"
       >
@@ -141,7 +159,10 @@ const ChatInput = () => {
         )}
       </div>
       {emjFlag ? (
-        <div className="tw-absolute tw-bottom-12 tw-right-0 tw-rounded-lg tw-w-96 tw-bg-deepGray tw-border-8 tw-border-b-4 tw-border-deepGray">
+        <div
+          id="emjSelect"
+          className="tw-absolute tw-bottom-12 tw-right-0 tw-rounded-lg tw-w-96 tw-bg-deepGray tw-border-8 tw-border-b-4 tw-border-deepGray"
+        >
           <div className="tw-flex tw-flex-wrap tw-gap-0.5 tw-w-full tw-h-60 tw-overflow-auto tw-pb-8">
             {emjOrMyFav ? emojiBoard : ''}
           </div>

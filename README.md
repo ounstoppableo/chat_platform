@@ -841,6 +841,76 @@ max-width: 100%;
 
 当我们使用justify-content:flex-end的时候overflow:auto会失效
 
+##### 再说说useEffect模拟生命周期的情况
+
+- 模拟`componentDidMount`
+
+  ~~~react
+  useEffect(() => {
+      console.log('Effect is running');
+      //第二个参数必须有，但是数组内没值，则模拟mount，执行一次
+    }, []);
+  ~~~
+
+- 模拟`componentWillUnmount`
+
+  ~~~react
+  useEffect(() => {
+      console.log('Effect is running');
+      //必须是在Mount的前提下写return，这时只会在unmount时执行，执行一次
+      return ()=>{
+          console.log('unmount')
+      }
+    }, []);
+  ~~~
+
+- 模拟`componentDidUpdate`
+
+  ~~~react
+  //第一种情况
+  useEffect(() => {
+      console.log('Effect is running');
+      return ()=>{
+          console.log('unmount')
+      }
+  	//无依赖，任何state的变化都会引发useEffect执行
+    });
+  //第二种情况
+  const [count,setCount] = useState(1)
+  useEffect(() => {
+      console.log('Effect is running');
+      return ()=>{
+          console.log('unmount')
+      }
+  	//有依赖，count的变化才会引发count执行
+    },[count]);
+  ~~~
+
+  **注意点**
+  这里的return在每次更新都会执行，并不是只在unmount时执行
+
+  那我们可能会有一个疑惑，既然它每次更新都会执行，那么我们的逻辑不是白执行了吗？设定好的用户事件、计时器还没开始执行不就被清理了？
+
+  实际上清理函数是在我们逻辑执行之前执行的，所以清理的也是上次运行的逻辑，我们用一个例子更直观的看看
+
+  ~~~react
+    useEffect(() => {
+      const callback = (e: any) => {
+          console.log(22222)
+      };
+      console.log(111111)
+      document.addEventListener('click', callback);
+      return () => {
+        console.log(333333)
+        document.removeEventListener('click', callback);
+      };
+    }, [demo]);
+  
+  //这里我们触发点击后
+  //333333总是会在111111之前出现，也印证了我们的猜想
+  //因为我们的逻辑还没执行，所以清理函数的callback是上次的callback
+  ~~~
+
 #### 待做事项
 
 - [x] 静态页面搭建
@@ -854,6 +924,5 @@ max-width: 100%;
 
 明日:
 
-- [ ] ui测试
 - [ ] 聊天上传后端逻辑、redius
 

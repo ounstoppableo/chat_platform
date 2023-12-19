@@ -2,7 +2,10 @@ const MemberList = () => {
   const a = [];
   for (let i = 0; i < 100; i++) {
     a.push(
-      <div className="hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded">
+      <div
+        key={i}
+        className="hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+      >
         <div
           className="tw-w-6 tw-rounded-full tw-relative 
                     after:tw-content-[''] after:tw-w-2 after:tw-h-2 after:tw-bg-onlineGreen after:tw-absolute after:tw-bottom-0 after:tw-right-0 after:tw-rounded-full

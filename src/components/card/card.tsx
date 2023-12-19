@@ -4,8 +4,8 @@ const Card = () => {
       <div
         className="tw-bg-lightGray"
         style={{
-          height: '100%',
-          width: '100%'
+          height: '80%',
+          width: '80%'
         }}
       ></div>
     </>

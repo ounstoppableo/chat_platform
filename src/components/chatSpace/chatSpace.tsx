@@ -6,7 +6,7 @@ const ChatSpace = () => {
   for (let i = 0; i < 100; i++) {
     const rand = Math.random();
     a.push(
-      <div className="tw-flex tw-gap-2">
+      <div className="tw-flex tw-gap-2" key={i}>
         <div className="tw-w-10">
           {rand > 0.5 ? (
             <img
