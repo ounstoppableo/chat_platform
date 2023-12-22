@@ -6,7 +6,7 @@ export default function Counter() {
   const dispatch = useDispatch();
 
   return (
-    <div>
+    <div className="tw-text-hoverColor">
       <div>
         <button
           aria-label="Increment value"

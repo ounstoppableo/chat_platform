@@ -1,16 +1,8 @@
 import ChatInput from '@/components/chatInput/chatInput.tsx';
-import wsContext from '@/context/wsContext';
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
+
 const ChatSpace = ({ inputMaskFlag }: any) => {
-  const ws = useContext(wsContext);
-  useEffect(() => {
-    const listener = (e: any) => {
-      console.log(e);
-    };
-    ws.addListener(listener);
-    return () => ws.removeListener(listener);
-  }, []);
   const chatSpaceRef = useRef<any>(null);
   const a = [];
   for (let i = 0; i < 100; i++) {

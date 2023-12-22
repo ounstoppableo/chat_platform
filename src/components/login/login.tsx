@@ -11,8 +11,10 @@ import {
 import { Button, Input, message } from 'antd';
 import { useContext, useRef, useState } from 'react';
 import sha256 from 'crypto-js/sha256';
+import wsContext from '@/context/wsContext';
 
 const Login = (props: any) => {
+  const ws = useContext(wsContext);
   const { closeMask, show } = props;
   const [loginMethod, setLoginMethod] = useState<'username' | 'wechat'>(
     'username'
@@ -55,6 +57,10 @@ const Login = (props: any) => {
             message.success('登录成功');
             loginControl.closeLoginForm();
             closeMask();
+            ws.send({
+              type: 'login',
+              data: res.token
+            });
           } else {
             loginAntiMulClick.current = false;
           }

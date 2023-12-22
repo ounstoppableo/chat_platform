@@ -6,15 +6,15 @@ import '@/index.scss';
 import '@/theme.scss';
 import store from '@/redux/store';
 import { Provider } from 'react-redux';
-import webSocketService from './ws/ws';
+import WebSocketService from './utils/ws';
 import wsContext from './context/wsContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <wsContext.Provider value={webSocketService}>
-      <Provider store={store}>
+    <Provider store={store}>
+      <wsContext.Provider value={new WebSocketService()}>
         <App />
-      </Provider>
-    </wsContext.Provider>
+      </wsContext.Provider>
+    </Provider>
   </React.StrictMode>
 );

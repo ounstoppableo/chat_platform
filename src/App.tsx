@@ -10,7 +10,11 @@ const router = createBrowserRouter(routes);
 function App() {
   const ws = useContext(wsContext);
   useEffect(() => {
-    ws.connect(`wss://${location.host}/local/chat`);
+    ws.connect(
+      `wss://${location.host}/local/chat?token=${
+        localStorage.getItem('token') || ''
+      }`
+    );
     return () => ws.close();
   }, []);
   return (

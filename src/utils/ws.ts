@@ -1,3 +1,9 @@
+import { wsSendType } from '@/type/wsSend.type';
+
+type msgType = {
+  type: 'getUserInfo' | 'getGroups';
+  data: any;
+};
 class WebSocketService {
   socket: any;
   listeners: Set<any>;
@@ -12,7 +18,10 @@ class WebSocketService {
       console.log('WebSocket connection opened.');
     };
 
-    this.socket.onmessage = (e: any) => {
+    this.socket.onmessage = (e: msgType) => {
+      if (e.type === 'getUserInfo') {
+        localStorage.setItem('userInfo', e.data);
+      }
       this.listeners.forEach((listener) => listener(JSON.parse(e.data)));
     };
 
@@ -24,9 +33,12 @@ class WebSocketService {
     };
   }
 
-  send(message: any) {
+  //发送消息，并添加连接检测轮询
+  send(message: wsSendType) {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      setTimeout(() => this.send(message), 500);
     } else {
       console.error('WebSocket not open. Message not sent.');
     }
@@ -45,5 +57,4 @@ class WebSocketService {
   }
 }
 
-const webSocketService = new WebSocketService();
-export default webSocketService;
+export default WebSocketService;
