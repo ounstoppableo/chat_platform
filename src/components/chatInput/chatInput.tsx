@@ -8,13 +8,15 @@ import {
   RocketTwoTone,
   SmileOutlined
 } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Input, UploadProps, message, Upload } from 'antd';
 import emoji from 'emojilib';
 import styles from './chatInput.module.scss';
 import { RcFile } from 'antd/es/upload';
+import wsContext from '@/context/wsContext';
 
 const ChatInput = () => {
+  const ws = useContext(wsContext);
   const [msgFlag, setMsgFlag] = useState(false);
   const [emjFlag, setEmjFlag] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -55,7 +57,7 @@ const ChatInput = () => {
     if (i === 209) break;
   }
 
-  //图片上传的回调
+  //图片上传的配置
   const selectPicProps: UploadProps = {
     name: 'selectPictures',
     action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
@@ -75,7 +77,7 @@ const ChatInput = () => {
     onChange: () => {}
   };
 
-  //上传文件的回调
+  //上传文件的配置
   const selectFolderProps: UploadProps = {
     name: 'selectFolder',
     action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
@@ -88,6 +90,12 @@ const ChatInput = () => {
       return isLt2M;
     },
     onChange: () => {}
+  };
+
+  //发送消息的回调
+  const sendMsg = () => {
+    const message = { type: 'chat', content: 'Hello, WebSocket!' };
+    ws.send(JSON.stringify(message));
   };
 
   //添加全局点击事件
@@ -147,10 +155,12 @@ const ChatInput = () => {
       </Upload>
       <div className="tw-ml-3 tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg">
         {inputValue.length > 0 ? (
-          <RocketTwoTone
-            className={styles.rotateAnimation}
-            style={{ fontSize: '25px', cursor: 'pointer' }}
-          />
+          <div onClick={sendMsg}>
+            <RocketTwoTone
+              className={styles.rotateAnimation}
+              style={{ fontSize: '25px', cursor: 'pointer' }}
+            />
+          </div>
         ) : (
           <RocketOutlined
             rotate={45}

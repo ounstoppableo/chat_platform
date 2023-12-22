@@ -1,10 +1,14 @@
 const ChatRelation = () => {
-  return (
-    <div className="tw-flex tw-flex-col tw-gap-3">
-      <div className="tw-h-16 tw-rounded-lg tw-bg-chatRelationActive tw-flex tw-p-3 tw-gap-3 tw-items-center">
+  const arr = [];
+  for (let i = 0; i < 10; i++) {
+    arr.push(
+      <div
+        key={i}
+        className="tw-h-16 tw-rounded-lg tw-bg-chatRelationActive tw-flex tw-p-3 tw-gap-3 tw-items-center"
+      >
         <div className="tw-w-10 tw-h-10 tw-rounded-full tw-overflow-hidden">
           <img
-            src="http://8.130.54.105/assets/avatar.jpeg"
+            src="/src/assets/avatar.jpeg"
             alt=""
             className="tw-w-full tw-h-full tw-object-contain"
           />
@@ -19,7 +23,8 @@ const ChatRelation = () => {
           12月04日
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  return <div className="tw-flex tw-flex-col tw-gap-3">{arr}</div>;
 };
 export default ChatRelation;

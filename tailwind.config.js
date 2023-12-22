@@ -14,7 +14,14 @@ export default {
         chatSpaceFooter: '#424654',
         onlineGreen: '#adff2f',
         messageBackground: '#383c4b',
-        chatInputActive: '#353845'
+        chatInputActive: '#353845',
+        loginMask: 'rgba(0,0,0,0.4)',
+        loginForm: '#141414',
+        whiteTextColor: '#cfd3dc',
+        greenTextColor: '#2aae67'
+      },
+      backdropBlur: {
+        xs: '2px'
       },
       backgroundImage: {
         temple: "url('@/assets/background.jpeg')"

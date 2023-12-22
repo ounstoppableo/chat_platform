@@ -31,5 +31,26 @@ export default defineConfig({
     postcss: {
       plugins: [tailwindcss, autoprefixer]
     }
+  },
+  server: {
+    https: {
+      key: './cert/server.key',
+      cert: './cert/server.crt'
+    },
+    proxy: {
+      '/local/': {
+        secure: false,
+        target: 'wss://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/local\//, '/'),
+        ws: true
+      },
+      '/api': {
+        secure: false,
+        target: 'https://localhost:3000/user',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/')
+      }
+    }
   }
 });

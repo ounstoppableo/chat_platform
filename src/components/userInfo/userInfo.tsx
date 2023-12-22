@@ -15,7 +15,7 @@ const UserInfo = () => {
       <div className="tw-flex tw-flex-col tw-gap-3 tw-items-center">
         <img
           className="tw-w-14 tw-h-14 tw-rounded-full tw-object-cover tw-object-center"
-          src="http://8.130.54.105/assets/avatar.jpeg"
+          src="/src/assets/avatar.jpeg"
         />
         <div className="tw-bg-lightGray tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointer tw-text-white hover:tw-text-hoverColor">
           <MessageOutlined style={{ fontSize: 25 + 'px' }} />

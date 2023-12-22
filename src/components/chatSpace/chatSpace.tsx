@@ -1,6 +1,16 @@
 import ChatInput from '@/components/chatInput/chatInput.tsx';
-import { useEffect, useRef } from 'react';
-const ChatSpace = () => {
+import wsContext from '@/context/wsContext';
+import { useContext, useEffect, useRef } from 'react';
+import InputMask from '../InputMask/InputMask.tsx';
+const ChatSpace = ({ inputMaskFlag }: any) => {
+  const ws = useContext(wsContext);
+  useEffect(() => {
+    const listener = (e: any) => {
+      console.log(e);
+    };
+    ws.addListener(listener);
+    return () => ws.removeListener(listener);
+  }, []);
   const chatSpaceRef = useRef<any>(null);
   const a = [];
   for (let i = 0; i < 100; i++) {
@@ -10,7 +20,7 @@ const ChatSpace = () => {
         <div className="tw-w-10">
           {rand > 0.5 ? (
             <img
-              src="http://8.130.54.105/assets/avatar.jpeg"
+              src="/src/assets/avatar.jpeg"
               alt=""
               className="tw-w-10 tw-rounded-full tw-object-contain"
             />
@@ -39,7 +49,7 @@ const ChatSpace = () => {
         <div className="tw-w-10">
           {rand < 0.5 ? (
             <img
-              src="http://8.130.54.105/assets/avatar.jpeg"
+              src="/src/assets/avatar.jpeg"
               alt=""
               className="tw-w-10 tw-rounded-full tw-object-contain"
             />
@@ -65,8 +75,9 @@ const ChatSpace = () => {
       >
         {a}
       </div>
-      <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
+      <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg tw-overflow-hidden">
         <ChatInput></ChatInput>
+        <InputMask inputMaskFlag={inputMaskFlag}></InputMask>
       </div>
     </div>
   );

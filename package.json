@@ -14,7 +14,9 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@reduxjs/toolkit": "^1.9.7",
+    "@types/crypto-js": "^4.2.1",
     "antd": "^5.12.1",
+    "crypto-js": "^4.2.0",
     "emojilib": "^3.0.11",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",

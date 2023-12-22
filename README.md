@@ -911,11 +911,33 @@ max-width: 100%;
   //因为我们的逻辑还没执行，所以清理函数的callback是上次的callback
   ~~~
 
+##### ws升级为wss后连接不上的问题
+
+ws升级成wss后，客户端连接不上，需要解决以下几个问题：
+
+- 本地服务也需要换成https
+
+- proxy中需要这样配置
+
+  ~~~js
+      proxy: {
+          //必须要/local/这样写
+        '/local/': {
+            //必须添加
+          secure: false,
+            //基本设置
+          target: 'wss://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/local\//, ''),
+          ws: true
+        }
+  ~~~
+
 #### 待做事项
 
 - [x] 静态页面搭建
 
-- [ ] 发表情操作
+- [x] 发表情操作
 - [ ] 发图片操作
 - [ ] 发文件操作
 - [ ] 用户、消息懒加载
@@ -924,5 +946,5 @@ max-width: 100%;
 
 明日:
 
-- [ ] 聊天上传后端逻辑、redius
+- [ ] 聊天上传后端逻辑、redis
 

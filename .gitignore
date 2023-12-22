@@ -23,4 +23,5 @@ pnpm-lock.yaml
 *.sln
 *.sw?
 
+**/cert
 coverage

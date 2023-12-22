@@ -11,6 +11,7 @@ const initConfig = (config?: requestConfig) => {
     config.headers.append('Authorization', getToken() || '');
     if (config.method === 'POST' || config.method === 'PUT') {
       config.headers.append('Content-Type', 'application/json; charset=utf-8');
+      if (config.body) config.body = JSON.stringify(config.body);
     }
     return config;
   } else {
@@ -43,7 +44,7 @@ const judgeOkState = async (res: any) => {
   const cloneRes = await res.clone().json();
   //TODO:可以在这里管控全局请求
   if (!!cloneRes.code && cloneRes.code !== 200) {
-    message.error(`11${cloneRes.msg}${cloneRes.code}`);
+    message.error(`${cloneRes.msg}`);
   }
   return cloneRes;
 };

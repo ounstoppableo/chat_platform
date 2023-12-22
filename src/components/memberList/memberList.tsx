@@ -12,7 +12,7 @@ const MemberList = () => {
                   "
         >
           <img
-            src="http://8.130.54.105/assets/avatar.jpeg"
+            src="/src/assets/avatar.jpeg"
             alt=""
             className="tw-object-contain tw-rounded-full"
           />
@@ -34,7 +34,7 @@ const MemberList = () => {
                       "
           >
             <img
-              src="http://8.130.54.105/assets/avatar.jpeg"
+              src="/src/assets/avatar.jpeg"
               alt=""
               className="tw-object-contain tw-rounded-full"
             />
