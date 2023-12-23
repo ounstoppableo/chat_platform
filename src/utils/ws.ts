@@ -1,9 +1,3 @@
-import { wsSendType } from '@/type/wsSend.type';
-
-type msgType = {
-  type: 'getUserInfo' | 'getGroups';
-  data: any;
-};
 class WebSocketService {
   socket: any;
   listeners: Set<any>;
@@ -18,7 +12,7 @@ class WebSocketService {
       console.log('WebSocket connection opened.');
     };
 
-    this.socket.onmessage = (e: msgType) => {
+    this.socket.onmessage = (e: any) => {
       if (e.type === 'getUserInfo') {
         localStorage.setItem('userInfo', e.data);
       }
@@ -34,7 +28,7 @@ class WebSocketService {
   }
 
   //发送消息，并添加连接检测轮询
-  send(message: wsSendType) {
+  send(message: any) {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
     } else if (this.socket.readyState === WebSocket.CONNECTING) {

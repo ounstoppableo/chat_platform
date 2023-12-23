@@ -4,19 +4,29 @@ import ChatSpace from '@/components/chatSpace/chatSpace.tsx';
 import MemberList from '@/components/memberList/memberList.tsx';
 import loginFlagContext from '@/context/loginFlagContext';
 import Login from '@/components/login/login.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { userConfirm } from '@/service/login/login';
+import { useDispatch } from 'react-redux';
+import { setGroups, setUserInfo } from '@/redux/userInfo/userInfo';
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
-  const [inputMaskFlag, setInputMaskFlag] = useState(true);
-  const closeInputMaskFlag = () => {
-    setInputMaskFlag(false);
-  };
+  const dispatch = useDispatch();
   const showLoginForm = () => {
     setLoginFlag(true);
   };
   const closeLoginForm = () => {
     setLoginFlag(false);
   };
+  const loginConfirm = async () => {
+    const res = await userConfirm();
+    if (res.code === 200) {
+      dispatch(setUserInfo(res.data));
+      dispatch(setGroups(res.data.groups));
+    }
+  };
+  useEffect(() => {
+    loginConfirm();
+  }, []);
   return (
     <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
       <div
@@ -32,13 +42,13 @@ const Layout = () => {
             <ChatRelation />
           </div>
           <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
-            <ChatSpace inputMaskFlag={inputMaskFlag} />
+            <ChatSpace />
           </div>
           <div className="tw-w-48">
             <MemberList />
           </div>
         </div>
-        <Login show={loginFlag} closeMask={closeInputMaskFlag}></Login>
+        <Login show={loginFlag}></Login>
       </div>
     </loginFlagContext.Provider>
   );

@@ -1,5 +1,5 @@
 import loginFlagContext from '@/context/loginFlagContext';
-import { userLogin } from '@/service/login/login';
+import { userConfirm, userLogin } from '@/service/login/login';
 import {
   CloseOutlined,
   EyeInvisibleOutlined,
@@ -11,14 +11,25 @@ import {
 import { Button, Input, message } from 'antd';
 import { useContext, useRef, useState } from 'react';
 import sha256 from 'crypto-js/sha256';
-import wsContext from '@/context/wsContext';
+import { useDispatch } from 'react-redux';
+import {
+  setGroups,
+  setUserInfo as getUserInfo
+} from '@/redux/userInfo/userInfo';
 
 const Login = (props: any) => {
-  const ws = useContext(wsContext);
-  const { closeMask, show } = props;
+  const { show } = props;
   const [loginMethod, setLoginMethod] = useState<'username' | 'wechat'>(
     'username'
   );
+  const dispatch = useDispatch();
+  const loginCf = async () => {
+    const res = await userConfirm();
+    if (res.code === 200) {
+      dispatch(getUserInfo(res.data));
+      dispatch(setGroups(res.data.groups));
+    }
+  };
   const loginAntiMulClick = useRef(false);
 
   const [userInfo, setUserInfo] = useState<{
@@ -56,11 +67,7 @@ const Login = (props: any) => {
             localStorage.setItem('token', res.token);
             message.success('登录成功');
             loginControl.closeLoginForm();
-            closeMask();
-            ws.send({
-              type: 'login',
-              data: res.token
-            });
+            loginCf();
           } else {
             loginAntiMulClick.current = false;
           }

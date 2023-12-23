@@ -13,10 +13,13 @@ import { Input, UploadProps, message, Upload } from 'antd';
 import emoji from 'emojilib';
 import styles from './chatInput.module.scss';
 import { RcFile } from 'antd/es/upload';
-import wsContext from '@/context/wsContext';
+import { useSelector } from 'react-redux';
+import { UserInfo } from '@/redux/userInfo/userInfo.type';
+import loginFlagContext from '@/context/loginFlagContext';
 
 const ChatInput = () => {
-  const ws = useContext(wsContext);
+  const loginControl = useContext(loginFlagContext);
+  const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
   const [msgFlag, setMsgFlag] = useState(false);
   const [emjFlag, setEmjFlag] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -94,8 +97,8 @@ const ChatInput = () => {
 
   //发送消息的回调
   const sendMsg = () => {
-    const message = { type: 'chat', content: 'Hello, WebSocket!' };
-    ws.send(JSON.stringify(message));
+    if (!userInfo.isLogin) loginControl.showLoginForm();
+    // const message = { type: 'chat', content: 'Hello, WebSocket!' };
   };
 
   //添加全局点击事件
@@ -128,6 +131,7 @@ const ChatInput = () => {
           value={inputValue}
           placeholder="来聊点什么吧~"
           onChange={inputChange}
+          disabled={!userInfo.isLogin}
         />
       </div>
       <div
@@ -143,12 +147,12 @@ const ChatInput = () => {
       >
         @
       </div>
-      <Upload {...selectPicProps}>
+      <Upload {...selectPicProps} disabled={!userInfo.isLogin}>
         <div className="tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
           <PictureOutlined />
         </div>
       </Upload>
-      <Upload {...selectFolderProps}>
+      <Upload {...selectFolderProps} disabled={!userInfo.isLogin}>
         <div className="tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
           <FolderOutlined />
         </div>
@@ -196,7 +200,7 @@ const ChatInput = () => {
           </div>
         </div>
       ) : (
-        ''
+        <></>
       )}
     </>
   );

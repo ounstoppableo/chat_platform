@@ -2,7 +2,7 @@ import ChatInput from '@/components/chatInput/chatInput.tsx';
 import { useEffect, useRef } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
 
-const ChatSpace = ({ inputMaskFlag }: any) => {
+const ChatSpace = () => {
   const chatSpaceRef = useRef<any>(null);
   const a = [];
   for (let i = 0; i < 100; i++) {
@@ -67,9 +67,9 @@ const ChatSpace = ({ inputMaskFlag }: any) => {
       >
         {a}
       </div>
-      <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg tw-overflow-hidden">
+      <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
         <ChatInput></ChatInput>
-        <InputMask inputMaskFlag={inputMaskFlag}></InputMask>
+        <InputMask></InputMask>
       </div>
     </div>
   );

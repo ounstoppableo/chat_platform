@@ -1,24 +1,7 @@
-import wsContext from '@/context/wsContext';
-import { setGroups } from '@/redux/userInfo/userInfo';
-import { useContext, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const ChatRelation = () => {
-  const ws = useContext(wsContext);
   const groups = useSelector((state: any) => state.userInfo.groups);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const listener = (e: any) => {
-      if (e.type === 'getGroups') {
-        console.log(e.data);
-        dispatch(setGroups(e.data));
-      } else if (e.type === 'getGroupErr') {
-        dispatch(setGroups([]));
-      }
-    };
-    ws.addListener(listener);
-    return () => ws.removeListener(listener);
-  }, []);
   const arr: any[] = [];
   groups.forEach((item: any) => {
     arr.push(

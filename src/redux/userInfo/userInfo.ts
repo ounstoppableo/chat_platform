@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserInfo } from './userInfo.type';
+import { Group, UserInfo } from './userInfo.type';
 export const userInfoSlice = createSlice({
   name: 'userInfo',
   initialState: {
     data: {} as UserInfo,
-    groups: []
+    groups: [] as Group[]
   },
   reducers: {
     setUserInfo: (state, crruent) => {

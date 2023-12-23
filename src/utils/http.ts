@@ -2,13 +2,15 @@ import getToken from './getToken';
 import { message } from 'antd';
 const initConfig = (config?: requestConfig) => {
   const headers = new Headers();
+  //添加token
+  headers.append('Authorization', getToken());
   if (config) {
     config.method = config.method || 'GET';
-    config.headers = config.headers || headers;
+    config.headers = config.headers
+      ? Object.assign(config.headers, headers)
+      : headers;
     config.mode = config.mode || 'cors';
     config.credentials = config.credentials || 'include';
-    //添加token
-    config.headers.append('Authorization', getToken() || '');
     if (config.method === 'POST' || config.method === 'PUT') {
       config.headers.append('Content-Type', 'application/json; charset=utf-8');
       if (config.body) config.body = JSON.stringify(config.body);

@@ -1,3 +1,9 @@
 import { createContext } from 'react';
-const loginFlagContext = createContext<any>({});
+type LoginFlagContext = {
+  showLoginForm: () => void;
+  closeLoginForm: () => void;
+};
+const loginFlagContext = createContext<LoginFlagContext>(
+  {} as LoginFlagContext
+);
 export default loginFlagContext;

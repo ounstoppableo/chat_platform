@@ -10,3 +10,6 @@ export const userLogin = (userInfo: userInfo) => {
     body: userInfo
   });
 };
+export const userConfirm = () => {
+  return http('/api/userConfirm');
+};

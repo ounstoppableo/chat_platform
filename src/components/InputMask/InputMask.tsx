@@ -1,13 +1,16 @@
 import loginFlagContext from '@/context/loginFlagContext';
+import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import { LockOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
+import { useSelector } from 'react-redux';
 
-const InputMask = ({ inputMaskFlag }: any) => {
+const InputMask = () => {
   const loginControl = useContext(loginFlagContext);
+  const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
 
   return (
     <>
-      {inputMaskFlag ? (
+      {!userInfo.isLogin ? (
         <div className="tw-rounded-lg tw-absolute tw-inset-0 tw-backdrop-blur-xs tw-text-base tw-flex tw-justify-center tw-items-center">
           <span
             className="tw-cursor-pointer"

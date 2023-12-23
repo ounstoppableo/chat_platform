@@ -1,6 +1,15 @@
 export interface UserInfo {
   avatar: string;
-  groupIds: string[];
-  relationship: string[];
-  isOnline: boolean;
+  uid: string;
+  username: string;
+  isLogin: boolean;
+}
+
+export interface Group {
+  groupName: string;
+  groupId: string;
+  username: string;
+  gavatar: string;
+  lastMsg: string;
+  date: Date;
 }
