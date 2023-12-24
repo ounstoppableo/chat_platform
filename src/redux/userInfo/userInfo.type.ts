@@ -2,7 +2,8 @@ export interface UserInfo {
   avatar: string;
   uid: string;
   username: string;
-  isLogin: boolean;
+  isLogin?: boolean;
+  isOnline?: boolean;
 }
 
 export interface Group {

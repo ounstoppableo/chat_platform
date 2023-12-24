@@ -18,7 +18,8 @@ export default {
         loginMask: 'rgba(0,0,0,0.4)',
         loginForm: '#141414',
         whiteTextColor: '#cfd3dc',
-        greenTextColor: '#2aae67'
+        greenTextColor: '#2aae67',
+        unOnline: '#dfdfdf'
       },
       backdropBlur: {
         xs: '2px'

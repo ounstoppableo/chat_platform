@@ -16,8 +16,12 @@ import { RcFile } from 'antd/es/upload';
 import { useSelector } from 'react-redux';
 import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import loginFlagContext from '@/context/loginFlagContext';
+import socketContext from '@/context/socketContext';
+import dayjs from 'dayjs';
 
-const ChatInput = () => {
+const ChatInput = (props: any) => {
+  const { selectedGroup } = props;
+  const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
   const [msgFlag, setMsgFlag] = useState(false);
@@ -98,7 +102,11 @@ const ChatInput = () => {
   //发送消息的回调
   const sendMsg = () => {
     if (!userInfo.isLogin) loginControl.showLoginForm();
-    // const message = { type: 'chat', content: 'Hello, WebSocket!' };
+    socket.current.emit('msgToServer', {
+      room: selectedGroup.groupId,
+      msg: inputValue,
+      time: dayjs(new Date()).format('YYYY年MM月DD日 HH:mm:ss')
+    });
   };
 
   //添加全局点击事件

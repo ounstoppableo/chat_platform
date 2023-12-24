@@ -1,5 +1,5 @@
 import loginFlagContext from '@/context/loginFlagContext';
-import { userConfirm, userLogin } from '@/service/login/login';
+import { userConfirm, userLogin } from '@/service/login';
 import {
   CloseOutlined,
   EyeInvisibleOutlined,
@@ -12,10 +12,13 @@ import { Button, Input, message } from 'antd';
 import { useContext, useRef, useState } from 'react';
 import sha256 from 'crypto-js/sha256';
 import { useDispatch } from 'react-redux';
+
 import {
   setGroups,
   setUserInfo as getUserInfo
 } from '@/redux/userInfo/userInfo';
+import { io } from 'socket.io-client';
+import getToken from '@/utils/getToken';
 
 const Login = (props: any) => {
   const { show } = props;
@@ -28,6 +31,14 @@ const Login = (props: any) => {
     if (res.code === 200) {
       dispatch(getUserInfo(res.data));
       dispatch(setGroups(res.data.groups));
+      const socket = io('https://localhost:3000', {
+        auth: {
+          token: getToken()
+        }
+      });
+      socket.on('connect', () => {
+        console.log(socket.id);
+      });
     }
   };
   const loginAntiMulClick = useRef(false);

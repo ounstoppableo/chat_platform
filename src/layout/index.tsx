@@ -4,13 +4,28 @@ import ChatSpace from '@/components/chatSpace/chatSpace.tsx';
 import MemberList from '@/components/memberList/memberList.tsx';
 import loginFlagContext from '@/context/loginFlagContext';
 import Login from '@/components/login/login.tsx';
-import { useEffect, useState } from 'react';
-import { userConfirm } from '@/service/login/login';
+import { useEffect, useRef, useState } from 'react';
+import { userConfirm } from '@/service/login';
 import { useDispatch } from 'react-redux';
-import { setGroups, setUserInfo } from '@/redux/userInfo/userInfo';
+import { setGroups, setMsg, setUserInfo } from '@/redux/userInfo/userInfo';
+import { io } from 'socket.io-client';
+import getToken from '@/utils/getToken';
+import socketContext from '@/context/socketContext';
+import { Group } from '@/redux/userInfo/userInfo.type';
+import { message } from 'antd';
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<
+    Pick<Group, 'groupName' | 'groupId'>
+  >({
+    groupName: '全员总群',
+    groupId: '1'
+  });
+  const socket = useRef<any>(null);
   const dispatch = useDispatch();
+  const switchGroup = (groupInfo: Pick<Group, 'groupName' | 'groupId'>) => {
+    setSelectedGroup(groupInfo);
+  };
   const showLoginForm = () => {
     setLoginFlag(true);
   };
@@ -20,37 +35,57 @@ const Layout = () => {
   const loginConfirm = async () => {
     const res = await userConfirm();
     if (res.code === 200) {
-      dispatch(setUserInfo(res.data));
-      dispatch(setGroups(res.data.groups));
+      socket.current = io('https://localhost:3000', {
+        auth: {
+          token: getToken()
+        }
+      });
+      socket.current.on('connect', () => {
+        dispatch(setUserInfo(res.data));
+        dispatch(setGroups(res.data.groups));
+        socket.current.emit('joinRoom', res.data.groups);
+      });
+      socket.current.on('toRoomClient', (msg: any) => {
+        dispatch(setMsg(msg));
+      });
+      socket.current.on('error', (err: any) => {
+        console.log(err);
+        message.error('与服务器连接失败');
+      });
     }
   };
   useEffect(() => {
     loginConfirm();
   }, []);
   return (
-    <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
-      <div
-        className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
-      >
+    <socketContext.Provider value={socket}>
+      <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
         <div
-          className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+          className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
         >
-          <div className="tw-w-14">
-            <UserInfo />
+          <div
+            className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+          >
+            <div className="tw-w-14">
+              <UserInfo />
+            </div>
+            <div className="tw-w-64 tw-overflow-auto tw-pr-2">
+              <ChatRelation
+                selectedGroup={selectedGroup}
+                switchGroup={switchGroup}
+              />
+            </div>
+            <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
+              <ChatSpace selectedGroup={selectedGroup} />
+            </div>
+            <div className="tw-w-48">
+              <MemberList selectedGroup={selectedGroup} />
+            </div>
           </div>
-          <div className="tw-w-64 tw-overflow-auto tw-pr-2">
-            <ChatRelation />
-          </div>
-          <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
-            <ChatSpace />
-          </div>
-          <div className="tw-w-48">
-            <MemberList />
-          </div>
+          <Login show={loginFlag}></Login>
         </div>
-        <Login show={loginFlag}></Login>
-      </div>
-    </loginFlagContext.Provider>
+      </loginFlagContext.Provider>
+    </socketContext.Provider>
   );
 };
 export default Layout;

@@ -3,7 +3,7 @@ import { message } from 'antd';
 const initConfig = (config?: requestConfig) => {
   const headers = new Headers();
   //添加token
-  headers.append('Authorization', getToken());
+  getToken() ? headers.append('Authorization', getToken()) : null;
   if (config) {
     config.method = config.method || 'GET';
     config.headers = config.headers
@@ -46,6 +46,7 @@ const judgeOkState = async (res: any) => {
   const cloneRes = await res.clone().json();
   //TODO:可以在这里管控全局请求
   if (!!cloneRes.code && cloneRes.code !== 200) {
+    if (cloneRes.code === 403) localStorage.removeItem('token');
     message.error(`${cloneRes.msg}`);
   }
   return cloneRes;
