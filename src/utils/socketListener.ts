@@ -7,12 +7,13 @@ import {
   setUserStatus
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
+import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
 import { message } from 'antd';
 import { Dispatch } from 'react';
 import { Socket } from 'socket.io-client';
 
 const socketListener = (
-  socket: Socket,
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>,
   dispatch: Dispatch<any>,
   userData: any
 ) => {
@@ -31,12 +32,9 @@ const socketListener = (
   });
 
   //某个用户状态改变
-  socket.on(
-    'someoneStatusChange',
-    (msg: { username: string; isOnline: boolean }) => {
-      dispatch(setUserStatus(msg));
-    }
-  );
+  socket.on('someoneStatusChange', (msg) => {
+    dispatch(setUserStatus(msg));
+  });
   socket.on('error', (err: any) => {
     console.log(err);
     message.error('与服务器连接失败');

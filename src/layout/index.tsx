@@ -7,11 +7,13 @@ import Login from '@/components/login/login.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { userConfirm } from '@/service/login';
 import { useDispatch } from 'react-redux';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
 import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
+import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
+
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<
@@ -20,7 +22,9 @@ const Layout = () => {
     groupName: '全员总群',
     groupId: '1'
   });
-  const socket = useRef<any>(null);
+  const socket = useRef<Socket<ServerToClientEvents, ClientToServerEvents>>(
+    {} as Socket<ServerToClientEvents, ClientToServerEvents>
+  );
   const dispatch = useDispatch();
   const switchGroup = (groupInfo: Pick<Group, 'groupName' | 'groupId'>) => {
     setSelectedGroup(groupInfo);
