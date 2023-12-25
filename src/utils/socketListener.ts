@@ -1,7 +1,7 @@
 import {
   setGroups,
   setHadNewMsg,
-  setMsg,
+  setNewMsg,
   setNewGroupMsg,
   setUserInfo,
   setUserStatus
@@ -25,7 +25,7 @@ const socketListener = (
 
   //接收到消息
   socket.on('toRoomClient', (msg: Msg) => {
-    dispatch(setMsg(msg));
+    dispatch(setNewMsg(msg));
     dispatch(setNewGroupMsg(msg));
     dispatch(setHadNewMsg({ groupId: msg.room, hadNewMsg: true }));
   });

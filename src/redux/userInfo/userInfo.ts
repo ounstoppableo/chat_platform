@@ -5,7 +5,8 @@ export const userInfoSlice = createSlice({
   initialState: {
     data: {} as UserInfo,
     groups: [] as Group[],
-    msg: {} as AllMsg,
+    newMsg: {} as AllMsg,
+    historyMsg: {} as AllMsg,
     groupMember: [] as UserInfo[]
   },
   reducers: {
@@ -15,20 +16,20 @@ export const userInfoSlice = createSlice({
     setGroups: (state, action) => {
       state.groups = action.payload;
     },
-    setMsg: (
+    setNewMsg: (
       state,
       action: { payload: Msg & { reset?: boolean; room?: string } }
     ) => {
       if (action.payload.reset) {
-        state.msg = {
-          ...state.msg,
+        state.newMsg = {
+          ...state.newMsg,
           [action.payload.room]: []
         };
       } else {
-        const msgStack = state.msg[action.payload.room] || [];
+        const msgStack = state.newMsg[action.payload.room] || [];
         msgStack.push(action.payload);
-        state.msg = {
-          ...state.msg,
+        state.newMsg = {
+          ...state.newMsg,
           [action.payload.room]: msgStack
         };
       }
@@ -63,6 +64,17 @@ export const userInfoSlice = createSlice({
           item.isOnline = action.payload.isOnline;
         }
       });
+    },
+    setHistoryMessage: (
+      state,
+      action: { payload: { msgs: Msg[]; groupId: string } }
+    ) => {
+      state.historyMsg[action.payload.groupId]
+        ? (state.historyMsg[action.payload.groupId] = [
+            ...state.historyMsg[action.payload.groupId],
+            ...action.payload.msgs
+          ])
+        : (state.historyMsg[action.payload.groupId] = [...action.payload.msgs]);
     }
   }
 });
@@ -70,11 +82,12 @@ export const userInfoSlice = createSlice({
 export const {
   setUserInfo,
   setGroups,
-  setMsg,
+  setNewMsg,
   setNewGroupMsg,
   setHadNewMsg,
   setUserStatus,
-  setGroupMember
+  setGroupMember,
+  setHistoryMessage
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;
