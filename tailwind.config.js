@@ -4,6 +4,16 @@ export default {
   content: ['./index.html', './src/**/*.{html,js,tsx,jsx}'],
   theme: {
     extend: {
+      keyframes: {
+        hadMsg: {
+          '0%': { backgroundColor: 'rgba(255,158,2,0.5)' },
+          '50%': { backgroundColor: 'rgba(255,158,2,0.1)' },
+          '100%': { backgroundColor: 'rgba(255,158,2,0.5)' }
+        }
+      },
+      animation: {
+        hadMsg: 'hadMsg 2s ease-in-out infinite'
+      },
       colors: {
         lightGray: '#323644',
         deepGray: '#272a37',

@@ -19,8 +19,11 @@ import {
 } from '@/redux/userInfo/userInfo';
 import { io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
+import socketContext from '@/context/socketContext';
+import socketListener from '@/utils/socketListener';
 
 const Login = (props: any) => {
+  const socket = useContext(socketContext);
   const { show } = props;
   const [loginMethod, setLoginMethod] = useState<'username' | 'wechat'>(
     'username'
@@ -31,14 +34,12 @@ const Login = (props: any) => {
     if (res.code === 200) {
       dispatch(getUserInfo(res.data));
       dispatch(setGroups(res.data.groups));
-      const socket = io('https://localhost:3000', {
+      socket.current = io('https://localhost:3000', {
         auth: {
           token: getToken()
         }
       });
-      socket.on('connect', () => {
-        console.log(socket.id);
-      });
+      socketListener(socket.current, dispatch, res.data);
     }
   };
   const loginAntiMulClick = useRef(false);

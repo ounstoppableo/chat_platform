@@ -7,12 +7,11 @@ import Login from '@/components/login/login.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { userConfirm } from '@/service/login';
 import { useDispatch } from 'react-redux';
-import { setGroups, setMsg, setUserInfo } from '@/redux/userInfo/userInfo';
 import { io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
 import { Group } from '@/redux/userInfo/userInfo.type';
-import { message } from 'antd';
+import socketListener from '@/utils/socketListener';
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<
@@ -40,22 +39,14 @@ const Layout = () => {
           token: getToken()
         }
       });
-      socket.current.on('connect', () => {
-        dispatch(setUserInfo(res.data));
-        dispatch(setGroups(res.data.groups));
-        socket.current.emit('joinRoom', res.data.groups);
-      });
-      socket.current.on('toRoomClient', (msg: any) => {
-        dispatch(setMsg(msg));
-      });
-      socket.current.on('error', (err: any) => {
-        console.log(err);
-        message.error('与服务器连接失败');
-      });
+      socketListener(socket.current, dispatch, res.data);
     }
   };
   useEffect(() => {
     loginConfirm();
+    return () => {
+      socket.current ? socket.current.close() : null;
+    };
   }, []);
   return (
     <socketContext.Provider value={socket}>

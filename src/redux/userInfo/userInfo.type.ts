@@ -13,4 +13,15 @@ export interface Group {
   gavatar: string;
   lastMsg: string;
   date: Date;
+  hadNewMsg: boolean;
 }
+export type AllMsg = {
+  [key: string]: Msg[];
+};
+export type Msg = {
+  avatar: string;
+  username: string;
+  msg: string;
+  time: Date;
+  room: string;
+};

@@ -105,7 +105,8 @@ const ChatInput = (props: any) => {
     socket.current.emit('msgToServer', {
       room: selectedGroup.groupId,
       msg: inputValue,
-      time: dayjs(new Date()).format('YYYY年MM月DD日 HH:mm:ss')
+      time: new Date(),
+      avatar: userInfo.avatar
     });
   };
 

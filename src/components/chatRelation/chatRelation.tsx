@@ -14,7 +14,9 @@ const ChatRelation = (props: any) => {
           selectedGroup.groupId === item.groupId
             ? 'tw-bg-chatRelationActive'
             : 'lightGray'
-        } tw-flex tw-p-3 tw-gap-3 tw-items-center`}
+        } tw-flex tw-p-3 tw-gap-3 tw-items-center tw-cursor-pointer ${
+          item.hadNewMsg ? 'tw-animate-hadMsg' : ''
+        }`}
         onClick={() =>
           switchGroup({ groupId: item.groupId, groupName: item.groupName })
         }

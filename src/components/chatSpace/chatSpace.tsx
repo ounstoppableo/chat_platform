@@ -2,7 +2,7 @@ import ChatInput from '@/components/chatInput/chatInput.tsx';
 import { useEffect, useRef, useState } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMsg } from '@/redux/userInfo/userInfo.ts';
+import { setHadNewMsg, setMsg } from '@/redux/userInfo/userInfo.ts';
 
 const ChatSpace = (props: any) => {
   const msg = useSelector((state: any) => state.userInfo.msg);
@@ -22,7 +22,7 @@ const ChatSpace = (props: any) => {
             <div className="tw-w-10">
               {item.username !== userInfo.username ? (
                 <img
-                  src={'/public' + userInfo.avatar}
+                  src={'/public' + item.avatar}
                   alt=""
                   className="tw-w-10 tw-rounded-full tw-object-contain"
                 />
@@ -55,7 +55,7 @@ const ChatSpace = (props: any) => {
             <div className="tw-w-10">
               {item.username === userInfo.username ? (
                 <img
-                  src={'/public' + userInfo.avatar}
+                  src={'/public' + item.avatar}
                   alt=""
                   className="tw-w-10 tw-rounded-full tw-object-contain"
                 />
@@ -67,9 +67,73 @@ const ChatSpace = (props: any) => {
         );
       });
       dispatch(setMsg({ reset: true, room: selectedGroup.groupId } as any));
+      dispatch(
+        setHadNewMsg({ groupId: selectedGroup.groupId, hadNewMsg: false })
+      );
       setMsgArr([...msgArr, ...arr]);
     }
   }, [msg]);
+  useEffect(() => {
+    setMsgArr([]);
+    if (msg[selectedGroup.groupId] && msg[selectedGroup.groupId].length !== 0) {
+      const arr = [] as any;
+      msg[selectedGroup.groupId].forEach((item: any) => {
+        arr.push(
+          <div className="tw-flex tw-gap-2">
+            <div className="tw-w-10">
+              {item.username !== userInfo.username ? (
+                <img
+                  src={'/public' + item.avatar}
+                  alt=""
+                  className="tw-w-10 tw-rounded-full tw-object-contain"
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden">
+              <div
+                className={`tw-text-textGrayColor tw-text-xs ${
+                  item.username !== userInfo.username ? '' : 'tw-self-end'
+                } tw-flex tw-flex-row${
+                  item.username === userInfo.username ? '' : '-reverse'
+                }`}
+              >
+                <span>{item.username}</span>&nbsp;<span>{`(${'北京'})`}</span>
+              </div>
+              <div
+                className={`tw-bg-messageBackground tw-py-2 tw-px-4 ${
+                  item.username !== userInfo.username ? '' : 'tw-self-end'
+                } tw-w-fit tw-max-w-full tw-break-words tw-rounded-2xl ${
+                  item.username !== userInfo.username
+                    ? 'tw-rounded-tl-none'
+                    : 'tw-rounded-tr-none'
+                }`}
+              >
+                {item.msg}
+              </div>
+            </div>
+            <div className="tw-w-10">
+              {item.username === userInfo.username ? (
+                <img
+                  src={'/public' + item.avatar}
+                  alt=""
+                  className="tw-w-10 tw-rounded-full tw-object-contain"
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+          </div>
+        );
+      });
+      dispatch(setMsg({ reset: true, room: selectedGroup.groupId } as any));
+      dispatch(
+        setHadNewMsg({ groupId: selectedGroup.groupId, hadNewMsg: false })
+      );
+      setMsgArr([...msgArr, ...arr]);
+    }
+  }, [selectedGroup]);
   //聊天空间默认卷到底部
   useEffect(() => {
     chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight;

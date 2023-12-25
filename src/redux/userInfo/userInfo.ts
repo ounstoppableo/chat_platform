@@ -1,37 +1,80 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Group, UserInfo } from './userInfo.type';
+import { AllMsg, Group, Msg, UserInfo } from './userInfo.type';
 export const userInfoSlice = createSlice({
   name: 'userInfo',
   initialState: {
     data: {} as UserInfo,
     groups: [] as Group[],
-    msg: {} as any
+    msg: {} as AllMsg,
+    groupMember: [] as UserInfo[]
   },
   reducers: {
-    setUserInfo: (state, current) => {
-      state.data = current.payload;
+    setUserInfo: (state, action: { payload: UserInfo }) => {
+      state.data = action.payload;
     },
-    setGroups: (state, current) => {
-      state.groups = current.payload;
+    setGroups: (state, action) => {
+      state.groups = action.payload;
     },
-    setMsg: (state, current: any) => {
-      if (current.payload.reset) {
+    setMsg: (
+      state,
+      action: { payload: Msg & { reset?: boolean; room?: string } }
+    ) => {
+      if (action.payload.reset) {
         state.msg = {
           ...state.msg,
-          [current.payload.room]: []
+          [action.payload.room]: []
         };
       } else {
-        const msgStack = state.msg[current.payload.room] || [];
-        msgStack.push(current.payload);
+        const msgStack = state.msg[action.payload.room] || [];
+        msgStack.push(action.payload);
         state.msg = {
           ...state.msg,
-          [current.payload.room]: msgStack
+          [action.payload.room]: msgStack
         };
       }
+    },
+    setNewGroupMsg: (state, action: { payload: Msg }) => {
+      state.groups.forEach((item) => {
+        if (item.groupId === action.payload.room) {
+          item.lastMsg = action.payload.msg;
+          item.date = action.payload.time;
+        }
+      });
+    },
+    setHadNewMsg: (
+      state,
+      action: { payload: { groupId: string; hadNewMsg: boolean } }
+    ) => {
+      state.groups.forEach((item) => {
+        if (item.groupId === action.payload.groupId) {
+          item.hadNewMsg = action.payload.hadNewMsg;
+        }
+      });
+    },
+    setGroupMember: (state, action: { payload: UserInfo[] }) => {
+      state.groupMember = action.payload;
+    },
+    setUserStatus: (
+      state,
+      action: { payload: { username: string; isOnline: boolean } }
+    ) => {
+      state.groupMember.forEach((item) => {
+        if (item.username === action.payload.username) {
+          item.isOnline = action.payload.isOnline;
+        }
+      });
     }
   }
 });
 // 每个 case reducer 函数会生成对应的 Action creators
-export const { setUserInfo, setGroups, setMsg } = userInfoSlice.actions;
+export const {
+  setUserInfo,
+  setGroups,
+  setMsg,
+  setNewGroupMsg,
+  setHadNewMsg,
+  setUserStatus,
+  setGroupMember
+} = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;
