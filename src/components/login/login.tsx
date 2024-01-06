@@ -12,11 +12,6 @@ import { Button, Input, message } from 'antd';
 import { useContext, useRef, useState } from 'react';
 import sha256 from 'crypto-js/sha256';
 import { useDispatch } from 'react-redux';
-
-import {
-  setGroups,
-  setUserInfo as getUserInfo
-} from '@/redux/userInfo/userInfo';
 import { io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
@@ -32,8 +27,7 @@ const Login = (props: any) => {
   const loginCf = async () => {
     const res = await userConfirm();
     if (res.code === 200) {
-      dispatch(getUserInfo(res.data));
-      dispatch(setGroups(res.data.groups));
+      if (socket.current.disconnect) await socket.current.disconnect();
       socket.current = io('https://localhost:3000', {
         auth: {
           token: getToken()

@@ -19,9 +19,13 @@ export type AllMsg = {
   [key: string]: Msg[];
 };
 export type Msg = {
+  id: string;
   avatar: string;
-  username: string;
+  room: string;
   msg: string;
   time: Date;
-  room: string;
+  timestamp: number;
+  likes: number;
+  dislikes: number;
+  username: string;
 };

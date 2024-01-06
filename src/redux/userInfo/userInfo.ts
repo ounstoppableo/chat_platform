@@ -67,14 +67,26 @@ export const userInfoSlice = createSlice({
     },
     setHistoryMessage: (
       state,
-      action: { payload: { msgs: Msg[]; groupId: string } }
+      action: {
+        payload: {
+          msgs: Msg[] | AllMsg;
+          groupId: string;
+          opera: 'insert' | 'init';
+        };
+      }
     ) => {
-      state.historyMsg[action.payload.groupId]
-        ? (state.historyMsg[action.payload.groupId] = [
-            ...state.historyMsg[action.payload.groupId],
-            ...action.payload.msgs
-          ])
-        : (state.historyMsg[action.payload.groupId] = [...action.payload.msgs]);
+      if (action.payload.opera === 'insert') {
+        state.historyMsg[action.payload.groupId]
+          ? (state.historyMsg[action.payload.groupId] = [
+              ...state.historyMsg[action.payload.groupId],
+              ...(action.payload.msgs as Msg[])
+            ])
+          : (state.historyMsg[action.payload.groupId] = [
+              ...(action.payload.msgs as Msg[])
+            ]);
+      } else if (action.payload.opera === 'init') {
+        state.historyMsg = action.payload.msgs as AllMsg;
+      }
     }
   }
 });

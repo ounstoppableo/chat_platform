@@ -108,6 +108,7 @@ const ChatInput = (props: any) => {
       time: new Date(),
       avatar: userInfo.avatar
     });
+    setInputValue('');
   };
 
   //添加全局点击事件

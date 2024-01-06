@@ -30,8 +30,11 @@ const ChatRelation = (props: any) => {
         </div>
         <div className="tw-flex-1 tw-flex tw-flex-col tw-overflow-hidden">
           <div className="no-wrap-ellipsis">{item.groupName}</div>
-          <div className="no-wrap-ellipsis tw-text-textGrayColor tw-text-xs">
-            {item.lastMsg}
+          <div
+            className="no-wrap-ellipsis tw-text-textGrayColor tw-text-xs"
+            title={item.username + '：' + item.lastMsg}
+          >
+            {item.username + '：' + item.lastMsg}
           </div>
         </div>
         <div className="tw-w-14 tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">

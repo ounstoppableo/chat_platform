@@ -15,63 +15,67 @@ const ChatSpace = (props: any) => {
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const { selectedGroup } = props;
   const chatSpaceRef = useRef<any>(null);
-  const msgArr: any = [];
+  let msgArr: any = [];
 
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
-    historyMsg[selectedGroup.groupId].forEach((item: any) => {
-      msgArr.push(
-        <div className="tw-flex tw-gap-2">
-          <div className="tw-w-10">
-            {item.username !== userInfo.username ? (
-              <img
-                src={'/public' + item.avatar}
-                alt=""
-                className="tw-w-10 tw-rounded-full tw-object-contain"
-              />
-            ) : (
-              <></>
-            )}
-          </div>
-          <div className="tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden">
-            <div
-              className={`tw-text-textGrayColor tw-text-xs ${
-                item.username !== userInfo.username ? '' : 'tw-self-end'
-              } tw-flex tw-flex-row${
-                item.username === userInfo.username ? '' : '-reverse'
-              }`}
-            >
-              <span>{item.username}</span>&nbsp;<span>{`(${'北京'})`}</span>
+    msgArr = historyMsg[selectedGroup.groupId].map(
+      (item: any, index: number) => {
+        return (
+          <div className="tw-flex tw-gap-2" key={item.id + '' + index}>
+            <div className="tw-w-10">
+              {item.username !== userInfo.username ? (
+                <img
+                  src={'/public' + item.avatar}
+                  alt=""
+                  className="tw-w-10 tw-rounded-full tw-object-contain"
+                />
+              ) : (
+                <></>
+              )}
             </div>
-            <div
-              className={`tw-bg-messageBackground tw-py-2 tw-px-4 ${
-                item.username !== userInfo.username ? '' : 'tw-self-end'
-              } tw-w-fit tw-max-w-full tw-break-words tw-rounded-2xl ${
-                item.username !== userInfo.username
-                  ? 'tw-rounded-tl-none'
-                  : 'tw-rounded-tr-none'
-              }`}
-            >
-              {item.msg}
+            <div className="tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden">
+              <div
+                className={`tw-text-textGrayColor tw-text-xs ${
+                  item.username !== userInfo.username ? '' : 'tw-self-end'
+                } tw-flex tw-flex-row${
+                  item.username === userInfo.username ? '' : '-reverse'
+                }`}
+              >
+                <span>{item.username}</span>&nbsp;<span>{`(${'北京'})`}</span>
+              </div>
+              <div
+                className={`tw-bg-messageBackground tw-py-2 tw-px-4 ${
+                  item.username !== userInfo.username ? '' : 'tw-self-end'
+                } tw-w-fit tw-max-w-full tw-break-words tw-rounded-2xl ${
+                  item.username !== userInfo.username
+                    ? 'tw-rounded-tl-none'
+                    : 'tw-rounded-tr-none'
+                }`}
+              >
+                {item.msg}
+              </div>
+            </div>
+            <div className="tw-w-10">
+              {item.username === userInfo.username ? (
+                <img
+                  src={'/public' + item.avatar}
+                  alt=""
+                  className="tw-w-10 tw-rounded-full tw-object-contain"
+                />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
-          <div className="tw-w-10">
-            {item.username === userInfo.username ? (
-              <img
-                src={'/public' + item.avatar}
-                alt=""
-                className="tw-w-10 tw-rounded-full tw-object-contain"
-              />
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-      );
-    });
+        );
+      }
+    );
   }
 
-  //每次接收到新消息，都判断所在群是否有消息，有就取出来
+  //每次接收到新消息，都判断所在群是否有消息
+  //切换群组时，将新信息插入历史记录
+  //对应两个依赖
   useEffect(() => {
     if (
       newMsg[selectedGroup.groupId] &&
@@ -80,7 +84,8 @@ const ChatSpace = (props: any) => {
       dispatch(
         setHistoryMessage({
           groupId: selectedGroup.groupId,
-          msgs: newMsg[selectedGroup.groupId]
+          msgs: newMsg[selectedGroup.groupId],
+          opera: 'insert'
         })
       );
       dispatch(setNewMsg({ reset: true, room: selectedGroup.groupId } as any));
@@ -89,6 +94,7 @@ const ChatSpace = (props: any) => {
       );
     }
   }, [newMsg, selectedGroup]);
+
   //聊天空间默认卷到底部
   useEffect(() => {
     chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight;

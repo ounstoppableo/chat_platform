@@ -4,9 +4,11 @@ import {
   setNewMsg,
   setNewGroupMsg,
   setUserInfo,
-  setUserStatus
+  setUserStatus,
+  setHistoryMessage
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
+import { getTotalMsg } from '@/service/getGroupInfo';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
 import { message } from 'antd';
 import { Dispatch } from 'react';
@@ -21,7 +23,14 @@ const socketListener = (
   socket.on('connect', () => {
     dispatch(setUserInfo(userData));
     dispatch(setGroups(userData.groups));
-    socket.emit('joinRoom', userData.groups);
+    getTotalMsg(userData.username).then((res) => {
+      if (res.code === 200) {
+        dispatch(
+          setHistoryMessage({ msgs: res.data, groupId: '', opera: 'init' })
+        );
+        socket.emit('joinRoom', userData.groups);
+      }
+    });
   });
 
   //接收到消息

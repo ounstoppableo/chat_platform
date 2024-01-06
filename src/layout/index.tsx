@@ -13,6 +13,8 @@ import socketContext from '@/context/socketContext';
 import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
+import { getTotalMsg } from '@/service/getGroupInfo';
+import { setHistoryMessage } from '@/redux/userInfo/userInfo';
 
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
@@ -49,7 +51,9 @@ const Layout = () => {
   useEffect(() => {
     loginConfirm();
     return () => {
-      socket.current ? socket.current.close() : null;
+      JSON.stringify(socket.current) !== '{}'
+        ? socket.current.disconnect()
+        : null;
     };
   }, []);
   return (

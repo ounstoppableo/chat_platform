@@ -1,5 +1,5 @@
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
-import { Ref, createContext } from 'react';
+import { createContext } from 'react';
 import { Socket } from 'socket.io-client';
 
 const socketContext = createContext<{
