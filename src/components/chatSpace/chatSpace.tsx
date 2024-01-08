@@ -1,5 +1,5 @@
 import ChatInput from '@/components/chatInput/chatInput.tsx';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -12,6 +12,7 @@ import styles from './chatSpace.module.scss';
 import { DislikeFilled, LikeFilled, RollbackOutlined } from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
+import { UserInfo } from '@/redux/userInfo/userInfo.type.ts';
 
 const ChatSpace = (props: any) => {
   const socket = useContext(socketContext);
@@ -21,20 +22,32 @@ const ChatSpace = (props: any) => {
   const init = useRef(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: any) => state.userInfo.data);
-  const { selectedGroup, atMember } = props;
+  const { selectedGroup } = props;
   const chatSpaceRef = useRef<any>(null);
+  //@符号后跟着的成员列表显示隐藏控制
+  const [atFlag, setAtFlag] = useState(false);
+  const showAtMembers = (flag: boolean) => {
+    setAtFlag(flag);
+  };
+  //@符号后跟着的成员列表
+  const [atMember, setAtMember] = useState<UserInfo[]>([]);
+  const toSetAtMember = (data: UserInfo[]) => {
+    setAtMember(data);
+  };
   const atMemberVDom = atMember.map((item: any, index: number) => {
     return (
       <div
         key={index}
-        className="tw-h-8 tw-flex tw-gap-2 tw-items-center tw-cursor-pointer hover:tw-bg-lightHoverColor tw-rounded-lg tw-p-0.5"
+        className="tw-h-10 tw-flex tw-gap-2 tw-items-center tw-cursor-pointer hover:tw-bg-lightHoverColor tw-rounded-lg tw-p-1"
       >
         <img
-          src={item.avatar}
-          className="tw-h-full tw-rounded-full tw-object-contain"
+          src={'/public' + item.avatar}
+          className="tw-h-full tw-rounded-full tw-object-cover"
           alt=""
         />
-        <div>{item.username}</div>
+        <div title={item.username} className="tw-overflow-hidden">
+          {item.username}
+        </div>
       </div>
     );
   });
@@ -380,12 +393,20 @@ const ChatSpace = (props: any) => {
         {msgArr}
       </div>
       <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
-        <ChatInput selectedGroup={selectedGroup}></ChatInput>
+        <ChatInput
+          showAtMembers={showAtMembers}
+          toSetAtMember={toSetAtMember}
+          selectedGroup={selectedGroup}
+        ></ChatInput>
         <InputMask></InputMask>
       </div>
-      <div className="tw-absolute tw-bottom-16 tw-p-1 tw-flex tw-flex-col tw-gap-0.5 tw-overflow-auto tw-left-14 tw-w-40 tw-max-h-40 tw-bg-messageBackground tw-shadow-circle tw-rounded-lg">
-        {atMemberVDom}
-      </div>
+      {atFlag ? (
+        <div className="tw-absolute tw-bottom-16 tw-p-2 tw-flex tw-flex-col tw-gap-0.5 tw-overflow-auto tw-left-14 tw-w-40 tw-max-h-40 tw-bg-messageBackground tw-shadow-circle tw-rounded-lg">
+          {atMemberVDom}
+        </div>
+      ) : (
+        <> </>
+      )}
     </div>
   );
 };

@@ -13,8 +13,6 @@ import socketContext from '@/context/socketContext';
 import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
-import { getTotalMsg } from '@/service/getGroupInfo';
-import { setHistoryMessage } from '@/redux/userInfo/userInfo';
 
 const Layout = () => {
   const [loginFlag, setLoginFlag] = useState(false);
@@ -24,20 +22,7 @@ const Layout = () => {
     groupName: '全员总群',
     groupId: '1'
   });
-  //@符号后跟着的成员列表
-  const [atMember, setAtMember] = useState<
-    { username: string; avatar: string }[]
-  >([
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' },
-    { username: 'a', avatar: '/public/avatar/145.jpg' }
-  ]);
+
   const socket = useRef<Socket<ServerToClientEvents, ClientToServerEvents>>(
     {} as Socket<ServerToClientEvents, ClientToServerEvents>
   );
@@ -89,7 +74,7 @@ const Layout = () => {
               />
             </div>
             <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
-              <ChatSpace selectedGroup={selectedGroup} atMember={atMember} />
+              <ChatSpace selectedGroup={selectedGroup} />
             </div>
             <div className="tw-w-48">
               <MemberList selectedGroup={selectedGroup} />

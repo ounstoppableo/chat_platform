@@ -20,10 +20,13 @@ import socketContext from '@/context/socketContext';
 import dayjs from 'dayjs';
 
 const ChatInput = (props: any) => {
-  const { selectedGroup } = props;
+  const { selectedGroup, showAtMembers, toSetAtMember } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
+  const groupMember: UserInfo[] = useSelector(
+    (state: any) => state.userInfo.groupMember
+  );
   const [msgFlag, setMsgFlag] = useState(false);
   const [emjFlag, setEmjFlag] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -39,6 +42,12 @@ const ChatInput = (props: any) => {
     setInputValue(inputValue + emj);
   };
   const inputChange = (e: any) => {
+    if (e.currentTarget.value.includes('@')) {
+      toSetAtMember(groupMember);
+      showAtMembers(true);
+    } else {
+      showAtMembers(false);
+    }
     setInputValue(e.currentTarget.value);
   };
   const at = () => {
