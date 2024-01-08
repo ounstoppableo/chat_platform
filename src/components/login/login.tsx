@@ -94,7 +94,7 @@ const Login = (props: any) => {
   };
   return show ? (
     <div
-      className="tw-bg-loginMask tw-absolute tw-inset-0 tw-flex tw-justify-center tw-items-center tw-text-textGrayColor"
+      className="tw-bg-loginMask tw-absolute tw-inset-0 tw-flex tw-justify-center tw-items-center tw-text-textGrayColor tw-z-max"
       onClick={(e) => closeLoginForm(e)}
     >
       <div

@@ -1,0 +1,14 @@
+.showTime {
+    &> div {
+        &>span:last-child {
+            opacity: 0;
+        }
+    }
+    &:hover {
+        &> div {
+            &>span:last-child {
+                opacity: 100;
+            }
+        }
+    }
+}

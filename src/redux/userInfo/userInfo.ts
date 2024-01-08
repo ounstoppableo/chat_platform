@@ -87,6 +87,36 @@ export const userInfoSlice = createSlice({
       } else if (action.payload.opera === 'init') {
         state.historyMsg = action.payload.msgs as AllMsg;
       }
+    },
+    setMsgLikes: (
+      state,
+      action: {
+        payload: {
+          likes: number;
+          msgId: string;
+          room: string;
+          type: 'like' | 'cancelLike';
+        };
+      }
+    ) => {
+      state.historyMsg[action.payload.room].find(
+        (item) => item.id === action.payload.msgId
+      )!.likes = action.payload.likes;
+    },
+    setMsgDislikes: (
+      state,
+      action: {
+        payload: {
+          dislikes: number;
+          msgId: string;
+          room: string;
+          type: 'dislike' | 'cancelDislike';
+        };
+      }
+    ) => {
+      state.historyMsg[action.payload.room].find(
+        (item) => item.id === action.payload.msgId
+      )!.dislikes = action.payload.dislikes;
     }
   }
 });
@@ -99,7 +129,9 @@ export const {
   setHadNewMsg,
   setUserStatus,
   setGroupMember,
-  setHistoryMessage
+  setHistoryMessage,
+  setMsgLikes,
+  setMsgDislikes
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

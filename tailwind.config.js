@@ -14,10 +14,15 @@ export default {
       animation: {
         hadMsg: 'hadMsg 2s ease-in-out infinite'
       },
+      boxShadow: {
+        circle: ' 0 0 6px rgb(0,0,0,0.2)'
+      },
       colors: {
+        midGray: '#323543',
         lightGray: '#323644',
         deepGray: '#272a37',
         hoverColor: '#1d90f5',
+        lightHoverColor: '#33435d',
         chatRelationActive: '#2c3e50',
         textGrayColor: '#999999',
         chatSpaceHeader: '#5b5e69',
@@ -29,10 +34,15 @@ export default {
         loginForm: '#141414',
         whiteTextColor: '#cfd3dc',
         greenTextColor: '#2aae67',
-        unOnline: '#dfdfdf'
+        unOnline: '#dfdfdf',
+        love: '#fe2c55',
+        disLove: '#999999'
       },
       backdropBlur: {
         xs: '2px'
+      },
+      zIndex: {
+        max: '9999'
       },
       backgroundImage: {
         temple: "url('@/assets/background.jpeg')"

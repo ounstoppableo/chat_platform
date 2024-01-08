@@ -14,6 +14,7 @@ export interface Group {
   lastMsg: string;
   date: Date;
   hadNewMsg: boolean;
+  lastMsgUser: string;
 }
 export type AllMsg = {
   [key: string]: Msg[];

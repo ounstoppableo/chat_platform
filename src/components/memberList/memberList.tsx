@@ -10,6 +10,9 @@ const MemberList = (props: any) => {
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
   );
+  const onlineNum = groupMember.filter(
+    (item: any) => !!item.isOnline === true
+  ).length;
   const dispatch = useDispatch();
   useEffect(() => {
     getGroupMember(selectedGroup.groupId).then((res) => {
@@ -47,7 +50,7 @@ const MemberList = (props: any) => {
 
   return (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg tw-text-base tw-px-2.5 tw-py-2 tw-flex tw-flex-col tw-gap-4">
-      <div>在线人数：{memberArr.length}</div>
+      <div>在线人数：{onlineNum}</div>
       <div className="tw-flex tw-flex-col tw-gap-1 tw-overflow-auto">
         {memberArr}
       </div>

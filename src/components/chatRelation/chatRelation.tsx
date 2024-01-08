@@ -32,9 +32,15 @@ const ChatRelation = (props: any) => {
           <div className="no-wrap-ellipsis">{item.groupName}</div>
           <div
             className="no-wrap-ellipsis tw-text-textGrayColor tw-text-xs"
-            title={item.username + '：' + item.lastMsg}
+            title={
+              item.lastMsgUser && item.lastMsg
+                ? item.lastMsgUser + '：' + item.lastMsg
+                : '啥也没有o~'
+            }
           >
-            {item.username + '：' + item.lastMsg}
+            {item.lastMsgUser && item.lastMsg
+              ? item.lastMsgUser + '：' + item.lastMsg
+              : '啥也没有o~'}
           </div>
         </div>
         <div className="tw-w-14 tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">

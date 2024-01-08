@@ -29,3 +29,13 @@ html {overflow-y: scroll;}
   ::-webkit-scrollbar-thumb:hover {
     background-color: #484d5f; /* 滑块悬停时的背景颜色 */
   }
+
+
+//显示控制
+.opacity0 {
+    opacity: 0;
+}
+
+.opacity100 {
+    opacity: 1;
+}
