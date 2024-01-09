@@ -23,6 +23,7 @@ export default {
         deepGray: '#272a37',
         hoverColor: '#1d90f5',
         lightHoverColor: '#33435d',
+        midHoverColor: '#2b5281',
         chatRelationActive: '#2c3e50',
         textGrayColor: '#999999',
         chatSpaceHeader: '#5b5e69',
@@ -48,7 +49,8 @@ export default {
         temple: "url('@/assets/background.jpeg')"
       },
       minWidth: {
-        minChatSpace: '450px'
+        minChatSpace: '450px',
+        '100px': '100px'
       }
     }
   },

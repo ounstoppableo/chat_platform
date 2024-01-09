@@ -882,33 +882,37 @@ max-width: 100%;
       return ()=>{
           console.log('unmount')
       }
-  	//有依赖，count的变化才会引发count执行
+  	//有依赖，count的变化才会引发useEffect执行
     },[count]);
   ~~~
 
   **注意点**
-  这里的return在每次更新都会执行，并不是只在unmount时执行
+  这里的return在每次依赖更新都会执行，并不是只在unmount时执行
 
-  那我们可能会有一个疑惑，既然它每次更新都会执行，那么我们的逻辑不是白执行了吗？设定好的用户事件、计时器还没开始执行不就被清理了？
+  这里的执行逻辑是将return放到一个监听函数的回调中，等依赖发生改变时执行，之后才进入新的useEffect逻辑
 
-  实际上清理函数是在我们逻辑执行之前执行的，所以清理的也是上次运行的逻辑，我们用一个例子更直观的看看
+  我们用一个直观的例子来看：
 
   ~~~react
     useEffect(() => {
       const callback = (e: any) => {
           console.log(22222)
       };
-      console.log(111111)
-      document.addEventListener('click', callback);
+      if(demo===true) {
+          console.log(111111)
+      	document.addEventListener('click', callback);
+      }
       return () => {
-        console.log(333333)
-        document.removeEventListener('click', callback);
+        if(demo===true) {
+            console.log(333333)
+        	  document.removeEventListener('click', callback);
+        }
       };
     }, [demo]);
   
-  //这里我们触发点击后
-  //333333总是会在111111之前出现，也印证了我们的猜想
-  //因为我们的逻辑还没执行，所以清理函数的callback是上次的callback
+  //如果我们改变依赖的值会发现，当demo===true的时候会只输出到111111，而不会输出333333，表示return并没有执行；
+  //而当我们将demo置为false时，此时输出了333333
+  //并不代表demo===false时输出了33333，而是先执行了return后的函数才进入了新的useEffect逻辑
   ~~~
 
 ##### ws升级为wss后连接不上的问题

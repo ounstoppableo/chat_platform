@@ -13,8 +13,10 @@ import socketContext from '@/context/socketContext';
 import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
+import InputLogicContext from '@/context/inputLogicContext';
 
 const Layout = () => {
+  const [inputValue, setInputValue] = useState('');
   const [loginFlag, setLoginFlag] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<
     Pick<Group, 'groupName' | 'groupId'>
@@ -58,30 +60,32 @@ const Layout = () => {
   return (
     <socketContext.Provider value={socket}>
       <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
-        <div
-          className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
-        >
+        <InputLogicContext.Provider value={{ inputValue, setInputValue }}>
           <div
-            className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+            className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
           >
-            <div className="tw-w-14">
-              <UserInfo />
+            <div
+              className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+            >
+              <div className="tw-w-14">
+                <UserInfo />
+              </div>
+              <div className="tw-w-64 tw-overflow-auto tw-pr-2">
+                <ChatRelation
+                  selectedGroup={selectedGroup}
+                  switchGroup={switchGroup}
+                />
+              </div>
+              <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
+                <ChatSpace selectedGroup={selectedGroup} />
+              </div>
+              <div className="tw-w-48">
+                <MemberList selectedGroup={selectedGroup} />
+              </div>
             </div>
-            <div className="tw-w-64 tw-overflow-auto tw-pr-2">
-              <ChatRelation
-                selectedGroup={selectedGroup}
-                switchGroup={switchGroup}
-              />
-            </div>
-            <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
-              <ChatSpace selectedGroup={selectedGroup} />
-            </div>
-            <div className="tw-w-48">
-              <MemberList selectedGroup={selectedGroup} />
-            </div>
+            <Login show={loginFlag}></Login>
           </div>
-          <Login show={loginFlag}></Login>
-        </div>
+        </InputLogicContext.Provider>
       </loginFlagContext.Provider>
     </socketContext.Provider>
   );

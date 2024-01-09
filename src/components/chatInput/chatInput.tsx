@@ -17,19 +17,18 @@ import { useSelector } from 'react-redux';
 import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
-import dayjs from 'dayjs';
+import inputLogicContext from '@/context/inputLogicContext';
 
 const ChatInput = (props: any) => {
-  const { selectedGroup, showAtMembers, toSetAtMember } = props;
+  const { selectedGroup } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
-  const groupMember: UserInfo[] = useSelector(
-    (state: any) => state.userInfo.groupMember
-  );
+  const { inputValue, setInputValue } = useContext(inputLogicContext);
+
   const [msgFlag, setMsgFlag] = useState(false);
   const [emjFlag, setEmjFlag] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  // const [inputValue, setInputValue] = useState('');
   const [emjOrMyFav, setEmjOrMyFav] = useState(true);
   const emojiBoard = [];
   const handleMshMethod = () => {
@@ -42,12 +41,6 @@ const ChatInput = (props: any) => {
     setInputValue(inputValue + emj);
   };
   const inputChange = (e: any) => {
-    if (e.currentTarget.value.includes('@')) {
-      toSetAtMember(groupMember);
-      showAtMembers(true);
-    } else {
-      showAtMembers(false);
-    }
     setInputValue(e.currentTarget.value);
   };
   const at = () => {
