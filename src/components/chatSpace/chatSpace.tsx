@@ -340,18 +340,30 @@ const ChatSpace = (props: any) => {
   }, [newMsg, selectedGroup]);
 
   //聊天空间默认卷到底部，切换群组触发
-  useEffect(() => {
+  const scrollToBottom = () => {
     chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight;
+  };
+  useEffect(() => {
+    scrollToBottom();
   }, [selectedGroup]);
-  //修复首次加载不滑动到底部的问题
+  //修复首次加载不滑动到底部的问题,以及自己发送的消息需要滚动到底部
   useEffect(() => {
     if (
       historyMsg[selectedGroup.groupId] &&
       historyMsg[selectedGroup.groupId].length !== 0 &&
       !init.current
     ) {
-      chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight;
+      scrollToBottom();
       init.current = true;
+    }
+    if (
+      historyMsg[selectedGroup.groupId] &&
+      historyMsg[selectedGroup.groupId].length !== 0 &&
+      historyMsg[selectedGroup.groupId][
+        historyMsg[selectedGroup.groupId].length - 1
+      ].username === userInfo.username
+    ) {
+      scrollToBottom();
     }
   }, [historyMsg]);
 
