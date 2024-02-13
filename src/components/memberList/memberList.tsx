@@ -1,7 +1,12 @@
+import socketContext from '@/context/socketContext';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
 import { UserInfo } from '@/redux/userInfo/userInfo.type';
+import { addFriend } from '@/service/addRelationLogic';
 import { getGroupMember } from '@/service/getGroupInfo';
-import { useEffect } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { useContext, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 const MemberList = (props: any) => {
@@ -10,6 +15,7 @@ const MemberList = (props: any) => {
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
   );
+  const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
   const onlineNum = groupMember.filter(
     (item: any) => !!item.isOnline === true
   ).length;
@@ -22,11 +28,78 @@ const MemberList = (props: any) => {
     });
   }, [selectedGroup]);
 
-  groupMember.forEach((item: UserInfo) => {
+  //鼠标右键事件的回调
+  const [menu, setMenu] = useState(<></>);
+  const contextMenuCb = (e: any, username: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (username === userInfo.username) return;
+    if (!userInfo.isLogin) return;
+    console.log(username);
+    const toAddFriend = () => {
+      addFriend(username).then((res) => {
+        if (res.code === 200) {
+          if (res.data.type === 1) {
+            message.success(res.data.msg);
+          } else message.info(res.data.msg);
+          setMenu(<></>);
+        }
+      });
+    };
+    const atTa = () => {};
+    setMenu(
+      <div
+        className={`tw-text-xs tw-absolute tw-w-24 tw-h-16 tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
+        style={{ top: e.clientY + 'px', left: e.clientX + 'px' }}
+        id="menberListMenu"
+      >
+        <div
+          onClick={atTa}
+          className="tw-pl-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+        >
+          <span>@</span>
+          <span>艾特Ta</span>
+        </div>
+        <div
+          onClick={toAddFriend}
+          className="tw-pl-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+        >
+          <span>
+            <PlusOutlined />
+          </span>
+          <span>添加好友</span>
+        </div>
+      </div>
+    );
+  };
+  //清除菜单
+  useEffect(() => {
+    const cb = (e: any) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (
+        (!e.target.closest('#menberListMenu') && e.type === 'click') ||
+        (!e.target.closest('.menberListItem') && e.type === 'contextmenu')
+      ) {
+        setMenu(<></>);
+      }
+    };
+    window.addEventListener('click', cb);
+    window.addEventListener('contextmenu', cb);
+    return () => {
+      window.removeEventListener('click', cb);
+    };
+  }, []);
+
+  const sorted = [...groupMember].sort((a: any, b: any) => {
+    return b.isOnline - a.isOnline;
+  });
+  sorted.forEach((item: UserInfo) => {
     memberArr.push(
       <div
         key={item.uid}
-        className="hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+        className="menberListItem hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+        onContextMenu={(e) => contextMenuCb(e, item.username)}
       >
         <div
           className={`tw-w-6 tw-rounded-full tw-relative 
@@ -54,6 +127,7 @@ const MemberList = (props: any) => {
       <div className="tw-flex tw-flex-col tw-gap-1 tw-overflow-auto">
         {memberArr}
       </div>
+      {createPortal(menu, document.body)}
     </div>
   );
 };

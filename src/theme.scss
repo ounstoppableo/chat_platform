@@ -1,3 +1,50 @@
 .ant-btn {
     outline: none!important;
 }
+
+.customModal {
+    width: fit-content !important;
+    &>.ant-modal-content {
+        width: fit-content;
+        background-color: #141414;
+        box-shadow: 0px 12px 32px 4px rgba(0, 0, 0, .36),0px 8px 20px rgba(0, 0, 0, .72);
+        &>.ant-modal-body {
+            &>.ant-modal-confirm-body-wrapper {
+                &>.ant-modal-confirm-body {
+                    justify-content: center;
+                    margin-bottom: 20px;
+                }
+            }
+        }
+    }
+}
+.customTransfer  {
+    &>.ant-transfer-list {
+        border: none;
+        &>.ant-transfer-list-header {
+            background-color: #262727;
+            color: white;
+        }
+        &>.ant-transfer-list-body {
+            color: white;
+            &>.ant-transfer-list-content {
+                &>.ant-transfer-list-content-item-checked {
+                    background-color: #222;
+                }
+            }
+        }
+    }
+    &>.ant-transfer-operation {
+        & > button {
+            border: none;
+            background-color: #1677ff;
+            color: white;
+            &:hover {
+                background-color: #4096ff;
+            }
+            &:disabled {
+                background-color: #4096ff;
+            }
+        }
+    }
+}

@@ -28,6 +28,7 @@ const Layout = () => {
   const socket = useRef<Socket<ServerToClientEvents, ClientToServerEvents>>(
     {} as Socket<ServerToClientEvents, ClientToServerEvents>
   );
+  const [msgOrRelation, setMsgOrRelation] = useState<'msg' | 'relation'>('msg');
   const dispatch = useDispatch();
   const switchGroup = (groupInfo: Pick<Group, 'groupName' | 'groupId'>) => {
     setSelectedGroup(groupInfo);
@@ -68,12 +69,16 @@ const Layout = () => {
               className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
             >
               <div className="tw-w-14">
-                <UserInfo />
+                <UserInfo
+                  msgOrRelation={msgOrRelation}
+                  setMsgOrRelation={setMsgOrRelation}
+                />
               </div>
               <div className="tw-w-64 tw-overflow-auto tw-pr-2">
                 <ChatRelation
                   selectedGroup={selectedGroup}
                   switchGroup={switchGroup}
+                  msgOrRelation={msgOrRelation}
                 />
               </div>
               <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">

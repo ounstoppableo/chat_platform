@@ -9,10 +9,15 @@ export default {
           '0%': { backgroundColor: 'rgba(255,158,2,0.5)' },
           '50%': { backgroundColor: 'rgba(255,158,2,0.1)' },
           '100%': { backgroundColor: 'rgba(255,158,2,0.5)' }
+        },
+        unfold: {
+          '0%': { transform: 'scaleY(0)' },
+          '100%': { transform: 'scaleY(1)' }
         }
       },
       animation: {
-        hadMsg: 'hadMsg 2s ease-in-out infinite'
+        hadMsg: 'hadMsg 2s ease-in-out infinite',
+        unfold: 'unfold 0.5s linear'
       },
       boxShadow: {
         circle: ' 0 0 6px rgb(0,0,0,0.2)'
@@ -37,7 +42,9 @@ export default {
         greenTextColor: '#2aae67',
         unOnline: '#dfdfdf',
         love: '#fe2c55',
-        disLove: '#999999'
+        disLove: '#999999',
+        btnColor: '#1677ff',
+        btnHoverColor: '#4096ff'
       },
       backdropBlur: {
         xs: '2px'

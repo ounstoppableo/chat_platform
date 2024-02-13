@@ -1,12 +1,16 @@
 import { MessageOutlined, TeamOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
-const UserInfo = () => {
+const UserInfo = (prop: any) => {
+  const { msgOrRelation, setMsgOrRelation } = prop;
   const userInfo = useSelector((state: any) => state.userInfo.data);
   enum destEnum {
     backEnd = 'https://github.com/ounstoppableo/chat-platform-nodets.git',
     fontEnd = 'https://github.com/ounstoppableo/chat_platform.git',
     projectDoc = ''
   }
+  const changeMsgOrRelation = (type: 'msg' | 'relation') => {
+    setMsgOrRelation(type);
+  };
   function goToDest(linkName: keyof typeof destEnum) {
     const link = document.createElement('a');
     link.href = destEnum[linkName];
@@ -25,10 +29,28 @@ const UserInfo = () => {
             <div className="tw-w-full tw-h-full tw-text-4xl tw-bg-white tw-text-black iconfont icon-user-fill tw-flex tw-justify-center tw-items-center"></div>
           )}
         </div>
-        <div className="tw-bg-lightGray tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointer tw-text-white hover:tw-text-hoverColor">
+        <div
+          className={`tw-cursor-pointer tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointe hover:tw-text-hoverColor  ${
+            msgOrRelation === 'msg'
+              ? 'tw-text-hoverColor tw-bg-lightGray'
+              : 'tw-text-white'
+          }`}
+          onClick={() => {
+            changeMsgOrRelation('msg');
+          }}
+        >
           <MessageOutlined style={{ fontSize: 25 + 'px' }} />
         </div>
-        <div className="tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointer tw-text-white hover:tw-text-hoverColor">
+        <div
+          className={`tw-cursor-pointer tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointe hover:tw-text-hoverColor  ${
+            msgOrRelation === 'relation'
+              ? 'tw-text-hoverColor tw-bg-lightGray'
+              : 'tw-text-white'
+          }`}
+          onClick={() => {
+            changeMsgOrRelation('relation');
+          }}
+        >
           <TeamOutlined style={{ fontSize: 25 + 'px' }} />
         </div>
       </div>
