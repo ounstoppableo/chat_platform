@@ -192,124 +192,195 @@ const ChatSpace = (props: any) => {
     return null;
   };
 
+  //消息头日期控制
+  const dateControl = (msgIndex: any) => {
+    const curr = historyMsg[selectedGroup.groupId][msgIndex];
+    const prev =
+      msgIndex === 0 ? null : historyMsg[selectedGroup.groupId][msgIndex - 1];
+    const currTimeStamp = dayjs(curr.time).unix();
+    const prevTimeStamp = prev ? dayjs(prev.time).unix() : 0;
+    if (currTimeStamp - prevTimeStamp > 300) {
+      console.log(Date.now() / 1000 - currTimeStamp);
+      if (Date.now() / 1000 - currTimeStamp <= 86400) {
+        return (
+          <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
+            {dayjs(curr.time).format('HH:mm')}
+          </div>
+        );
+      } else if (
+        Date.now() / 1000 - currTimeStamp > 86400 &&
+        Date.now() / 1000 - currTimeStamp <= 172800
+      ) {
+        return (
+          <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
+            昨天&nbsp;{dayjs(curr.time).format('HH:mm')}
+          </div>
+        );
+      } else if (
+        Date.now() / 1000 - currTimeStamp > 172800 &&
+        Date.now() / 1000 - currTimeStamp <= 604800
+      ) {
+        let week;
+        switch (dayjs(curr.time).day()) {
+          case 0:
+            week = '星期日';
+            break;
+          case 1:
+            week = '星期一';
+            break;
+          case 2:
+            week = '星期二';
+            break;
+          case 3:
+            week = '星期三';
+            break;
+          case 4:
+            week = '星期四';
+            break;
+          case 5:
+            week = '星期五';
+            break;
+          case 6:
+            week = '星期六';
+            break;
+        }
+        return (
+          <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
+            {week}&nbsp;{dayjs(curr.time).format('HH:mm')}
+          </div>
+        );
+      } else {
+        return (
+          <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
+            {dayjs(curr.time).format('YYYY年MM月DD日 HH:mm')}
+          </div>
+        );
+      }
+    } else {
+      return <></>;
+    }
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
       (item: any, index: number) => {
         return (
-          <div
-            className="tw-flex tw-gap-2 tw-relative"
-            key={item.id + '' + index}
-          >
-            <div
-              id="opera"
-              className={`tw-flex tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
-            >
-              <div className="tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center">
-                <RollbackOutlined />
-              </div>
+          <div key={item.id + '' + index}>
+            {dateControl(index)}
+            <div className="tw-flex tw-gap-2 tw-relative">
               <div
-                onClick={() => like(item)}
-                className={`${
-                  getHadLikes(item.id) ? 'tw-text-love' : 'tw-text-white'
-                } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                id="opera"
+                className={`tw-flex tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
               >
-                <LikeFilled />
-              </div>
-              <div
-                onClick={() => dislike(item)}
-                className={`${
-                  getHadDislikes(item.id) ? 'tw-text-disLove' : 'tw-text-white'
-                } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
-              >
-                <DislikeFilled />
-              </div>
-            </div>
-            <div className="tw-w-10">
-              {item.username !== userInfo.username ? (
-                <img
-                  src={'/public' + item.avatar}
-                  alt=""
-                  className="tw-w-10 tw-rounded-full tw-object-contain"
-                />
-              ) : (
-                <></>
-              )}
-            </div>
-            <div
-              className={`tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden  ${styles.showTime}`}
-            >
-              <div
-                className={`tw-text-textGrayColor tw-text-xs ${
-                  item.username !== userInfo.username ? '' : 'tw-self-end'
-                } tw-flex ${
-                  item.username === userInfo.username
-                    ? 'tw-flex-row-reverse'
-                    : ''
-                }`}
-              >
-                <span>{item.username}</span>
-                <span>&nbsp;</span>
-                <span>{`(${'北京'})`}</span>
-                <span>&nbsp;</span>
-                <span className="tw-text-xs tw-transition-all">
-                  {dayjs(item.time).format('HH:mm')}
-                </span>
-              </div>
-              <div className={`tw-flex tw-flex-col tw-w-full`}>
-                <div
-                  className={`${
-                    item.username !== userInfo.username ? '' : 'tw-self-end'
-                  } tw-bg-messageBackground tw-py-2 tw-px-4 tw-rounded-2xl ${
-                    item.username !== userInfo.username
-                      ? 'tw-rounded-tl-none'
-                      : 'tw-rounded-tr-none'
-                  } tw-w-fit tw-max-w-full tw-break-words`}
-                  onMouseEnter={(e) => userOperaControl(e, item)}
-                  onMouseLeave={userOperaControlForLeave}
-                >
-                  {item.msg}
+                <div className="tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center">
+                  <RollbackOutlined />
                 </div>
-                {item.likes || item.dislikes ? (
-                  <div
-                    className={`tw-text-xs tw-flex tw-gap-2 tw-mt-1  ${
-                      item.username !== userInfo.username
-                        ? 'tw-ml-2'
-                        : 'tw-self-end tw-mr-2'
-                    }`}
-                  >
-                    {item.likes ? (
-                      <div className="tw-text-love">
-                        <LikeFilled />
-                        {item.likes}
-                      </div>
-                    ) : (
-                      <></>
-                    )}
-                    {item.dislikes ? (
-                      <div className="tw-text-disLove">
-                        <DislikeFilled />
-                        {item.dislikes}
-                      </div>
-                    ) : (
-                      <> </>
-                    )}
-                  </div>
+                <div
+                  onClick={() => like(item)}
+                  className={`${
+                    getHadLikes(item.id) ? 'tw-text-love' : 'tw-text-white'
+                  } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                >
+                  <LikeFilled />
+                </div>
+                <div
+                  onClick={() => dislike(item)}
+                  className={`${
+                    getHadDislikes(item.id)
+                      ? 'tw-text-disLove'
+                      : 'tw-text-white'
+                  } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                >
+                  <DislikeFilled />
+                </div>
+              </div>
+              <div className="tw-w-10">
+                {item.username !== userInfo.username ? (
+                  <img
+                    src={'/public' + item.avatar}
+                    alt=""
+                    className="tw-w-10 tw-rounded-full tw-object-contain"
+                  />
                 ) : (
                   <></>
                 )}
               </div>
-            </div>
-            <div className="tw-w-10">
-              {item.username === userInfo.username ? (
-                <img
-                  src={'/public' + item.avatar}
-                  alt=""
-                  className="tw-w-10 tw-rounded-full tw-object-contain"
-                />
-              ) : (
-                <></>
-              )}
+              <div
+                className={`tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden  ${styles.showTime}`}
+              >
+                <div
+                  className={`tw-text-textGrayColor tw-text-xs ${
+                    item.username !== userInfo.username ? '' : 'tw-self-end'
+                  } tw-flex ${
+                    item.username === userInfo.username
+                      ? 'tw-flex-row-reverse'
+                      : ''
+                  }`}
+                >
+                  <span>{item.username}</span>
+                  <span>&nbsp;</span>
+                  <span>{`(${'北京'})`}</span>
+                  <span>&nbsp;</span>
+                  <span className="tw-text-xs tw-transition-all">
+                    {dayjs(item.time).format('HH:mm')}
+                  </span>
+                </div>
+                <div className={`tw-flex tw-flex-col tw-w-full`}>
+                  <div
+                    className={`${
+                      item.username !== userInfo.username ? '' : 'tw-self-end'
+                    } tw-bg-messageBackground tw-py-2 tw-px-4 tw-rounded-2xl ${
+                      item.username !== userInfo.username
+                        ? 'tw-rounded-tl-none'
+                        : 'tw-rounded-tr-none'
+                    } tw-w-fit tw-max-w-full tw-break-words`}
+                    onMouseEnter={(e) => userOperaControl(e, item)}
+                    onMouseLeave={userOperaControlForLeave}
+                  >
+                    {item.msg}
+                  </div>
+                  {item.likes || item.dislikes ? (
+                    <div
+                      className={`tw-text-xs tw-flex tw-gap-2 tw-mt-1  ${
+                        item.username !== userInfo.username
+                          ? 'tw-ml-2'
+                          : 'tw-self-end tw-mr-2'
+                      }`}
+                    >
+                      {item.likes ? (
+                        <div className="tw-text-love">
+                          <LikeFilled />
+                          {item.likes}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                      {item.dislikes ? (
+                        <div className="tw-text-disLove">
+                          <DislikeFilled />
+                          {item.dislikes}
+                        </div>
+                      ) : (
+                        <> </>
+                      )}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
+              <div className="tw-w-10">
+                {item.username === userInfo.username ? (
+                  <img
+                    src={'/public' + item.avatar}
+                    alt=""
+                    className="tw-w-10 tw-rounded-full tw-object-contain"
+                  />
+                ) : (
+                  <></>
+                )}
+              </div>
             </div>
           </div>
         );
