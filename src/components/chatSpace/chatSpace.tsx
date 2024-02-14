@@ -191,6 +191,9 @@ const ChatSpace = (props: any) => {
     }
     return null;
   };
+  const getTodayTimeStamp = () => {
+    return dayjs(dayjs(new Date()).format('YYYY-MM-DD 00:00:00')).unix();
+  };
 
   //消息头日期控制
   const dateControl = (msgIndex: any) => {
@@ -200,16 +203,15 @@ const ChatSpace = (props: any) => {
     const currTimeStamp = dayjs(curr.time).unix();
     const prevTimeStamp = prev ? dayjs(prev.time).unix() : 0;
     if (currTimeStamp - prevTimeStamp > 300) {
-      console.log(Date.now() / 1000 - currTimeStamp);
-      if (Date.now() / 1000 - currTimeStamp <= 86400) {
+      if (getTodayTimeStamp() - currTimeStamp <= 0) {
         return (
           <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
             {dayjs(curr.time).format('HH:mm')}
           </div>
         );
       } else if (
-        Date.now() / 1000 - currTimeStamp > 86400 &&
-        Date.now() / 1000 - currTimeStamp <= 172800
+        getTodayTimeStamp() - currTimeStamp > 0 &&
+        getTodayTimeStamp() - currTimeStamp <= 86400
       ) {
         return (
           <div className="tw-text-center tw-text-disLove tw-text-xs tw-py-3">
@@ -217,8 +219,8 @@ const ChatSpace = (props: any) => {
           </div>
         );
       } else if (
-        Date.now() / 1000 - currTimeStamp > 172800 &&
-        Date.now() / 1000 - currTimeStamp <= 604800
+        getTodayTimeStamp() - currTimeStamp > 86400 &&
+        getTodayTimeStamp() - currTimeStamp <= 604800
       ) {
         let week;
         switch (dayjs(curr.time).day()) {
