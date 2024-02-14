@@ -142,6 +142,8 @@ const Login = (props: any) => {
               <Input
                 value={userInfo.username}
                 prefix={<UserOutlined />}
+                className="customInput"
+                classNames={{ input: 'customInput' }}
                 onChange={(e: any) => inputUserName(e)}
                 maxLength={20}
                 allowClear={true}
@@ -150,6 +152,8 @@ const Login = (props: any) => {
               <Input.Password
                 value={userInfo.password}
                 type="passward"
+                className="customInput"
+                classNames={{ input: 'customInput' }}
                 prefix={<KeyOutlined />}
                 onChange={(e: any) => inputPassword(e)}
                 maxLength={20}
@@ -159,7 +163,9 @@ const Login = (props: any) => {
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                 }
               ></Input.Password>
-              <Button onClick={(e) => loginConfirm(e)}>登录</Button>
+              <Button className="customBtn" onClick={(e) => loginConfirm(e)}>
+                登录
+              </Button>
             </div>
             <p className="tw-text-whiteTextColor">
               第一次登录<span className="tw-text-hoverColor">自动注册</span>噢~

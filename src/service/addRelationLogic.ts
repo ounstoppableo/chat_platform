@@ -28,3 +28,11 @@ export const delSystemInfo = (msgId: string) => {
 export const getFriends = () => {
   return http(`/api/getFriends`);
 };
+
+export const toCreateGroup = (groupName: string, avatar: string) => {
+  return http(`/api/createGroup?groupName=${groupName}&avatar=${avatar}`);
+};
+
+export const getGroups = () => {
+  return http('/api/getGroups');
+};

@@ -33,6 +33,7 @@ module.exports = {
       2,
       'always',
       [
+        'bug',
         'feat',
         'fix',
         'perf',

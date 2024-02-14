@@ -1,5 +1,5 @@
 import { Group } from '@/redux/userInfo/userInfo.type';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
   CheckOutlined,
@@ -7,23 +7,33 @@ import {
   NotificationOutlined,
   RightOutlined
 } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
-import { Modal, message } from 'antd';
-import useRelationCtrl from '@/hooks/relationCtrl.tsx';
-import {
-  acceptAddFriend,
-  delSystemInfo,
-  getFriends,
-  getSystemInfo,
-  rejectAddFriend
-} from '@/service/addRelationLogic';
+import { useSystemInfo } from './hooks/systemInfo.tsx';
+import { useGetFriend } from './hooks/friend.tsx';
+import { useAddGroup } from './hooks/addGroup.tsx';
+import { useContext, useEffect } from 'react';
+import { getGroups } from '@/service/addRelationLogic.ts';
+import { setGroups } from '@/redux/userInfo/userInfo.ts';
+import socketContext from '@/context/socketContext.ts';
 
 const ChatRelation = (props: any) => {
   const { selectedGroup, switchGroup, msgOrRelation } = props;
   const groups: Group[] = useSelector((state: any) => state.userInfo.groups);
+  const socket = useContext(socketContext);
+  const dispatch = useDispatch();
+
+  //切换时更新groups
+  useEffect(() => {
+    if (msgOrRelation === 'msg') {
+      getGroups().then((res) => {
+        if (res.code === 200) {
+          dispatch(setGroups(res.data.result));
+          socket.current.emit('joinRoom', res.data.result);
+        }
+      });
+    }
+  }, [msgOrRelation]);
+
   const arr: any[] = [];
-  const [systemInfo, setSystemInfo] = useState([]);
-  const [friends, setFriends] = useState([]);
   groups.forEach((item: Group) => {
     arr.push(
       <div
@@ -68,77 +78,26 @@ const ChatRelation = (props: any) => {
     );
   });
 
-  const { show } = useRelationCtrl();
   //创建群聊
-  const createGroup = () => {
-    show();
-  };
+  const { createGroup } = useAddGroup();
 
-  //展开新朋友列表
-  const [showSystemInfo, setShowSystemInfo] = useState(false);
-  const toShowSystemInfo = () => {
-    setShowSystemInfo(!showSystemInfo);
-  };
+  //联系人控制
+  const { friends, toShowRelation, setFriends, showRelation } = useGetFriend({
+    msgOrRelation
+  });
 
-  //展开联系人
-  const [showRelation, setShowRelation] = useState(false);
-  const toShowRelation = () => {
-    setShowRelation(!showRelation);
-  };
-
-  //获取系统消息和朋友列表
-  useEffect(() => {
-    if (msgOrRelation === 'relation') {
-      getSystemInfo().then((res) => {
-        if (res.code === 200) {
-          setSystemInfo(res.data.result);
-          if (res.data.result.length !== 0) setShowSystemInfo(true);
-        }
-      });
-      getFriends().then((res) => {
-        if (res.code === 200) {
-          setFriends(res.data.result);
-        }
-      });
-    }
-  }, [msgOrRelation]);
-
-  //确认添加好友
-  const confirmAddFriend = (
-    msgId: string,
-    fromName: string,
-    toName: string
-  ) => {
-    acceptAddFriend({ msgId, fromName, toName }).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
-        message.success('添加成功！');
-        getFriends().then((res) => {
-          if (res.code === 200) {
-            setFriends(res.data.result);
-          }
-        });
-      }
-    });
-  };
-  //取消添加好友
-  const cancelAddFriend = (msgId: string) => {
-    rejectAddFriend(msgId).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
-        message.success('已拒绝');
-      }
-    });
-  };
-
-  //删除系统信息
-  const toDelSystemInfo = (msgId: string) => {
-    delSystemInfo(msgId).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
-      }
-    });
-  };
+  //系统消息控制
+  const {
+    showSystemInfo,
+    systemInfo,
+    toShowSystemInfo,
+    confirmAddFriend,
+    cancelAddFriend,
+    toDelSystemInfo
+  } = useSystemInfo({
+    msgOrRelation,
+    setFriends
+  });
 
   const systemInfoDom = systemInfo.map((item: any) => {
     return (

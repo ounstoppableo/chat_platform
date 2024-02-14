@@ -1,6 +1,10 @@
 .ant-btn {
     outline: none!important;
 }
+.customBtn {
+    border-color: rgba(22, 119, 255,0.5);
+    color: #999
+}
 
 .customModal {
     width: fit-content !important;
@@ -13,6 +17,11 @@
                 &>.ant-modal-confirm-body {
                     justify-content: center;
                     margin-bottom: 20px;
+                    &>.ant-modal-confirm-paragraph{
+                        &>.ant-modal-confirm-title{
+                            color:white
+                        }
+                    }
                 }
             }
         }
@@ -48,3 +57,19 @@
         }
     }
 }
+.customInput {
+    &::placeholder{
+        color:#a8abb2;
+    }
+    background-color: #424654;
+    color: white;
+    border-color: #424654;
+    padding: 4px;
+    &:disabled {
+        background-color: #424654 !important;
+        border-color: #424654;
+        color: white;
+    }
+}
+//激活态阴影
+//rgba(22, 119, 255,0.1)

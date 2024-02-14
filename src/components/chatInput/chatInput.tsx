@@ -143,6 +143,7 @@ const ChatInput = (props: any) => {
           value={inputValue}
           placeholder="来聊点什么吧~"
           onChange={inputChange}
+          className="customInput"
           disabled={!userInfo.isLogin}
         />
       </div>
@@ -160,12 +161,12 @@ const ChatInput = (props: any) => {
         @
       </div>
       <Upload {...selectPicProps} disabled={!userInfo.isLogin}>
-        <div className="tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
+        <div className="tw-text-white  tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
           <PictureOutlined />
         </div>
       </Upload>
       <Upload {...selectFolderProps} disabled={!userInfo.isLogin}>
-        <div className="tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
+        <div className="tw-text-white tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
           <FolderOutlined />
         </div>
       </Upload>
