@@ -1,4 +1,4 @@
-import { Msg } from '@/redux/userInfo/userInfo.type';
+import { Msg, UserInfo } from '@/redux/userInfo/userInfo.type';
 
 export interface ServerToClientEvents {
   toRoomClient: (msg: Msg) => void;
@@ -29,10 +29,17 @@ export interface ServerToClientEvents {
     msgId: string;
     room: string;
   }) => void;
+  addGroupMember: ({
+    userInfo,
+    groupId
+  }: {
+    userInfo: UserInfo;
+    groupId: string;
+  }) => void;
   error: (err: any) => void;
 }
 export interface ClientToServerEvents {
-  joinRoom: (groupIds: string[]) => void;
+  joinRoom: (groupIds: any[] | string) => void;
   msgToServer: (msg: {
     room: string;
     msg: string;

@@ -7,7 +7,8 @@ import {
   setUserStatus,
   setHistoryMessage,
   setMsgLikes,
-  setMsgDislikes
+  setMsgDislikes,
+  setAddGroupMember
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getTotalMsg } from '@/service/getGroupInfo';
@@ -99,6 +100,13 @@ const socketListener = (
   //某个用户状态改变
   socket.on('someoneStatusChange', (msg) => {
     dispatch(setUserStatus(msg));
+  });
+
+  //加入群组
+  socket.on('addGroupMember', (msg) => {
+    if (localStorage.getItem('currGroupId') === msg.groupId) {
+      dispatch(setAddGroupMember(msg.userInfo));
+    }
   });
   socket.on('error', (err: any) => {
     console.log(err);

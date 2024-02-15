@@ -12,7 +12,7 @@ export interface Group {
   username: string;
   gavatar: string;
   lastMsg: string;
-  date: Date;
+  time: Date;
   hadNewMsg: boolean;
   lastMsgUser: string;
 }

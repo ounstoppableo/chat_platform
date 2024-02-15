@@ -1,10 +1,10 @@
-import socketContext from '@/context/socketContext';
+import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
 import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import { addFriend } from '@/service/addRelationLogic';
 import { getGroupMember } from '@/service/getGroupInfo';
 import { PlusOutlined } from '@ant-design/icons';
-import { message } from 'antd';
+import { Button, message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -121,9 +121,24 @@ const MemberList = (props: any) => {
     );
   });
 
+  const { show } = useRelationCtrl({
+    groupMember,
+    groupId: selectedGroup.groupId,
+    groupName: selectedGroup.groupName
+  });
+  const addMember = () => {
+    show();
+  };
+
   return (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg tw-text-base tw-px-2.5 tw-py-2 tw-flex tw-flex-col tw-gap-4">
       <div>在线人数：{onlineNum}</div>
+      <button
+        onClick={addMember}
+        className="tw-bg-[#409eff] tw-text-white tw-rounded-full tw-w-6 tw-h-6 tw-absolute tw-right-8"
+      >
+        <PlusOutlined />
+      </button>
       <div className="tw-flex tw-flex-col tw-gap-1 tw-overflow-auto">
         {memberArr}
       </div>

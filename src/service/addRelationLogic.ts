@@ -36,3 +36,28 @@ export const toCreateGroup = (groupName: string, avatar: string) => {
 export const getGroups = () => {
   return http('/api/getGroups');
 };
+
+export const addGroupMember = (
+  groupId: string,
+  targetsUsernames: string[],
+  groupName: string
+) => {
+  return http('/api/addGroupMember', {
+    method: 'POST',
+    body: { groupId, targetsUsernames, groupName }
+  });
+};
+
+export const acceptJoinGroup = (systemMsg: any) => {
+  return http('/api/acceptJoinGroup', {
+    method: 'POST',
+    body: { systemMsg }
+  });
+};
+
+export const rejectJoinGroup = (systemMsg: any) => {
+  return http('/api/rejectJoinGroup', {
+    method: 'POST',
+    body: { systemMsg }
+  });
+};

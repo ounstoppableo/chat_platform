@@ -26,15 +26,32 @@ const ChatRelation = (props: any) => {
     if (msgOrRelation === 'msg') {
       getGroups().then((res) => {
         if (res.code === 200) {
+          res.data.result.sort();
           dispatch(setGroups(res.data.result));
-          socket.current.emit('joinRoom', res.data.result);
+          socket.current.emit &&
+            socket.current.emit('joinRoom', res.data.result);
         }
       });
     }
   }, [msgOrRelation]);
 
+  const getTodayTimeStamp = () => {
+    return dayjs(dayjs(new Date()).format('YYYY-MM-DD 00:00:00')).unix();
+  };
+  const timeFilter = (time: Date) => {
+    if (getTodayTimeStamp() - dayjs(time).unix() <= 0) {
+      return dayjs(time).format('HH:mm');
+    } else {
+      return dayjs(time).format('MM-DD');
+    }
+  };
+
   const arr: any[] = [];
-  groups.forEach((item: Group) => {
+  const newGroups = [...groups].sort((a: Group, b: Group) => {
+    return dayjs(b.time).unix() - dayjs(a.time).unix();
+  });
+
+  newGroups.forEach((item: Group) => {
     arr.push(
       <div
         key={item.groupId}
@@ -71,8 +88,8 @@ const ChatRelation = (props: any) => {
               : '啥也没有o~'}
           </div>
         </div>
-        <div className="tw-w-14 tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">
-          {item.date ? dayjs(item.date).format('MM月DD日') : ''}
+        <div className="tw-w-fit tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">
+          {timeFilter(item.time)}
         </div>
       </div>
     );
@@ -87,66 +104,9 @@ const ChatRelation = (props: any) => {
   });
 
   //系统消息控制
-  const {
-    showSystemInfo,
-    systemInfo,
-    toShowSystemInfo,
-    confirmAddFriend,
-    cancelAddFriend,
-    toDelSystemInfo
-  } = useSystemInfo({
+  const { showSystemInfo, toShowSystemInfo, systemInfoDom } = useSystemInfo({
     msgOrRelation,
     setFriends
-  });
-
-  const systemInfoDom = systemInfo.map((item: any) => {
-    return (
-      <div
-        key={item.msgId}
-        className={`tw-h-16 tw-rounded-lg
-         tw-flex tw-p-3 tw-gap-3 tw-items-center tw-bg-lightGray`}
-      >
-        <div className="tw-w-10 tw-h-10 tw-rounded-full tw-overflow-hidden">
-          <div className="tw-w-full tw-h-full tw-flex tw-justify-center tw-items-center tw-text-[25px] tw-bg-[#fea356]">
-            <NotificationOutlined />
-          </div>
-        </div>
-        <div className="tw-flex-1 tw-flex tw-flex-col">
-          {item.done === 'padding' ? (
-            <div className=" tw-w-full tw-break-all">{`${item.fromName}请求添加您为好友，是否同意？`}</div>
-          ) : (
-            <div className=" tw-w-full tw-break-all">{`${item.toName}已拒绝添加您为好友。`}</div>
-          )}
-        </div>
-        {item.done === 'padding' ? (
-          <div className="tw-flex tw-gap-1">
-            <button
-              className="tw-text-[#00CC66]"
-              onClick={() =>
-                confirmAddFriend(item.msgId, item.fromName, item.toName)
-              }
-            >
-              <CheckOutlined />
-            </button>
-            <button
-              className="tw-text-[#FF6666]"
-              onClick={() => cancelAddFriend(item.msgId)}
-            >
-              <CloseOutlined />
-            </button>
-          </div>
-        ) : (
-          <div>
-            <button
-              className="tw-text-[#FF6666]"
-              onClick={() => toDelSystemInfo(item.msgId)}
-            >
-              <CloseOutlined />
-            </button>
-          </div>
-        )}
-      </div>
-    );
   });
 
   const friendsDom = friends.map((item: any) => {

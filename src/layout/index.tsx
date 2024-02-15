@@ -24,6 +24,15 @@ const Layout = () => {
     groupName: '全员总群',
     groupId: '1'
   });
+  //初始化
+  useEffect(() => {
+    localStorage.setItem('currGroupId', selectedGroup.groupId);
+  }, []);
+
+  const toSetSelectGroup = (prop: Pick<Group, 'groupName' | 'groupId'>) => {
+    localStorage.setItem('currGroupId', prop.groupId);
+    setSelectedGroup(prop);
+  };
 
   const socket = useRef<Socket<ServerToClientEvents, ClientToServerEvents>>(
     {} as Socket<ServerToClientEvents, ClientToServerEvents>
@@ -31,7 +40,7 @@ const Layout = () => {
   const [msgOrRelation, setMsgOrRelation] = useState<'msg' | 'relation'>('msg');
   const dispatch = useDispatch();
   const switchGroup = (groupInfo: Pick<Group, 'groupName' | 'groupId'>) => {
-    setSelectedGroup(groupInfo);
+    toSetSelectGroup(groupInfo);
   };
   const showLoginForm = () => {
     setLoginFlag(true);
@@ -51,11 +60,13 @@ const Layout = () => {
     }
   };
   useEffect(() => {
-    loginConfirm();
+    const promise = new Promise((resolve) => {
+      loginConfirm().then(() => resolve(1));
+    });
     return () => {
-      JSON.stringify(socket.current) !== '{}'
-        ? socket.current.disconnect()
-        : null;
+      promise.then(() => {
+        socket.current.disconnect();
+      });
     };
   }, []);
   return (

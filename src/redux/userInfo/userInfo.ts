@@ -38,7 +38,8 @@ export const userInfoSlice = createSlice({
       state.groups.forEach((item) => {
         if (item.groupId === action.payload.room) {
           item.lastMsg = action.payload.msg;
-          item.date = action.payload.time;
+          item.time = action.payload.time;
+          item.lastMsgUser = action.payload.username;
         }
       });
     },
@@ -54,6 +55,9 @@ export const userInfoSlice = createSlice({
     },
     setGroupMember: (state, action: { payload: UserInfo[] }) => {
       state.groupMember = action.payload;
+    },
+    setAddGroupMember: (state, action: { payload: UserInfo }) => {
+      state.groupMember.push(action.payload);
     },
     setUserStatus: (
       state,
@@ -131,7 +135,8 @@ export const {
   setGroupMember,
   setHistoryMessage,
   setMsgLikes,
-  setMsgDislikes
+  setMsgDislikes,
+  setAddGroupMember
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;
