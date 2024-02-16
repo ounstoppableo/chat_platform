@@ -9,7 +9,14 @@ import {
 } from '@/redux/userInfo/userInfo.ts';
 import dayjs from 'dayjs';
 import styles from './chatSpace.module.scss';
-import { DislikeFilled, LikeFilled, RollbackOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  DislikeFilled,
+  EditOutlined,
+  LikeFilled,
+  LogoutOutlined,
+  RollbackOutlined
+} from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
 import useAtMemberLogic from './hooks/atMemberLogic.tsx';
@@ -25,6 +32,11 @@ const ChatSpace = (props: any) => {
   const { selectedGroup } = props;
   const chatSpaceRef = useRef<any>(null);
   const { atFlag, atMemberVDom } = useAtMemberLogic();
+  const groups = useSelector((state: any) => state.userInfo.groups);
+  const currentGroup = groups.find(
+    (item: any) => item.groupId === selectedGroup.groupId
+  );
+
   let msgArr: any = [];
 
   //获取点赞信息
@@ -420,7 +432,9 @@ const ChatSpace = (props: any) => {
 
   //聊天空间默认卷到底部，切换群组触发
   const scrollToBottom = () => {
-    chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight;
+    chatSpaceRef.current
+      ? (chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight)
+      : null;
   };
   useEffect(() => {
     scrollToBottom();
@@ -446,10 +460,62 @@ const ChatSpace = (props: any) => {
     }
   }, [historyMsg]);
 
-  return (
+  //群名预处理（p2p专用）
+  const groupNamePreOpera = (groupName: string) => {
+    const temp = groupName.split('&&&');
+    return userInfo.username === temp[0] ? temp[1] : temp[0];
+  };
+
+  //删除群聊
+  const deleteGroup = () => {};
+  //退出群聊
+  const exitGroup = () => {};
+  //修改群名
+  const editGroupName = () => {};
+
+  return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-14 tw-relative">
-      <div className="tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-pl-2">
-        {selectedGroup.groupName}
+      <div className="tw-justify-between tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-px-2">
+        <span>
+          {selectedGroup.type === 'group'
+            ? selectedGroup.groupName
+            : groupNamePreOpera(selectedGroup.groupName)}
+          &nbsp;
+          {currentGroup &&
+          currentGroup.authorBy === userInfo.username &&
+          currentGroup.type === 'group' ? (
+            <span onClick={editGroupName} className="tw-cursor-pointer">
+              <EditOutlined />
+            </span>
+          ) : (
+            <></>
+          )}
+        </span>
+        <div>
+          {currentGroup &&
+          JSON.stringify(userInfo) !== '{}' &&
+          currentGroup.type === 'group' ? (
+            currentGroup.authorBy === userInfo.username ? (
+              <button
+                title="删除群聊"
+                onClick={deleteGroup}
+                className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#ff4d4f]"
+              >
+                <DeleteOutlined />
+              </button>
+            ) : (
+              <button
+                onClick={exitGroup}
+                title="退出群聊"
+                className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#f69220]"
+              >
+                <LogoutOutlined />
+              </button>
+            )
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
       <div
         ref={chatSpaceRef}
@@ -458,7 +524,10 @@ const ChatSpace = (props: any) => {
         {msgArr}
       </div>
       <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
-        <ChatInput selectedGroup={selectedGroup}></ChatInput>
+        <ChatInput
+          selectedGroup={selectedGroup}
+          toName={groupNamePreOpera(selectedGroup.groupName)}
+        ></ChatInput>
         <InputMask></InputMask>
       </div>
       {atFlag ? (
@@ -469,6 +538,8 @@ const ChatSpace = (props: any) => {
         <> </>
       )}
     </div>
+  ) : (
+    <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>
   );
 };
 export default ChatSpace;

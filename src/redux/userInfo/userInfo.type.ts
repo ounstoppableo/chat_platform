@@ -7,6 +7,7 @@ export interface UserInfo {
 }
 
 export interface Group {
+  authorBy: string;
   groupName: string;
   groupId: string;
   username: string;
@@ -15,6 +16,10 @@ export interface Group {
   time: Date;
   hadNewMsg: boolean;
   lastMsgUser: string;
+  type: string;
+  fromAvatar: string;
+  toAvatar: string;
+  toUsername: string;
 }
 export type AllMsg = {
   [key: string]: Msg[];

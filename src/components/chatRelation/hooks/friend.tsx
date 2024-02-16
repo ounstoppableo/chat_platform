@@ -1,8 +1,10 @@
 import { getFriends } from '@/service/addRelationLogic';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export const useGetFriend = (props: any) => {
-  const { msgOrRelation } = props;
+  const { msgOrRelation, switchGroup } = props;
+  const userInfo = useSelector((state: any) => state.userInfo.data);
   //展开联系人
   const [showRelation, setShowRelation] = useState(false);
   const [friends, setFriends] = useState([]);
@@ -19,9 +21,45 @@ export const useGetFriend = (props: any) => {
       });
     }
   }, [msgOrRelation]);
+
+  const chat = (friendInfo: any) => {
+    switchGroup({
+      groupName: userInfo.username + '&&&' + friendInfo.username,
+      type: 'p2p',
+      toAvatar: friendInfo.avatar,
+      groupId: friendInfo.groupId
+    });
+  };
+
+  const friendsDom = friends.map((item: any) => {
+    return (
+      <div
+        key={item.uid}
+        onClick={() => chat(item)}
+        className="menberListItem tw-cursor-pointer tw-bg-lightGray hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+      >
+        <div
+          className={`tw-w-6 tw-rounded-full tw-relative 
+          after:tw-content-[''] after:tw-w-2 after:tw-h-2 after:tw-bg-onlineGreen ${
+            item.isOnline ? '' : 'tw-grayscale'
+          } after:tw-absolute after:tw-bottom-0 after:tw-right-0 after:tw-rounded-full
+        `}
+        >
+          <img
+            src={'/public' + item.avatar}
+            alt=""
+            className={`tw-object-contain tw-rounded-full`}
+          />
+        </div>
+        <div className="no-wrap-ellipsis tw-w-3/5" title={item.username}>
+          {item.username}
+        </div>
+      </div>
+    );
+  });
   return {
     showRelation,
-    friends,
+    friendsDom,
     toShowRelation,
     setFriends
   };

@@ -16,6 +16,7 @@ import { io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
 import socketListener from '@/utils/socketListener';
+import { validateString } from '@/utils/validateString';
 
 const Login = (props: any) => {
   const socket = useContext(socketContext);
@@ -62,25 +63,29 @@ const Login = (props: any) => {
   const loginConfirm = (e: any) => {
     if (!userInfo.username.trim() || !userInfo.password.trim()) {
       message.error('请正确填写用户名和密码');
+      return;
+    }
+    if (validateString(userInfo.username)) {
+      message.error('用户名不能有标点符号！');
+      return;
+    }
+    if (!loginAntiMulClick.current) {
+      loginAntiMulClick.current = true;
+      userLogin({
+        username: userInfo.username,
+        password: sha256(userInfo.password).toString()
+      }).then((res: any) => {
+        if (res.code === 200) {
+          localStorage.setItem('token', res.token);
+          message.success('登录成功');
+          loginControl.closeLoginForm();
+          loginCf();
+        } else {
+          loginAntiMulClick.current = false;
+        }
+      });
     } else {
-      if (!loginAntiMulClick.current) {
-        loginAntiMulClick.current = true;
-        userLogin({
-          username: userInfo.username,
-          password: sha256(userInfo.password).toString()
-        }).then((res: any) => {
-          if (res.code === 200) {
-            localStorage.setItem('token', res.token);
-            message.success('登录成功');
-            loginControl.closeLoginForm();
-            loginCf();
-          } else {
-            loginAntiMulClick.current = false;
-          }
-        });
-      } else {
-        message.warning('别急哦~登录请求中');
-      }
+      message.warning('别急哦~登录请求中');
     }
   };
 

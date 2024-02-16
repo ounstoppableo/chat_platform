@@ -19,18 +19,21 @@ const Layout = () => {
   const [inputValue, setInputValue] = useState('');
   const [loginFlag, setLoginFlag] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<
-    Pick<Group, 'groupName' | 'groupId'>
+    Pick<Group, 'groupName' | 'groupId' | 'type'> & { toAvatar?: string }
   >({
     groupName: '全员总群',
-    groupId: '1'
+    groupId: '1',
+    type: 'group'
   });
   //初始化
   useEffect(() => {
-    localStorage.setItem('currGroupId', selectedGroup.groupId);
+    localStorage.setItem('currGroup', JSON.stringify(selectedGroup));
   }, []);
 
-  const toSetSelectGroup = (prop: Pick<Group, 'groupName' | 'groupId'>) => {
-    localStorage.setItem('currGroupId', prop.groupId);
+  const toSetSelectGroup = (
+    prop: Pick<Group, 'groupName' | 'groupId' | 'type'> & { toAvatar?: string }
+  ) => {
+    localStorage.setItem('currGroup', JSON.stringify(prop));
     setSelectedGroup(prop);
   };
 
@@ -39,7 +42,11 @@ const Layout = () => {
   );
   const [msgOrRelation, setMsgOrRelation] = useState<'msg' | 'relation'>('msg');
   const dispatch = useDispatch();
-  const switchGroup = (groupInfo: Pick<Group, 'groupName' | 'groupId'>) => {
+  const switchGroup = (
+    groupInfo: Pick<Group, 'groupName' | 'groupId' | 'type'> & {
+      toAvatar?: string;
+    }
+  ) => {
     toSetSelectGroup(groupInfo);
   };
   const showLoginForm = () => {
@@ -56,7 +63,7 @@ const Layout = () => {
           token: getToken()
         }
       });
-      socketListener(socket.current, dispatch, res.data);
+      socketListener(socket.current, dispatch, res.data, switchGroup);
     }
   };
   useEffect(() => {
@@ -77,12 +84,15 @@ const Layout = () => {
             className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
           >
             <div
-              className={`tw-absolute tw-inset-x-36 tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+              className={`tw-absolute tw-inset-x-${
+                selectedGroup.type === 'group' ? '36' : '60'
+              } tw-transition-all tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
             >
               <div className="tw-w-14">
                 <UserInfo
                   msgOrRelation={msgOrRelation}
                   setMsgOrRelation={setMsgOrRelation}
+                  switchGroup={switchGroup}
                 />
               </div>
               <div className="tw-w-64 tw-overflow-auto tw-pr-2">
@@ -95,9 +105,13 @@ const Layout = () => {
               <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
                 <ChatSpace selectedGroup={selectedGroup} />
               </div>
-              <div className="tw-w-48">
-                <MemberList selectedGroup={selectedGroup} />
-              </div>
+              {selectedGroup.type === 'group' ? (
+                <div className="tw-w-48">
+                  <MemberList selectedGroup={selectedGroup} />
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
             <Login show={loginFlag}></Login>
           </div>

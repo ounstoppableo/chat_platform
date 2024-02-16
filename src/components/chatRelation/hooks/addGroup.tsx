@@ -1,4 +1,5 @@
 import { toCreateGroup } from '@/service/addRelationLogic';
+import { validateString } from '@/utils/validateString';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Upload, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
@@ -19,7 +20,8 @@ export const useAddGroup = () => {
     const groupName = inputRef.current!.input.value;
     if (!imageUrl) return message.error('请上传群头像！');
     if (groupName.length > 10) return message.error('群名称不能超过10个字符！');
-    else if (!groupName.trim()) return message.error('请正确输入群名称！');
+    if (!groupName.trim()) return message.error('请正确输入群名称！');
+    if (validateString(groupName)) return message.error('群名不能有标点符号！');
     else {
       setConfirmDisabled(true);
       toCreateGroup(groupName, imageUrl).then((res) => {

@@ -1,7 +1,7 @@
 import { MessageOutlined, TeamOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 const UserInfo = (prop: any) => {
-  const { msgOrRelation, setMsgOrRelation } = prop;
+  const { msgOrRelation, setMsgOrRelation, switchGroup } = prop;
   const userInfo = useSelector((state: any) => state.userInfo.data);
   enum destEnum {
     backEnd = 'https://github.com/ounstoppableo/chat-platform-nodets.git',
@@ -10,6 +10,13 @@ const UserInfo = (prop: any) => {
   }
   const changeMsgOrRelation = (type: 'msg' | 'relation') => {
     setMsgOrRelation(type);
+    type === 'msg'
+      ? switchGroup({
+          groupName: '全员总群',
+          groupId: '1',
+          type: 'group'
+        })
+      : switchGroup({});
   };
   function goToDest(linkName: keyof typeof destEnum) {
     const link = document.createElement('a');
@@ -41,20 +48,24 @@ const UserInfo = (prop: any) => {
         >
           <MessageOutlined style={{ fontSize: 25 + 'px' }} />
         </div>
-        <div
-          className={`tw-cursor-pointer tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointe hover:tw-text-hoverColor  ${
-            msgOrRelation === 'relation'
-              ? 'tw-text-hoverColor tw-bg-lightGray'
-              : 'tw-text-white'
-          }`}
-          onClick={() => {
-            changeMsgOrRelation('relation');
-          }}
-        >
-          <TeamOutlined style={{ fontSize: 25 + 'px' }} />
-        </div>
+        {userInfo.isLogin ? (
+          <div
+            className={`tw-cursor-pointer tw-rounded-lg tw-w-14 tw-h-14 tw-items-center tw-justify-center tw-flex tw-cursor-pointe hover:tw-text-hoverColor  ${
+              msgOrRelation === 'relation'
+                ? 'tw-text-hoverColor tw-bg-lightGray'
+                : 'tw-text-white'
+            }`}
+            onClick={() => {
+              changeMsgOrRelation('relation');
+            }}
+          >
+            <TeamOutlined style={{ fontSize: 25 + 'px' }} />
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
-      <div className="tw-flex tw-flex-col tw-gap-3 tw-items-center">
+      <div className="tw-flex tw-flex-col tw-gap-3 tw-items-center tw-mt-8">
         <div>
           <svg className="icon tw-text-3xl" aria-hidden="true">
             <use xlinkHref="#icon-weixin"></use>

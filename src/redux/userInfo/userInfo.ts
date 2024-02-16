@@ -16,6 +16,9 @@ export const userInfoSlice = createSlice({
     setGroups: (state, action) => {
       state.groups = action.payload;
     },
+    setAddGroups: (state, action: { payload: Group }) => {
+      state.groups.push(action.payload);
+    },
     setNewMsg: (
       state,
       action: { payload: Msg & { reset?: boolean; room?: string } }
@@ -136,7 +139,8 @@ export const {
   setHistoryMessage,
   setMsgLikes,
   setMsgDislikes,
-  setAddGroupMember
+  setAddGroupMember,
+  setAddGroups
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

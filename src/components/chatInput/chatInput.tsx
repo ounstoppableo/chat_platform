@@ -20,7 +20,7 @@ import socketContext from '@/context/socketContext';
 import inputLogicContext from '@/context/inputLogicContext';
 
 const ChatInput = (props: any) => {
-  const { selectedGroup } = props;
+  const { selectedGroup, toName } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
@@ -101,14 +101,28 @@ const ChatInput = (props: any) => {
     onChange: () => {}
   };
 
-  //发送消息的回调
-  const sendMsg = () => {
+  //发送消息的回调(群)
+  const sendMsgToGroup = () => {
     if (!userInfo.isLogin) loginControl.showLoginForm();
     socket.current.emit('msgToServer', {
       room: selectedGroup.groupId,
       msg: inputValue,
       time: new Date(),
       avatar: userInfo.avatar
+    });
+    setInputValue('');
+  };
+
+  //发送消息的回调(p2p)
+  const sendMsgForP2P = () => {
+    if (!userInfo.isLogin) loginControl.showLoginForm();
+    socket.current.emit('p2pChat', {
+      fromName: userInfo.username,
+      toName: toName,
+      msg: inputValue,
+      time: new Date(),
+      fromAvatar: userInfo.avatar,
+      toAvatar: selectedGroup.toAvatar
     });
     setInputValue('');
   };
@@ -154,12 +168,16 @@ const ChatInput = (props: any) => {
       >
         {emjFlag ? '😀' : '😐'}
       </div>
-      <div
-        onClick={at}
-        className="tw-cursor-pointer tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive"
-      >
-        @
-      </div>
+      {selectedGroup.type === 'group' ? (
+        <div
+          onClick={at}
+          className="tw-cursor-pointer tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive"
+        >
+          @
+        </div>
+      ) : (
+        <></>
+      )}
       <Upload {...selectPicProps} disabled={!userInfo.isLogin}>
         <div className="tw-text-white  tw-text-lg tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive">
           <PictureOutlined />
@@ -172,7 +190,13 @@ const ChatInput = (props: any) => {
       </Upload>
       <div className="tw-ml-3 tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg">
         {inputValue.length > 0 ? (
-          <div onClick={sendMsg}>
+          <div
+            onClick={() =>
+              selectedGroup.type === 'group'
+                ? sendMsgToGroup()
+                : sendMsgForP2P()
+            }
+          >
             <RocketTwoTone
               className={styles.rotateAnimation}
               style={{ fontSize: '25px', cursor: 'pointer' }}

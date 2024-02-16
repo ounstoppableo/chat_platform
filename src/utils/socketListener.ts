@@ -8,7 +8,8 @@ import {
   setHistoryMessage,
   setMsgLikes,
   setMsgDislikes,
-  setAddGroupMember
+  setAddGroupMember,
+  setAddGroups
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getTotalMsg } from '@/service/getGroupInfo';
@@ -20,7 +21,8 @@ import { Socket } from 'socket.io-client';
 const socketListener = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
   dispatch: Dispatch<any>,
-  userData: any
+  userData: any,
+  switchGroup: any
 ) => {
   //初次连接，用于初始化用户信息
   socket.on('connect', () => {
@@ -103,14 +105,40 @@ const socketListener = (
   });
 
   //加入群组
-  socket.on('addGroupMember', (msg) => {
-    if (localStorage.getItem('currGroupId') === msg.groupId) {
+  socket.on('addGroup', (msg) => {
+    if (
+      JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+        msg.groupId &&
+      msg.userInfo
+    ) {
       dispatch(setAddGroupMember(msg.userInfo));
+    }
+    if (msg.groupInfo) {
+      const currGroupName = JSON.parse(
+        localStorage.getItem('currGroup') || '{}'
+      ).groupName;
+      if (
+        currGroupName ===
+          msg.groupInfo.authorBy + '&&&' + msg.groupInfo.toUsername ||
+        currGroupName ===
+          msg.groupInfo.toUsername + '&&&' + msg.groupInfo.authorBy
+      ) {
+        switchGroup({
+          groupName: currGroupName,
+          groupId: msg.groupInfo.groupId,
+          type: msg.groupInfo.type
+        });
+      }
+
+      dispatch(setAddGroups(msg.groupInfo));
     }
   });
   socket.on('error', (err: any) => {
     console.log(err);
     message.error('与服务器连接失败');
+  });
+  socket.on('clientError', (err) => {
+    message.error(err.msg);
   });
 };
 export default socketListener;

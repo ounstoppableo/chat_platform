@@ -1,4 +1,4 @@
-import { Msg, UserInfo } from '@/redux/userInfo/userInfo.type';
+import { Group, Msg, UserInfo } from '@/redux/userInfo/userInfo.type';
 
 export interface ServerToClientEvents {
   toRoomClient: (msg: Msg) => void;
@@ -29,14 +29,13 @@ export interface ServerToClientEvents {
     msgId: string;
     room: string;
   }) => void;
-  addGroupMember: ({
-    userInfo,
-    groupId
-  }: {
-    userInfo: UserInfo;
+  addGroup: (msg: {
+    userInfo?: UserInfo;
     groupId: string;
+    groupInfo?: Group;
   }) => void;
   error: (err: any) => void;
+  clientError: (err: { msg: string }) => void;
 }
 export interface ClientToServerEvents {
   joinRoom: (groupIds: any[] | string) => void;
@@ -69,5 +68,13 @@ export interface ClientToServerEvents {
     msgId: number;
     dislikes: number;
     room: string;
+  }) => void;
+  p2pChat: (msg: {
+    fromName: string;
+    toName: string;
+    msg: string;
+    time: Date;
+    fromAvatar: string;
+    toAvatar: string;
   }) => void;
 }
