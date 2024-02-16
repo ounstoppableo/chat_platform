@@ -134,7 +134,6 @@ const socketListener = (
     }
   });
   socket.on('error', (err: any) => {
-    console.log(err);
     message.error('与服务器连接失败');
   });
   socket.on('clientError', (err) => {

@@ -35,7 +35,6 @@ const MemberList = (props: any) => {
     e.stopPropagation();
     if (username === userInfo.username) return;
     if (!userInfo.isLogin) return;
-    console.log(username);
     const toAddFriend = () => {
       addFriend(username).then((res) => {
         if (res.code === 200) {

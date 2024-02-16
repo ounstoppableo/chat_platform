@@ -55,6 +55,7 @@ const ChatSpace = (props: any) => {
       e.target.parentElement.parentElement.parentElement.querySelector(
         '#opera'
       );
+    if (!operaEle) return;
     operaEle.style.display = 'flex';
     requestAnimationFrame(() => {
       const nextSbling = e.target.nextElementSibling;
@@ -118,6 +119,7 @@ const ChatSpace = (props: any) => {
       e.target.parentElement.parentElement.parentElement.querySelector(
         '#opera'
       );
+    if (!operaEle) return;
     operaEle.classList.remove('opacity100');
     setTimeout(() => {
       operaEle.style.transition = 'none';
@@ -289,32 +291,36 @@ const ChatSpace = (props: any) => {
           <div key={item.id + '' + index}>
             {dateControl(index)}
             <div className="tw-flex tw-gap-2 tw-relative">
-              <div
-                id="opera"
-                className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
-              >
-                <div className="tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center">
-                  <RollbackOutlined />
-                </div>
+              {selectedGroup.type === 'group' ? (
                 <div
-                  onClick={() => like(item)}
-                  className={`${
-                    getHadLikes(item.id) ? 'tw-text-love' : 'tw-text-white'
-                  } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                  id="opera"
+                  className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
                 >
-                  <LikeFilled />
+                  <div className="tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center">
+                    <RollbackOutlined />
+                  </div>
+                  <div
+                    onClick={() => like(item)}
+                    className={`${
+                      getHadLikes(item.id) ? 'tw-text-love' : 'tw-text-white'
+                    } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                  >
+                    <LikeFilled />
+                  </div>
+                  <div
+                    onClick={() => dislike(item)}
+                    className={`${
+                      getHadDislikes(item.id)
+                        ? 'tw-text-disLove'
+                        : 'tw-text-white'
+                    } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                  >
+                    <DislikeFilled />
+                  </div>
                 </div>
-                <div
-                  onClick={() => dislike(item)}
-                  className={`${
-                    getHadDislikes(item.id)
-                      ? 'tw-text-disLove'
-                      : 'tw-text-white'
-                  } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
-                >
-                  <DislikeFilled />
-                </div>
-              </div>
+              ) : (
+                <></>
+              )}
               <div className="tw-w-10">
                 {item.username !== userInfo.username ? (
                   <img
