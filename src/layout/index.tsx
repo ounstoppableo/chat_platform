@@ -25,6 +25,21 @@ const Layout = () => {
     groupId: '1',
     type: 'group'
   });
+  const mentions = useRef<any>(null);
+  const at = (username?: string) => {
+    if (mentions.current) {
+      mentions.current.focus();
+      setInputValue(`@${username}`);
+      const keyboardEvent = new KeyboardEvent('keyup', {
+        key: 'Shift',
+        shiftKey: true,
+        bubbles: true
+      });
+      requestAnimationFrame(() => {
+        mentions.current.textarea.dispatchEvent(keyboardEvent);
+      });
+    }
+  };
   //初始化
   useEffect(() => {
     localStorage.setItem('currGroup', JSON.stringify(selectedGroup));
@@ -105,11 +120,15 @@ const Layout = () => {
                 />
               </div>
               <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
-                <ChatSpace selectedGroup={selectedGroup} />
+                <ChatSpace
+                  selectedGroup={selectedGroup}
+                  at={at}
+                  ref={mentions}
+                />
               </div>
               {selectedGroup.type === 'group' ? (
                 <div className="tw-w-48">
-                  <MemberList selectedGroup={selectedGroup} />
+                  <MemberList selectedGroup={selectedGroup} at={at} />
                 </div>
               ) : (
                 <></>

@@ -8,7 +8,7 @@ import {
   RocketTwoTone,
   SmileOutlined
 } from '@ant-design/icons';
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Input, UploadProps, message, Upload, Mentions } from 'antd';
 import emoji from 'emojilib';
 import styles from './chatInput.module.scss';
@@ -19,8 +19,8 @@ import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
 import inputLogicContext from '@/context/inputLogicContext';
 
-const ChatInput = (props: any) => {
-  const { selectedGroup, toName, replyInfo, closeReply } = props;
+const ChatInput = React.forwardRef((props: any, ref) => {
+  const { selectedGroup, toName, replyInfo, closeReply, at } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
@@ -49,9 +49,6 @@ const ChatInput = (props: any) => {
     setInputValue(
       e.currentTarget ? e.currentTarget.value.slice(0, 500) : e.slice(0, 500)
     );
-  };
-  const at = () => {
-    setInputValue(inputValue + '@');
   };
   const selectEmjOrMyFav = (tips: string) => {
     tips === 'emj' ? setEmjOrMyFav(true) : setEmjOrMyFav(false);
@@ -208,6 +205,7 @@ const ChatInput = (props: any) => {
       <div className="tw-flex-1">
         {selectedGroup.type === 'group' ? (
           <Mentions
+            ref={ref as any}
             value={inputValue}
             className="customMentions"
             placeholder="来聊点什么吧~"
@@ -311,5 +309,6 @@ const ChatInput = (props: any) => {
       )}
     </>
   );
-};
+});
+ChatInput.displayName = 'ChatInput';
 export default ChatInput;

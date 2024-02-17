@@ -1,5 +1,5 @@
 import ChatInput from '@/components/chatInput/chatInput.tsx';
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -10,20 +10,18 @@ import {
 import dayjs from 'dayjs';
 import styles from './chatSpace.module.scss';
 import {
-  ArrowUpOutlined,
   CloseOutlined,
   DeleteOutlined,
   DislikeFilled,
   EditOutlined,
   LikeFilled,
-  LogoutOutlined,
-  VerticalAlignTopOutlined
+  LogoutOutlined
 } from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
 import { Msg } from '@/redux/userInfo/userInfo.type.ts';
 
-const ChatSpace = (props: any) => {
+const ChatSpace = React.forwardRef((props: any, ref) => {
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const newMsg = useSelector((state: any) => state.userInfo.newMsg);
@@ -31,7 +29,7 @@ const ChatSpace = (props: any) => {
   const init = useRef(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: any) => state.userInfo.data);
-  const { selectedGroup } = props;
+  const { selectedGroup, at } = props;
   const chatSpaceRef = useRef<any>(null);
   const groups = useSelector((state: any) => state.userInfo.groups);
   const currentGroup = groups.find(
@@ -606,7 +604,7 @@ const ChatSpace = (props: any) => {
         </span>
         <div>
           {currentGroup &&
-          JSON.stringify(userInfo) !== '{}' &&
+          userInfo.username &&
           currentGroup.type === 'group' ? (
             currentGroup.authorBy === userInfo.username ? (
               <button
@@ -653,10 +651,12 @@ const ChatSpace = (props: any) => {
       )}
       <div className="tw-h-10 tw-relative tw-mx-5 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
         <ChatInput
+          ref={ref}
           selectedGroup={selectedGroup}
           toName={groupNamePreOpera(selectedGroup.groupName)}
           replyInfo={replyInfo}
           closeReply={closeReply}
+          at={at}
         ></ChatInput>
         <InputMask></InputMask>
       </div>
@@ -664,5 +664,6 @@ const ChatSpace = (props: any) => {
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>
   );
-};
+});
+ChatSpace.displayName = 'ChatSpace';
 export default ChatSpace;

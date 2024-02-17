@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 const MemberList = (props: any) => {
-  const { selectedGroup } = props;
+  const { selectedGroup, at } = props;
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
@@ -45,7 +45,6 @@ const MemberList = (props: any) => {
         }
       });
     };
-    const atTa = () => {};
     setMenu(
       <div
         className={`tw-text-xs tw-absolute tw-w-24 tw-h-16 tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
@@ -53,7 +52,7 @@ const MemberList = (props: any) => {
         id="menberListMenu"
       >
         <div
-          onClick={atTa}
+          onClick={() => at(username)}
           className="tw-pl-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
         >
           <span>@</span>
