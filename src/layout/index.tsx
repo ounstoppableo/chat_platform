@@ -84,8 +84,10 @@ const Layout = () => {
             className={`tw-h-screen tw-min-h-[580px] tw-relative tw-bg-temple tw-bg-cover`}
           >
             <div
-              className={`tw-absolute tw-inset-x-${
-                selectedGroup.type === 'group' ? '36' : '60'
+              className={`tw-absolute ${
+                selectedGroup.type === 'group'
+                  ? 'tw-inset-x-36'
+                  : 'tw-inset-x-60'
               } tw-transition-all tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
             >
               <div className="tw-w-14">

@@ -1,13 +1,15 @@
+import { setFriends } from '@/redux/userInfo/userInfo';
 import { getFriends } from '@/service/addRelationLogic';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const useGetFriend = (props: any) => {
   const { msgOrRelation, switchGroup } = props;
   const userInfo = useSelector((state: any) => state.userInfo.data);
   //展开联系人
   const [showRelation, setShowRelation] = useState(false);
-  const [friends, setFriends] = useState([]);
+  const friends = useSelector((state: any) => state.userInfo.friends);
+  const dispartch = useDispatch();
   const toShowRelation = () => {
     setShowRelation(!showRelation);
   };
@@ -16,7 +18,7 @@ export const useGetFriend = (props: any) => {
     if (msgOrRelation === 'relation') {
       getFriends().then((res) => {
         if (res.code === 200) {
-          setFriends(res.data.result);
+          dispartch(setFriends(res.data.result));
         }
       });
     }

@@ -7,7 +7,8 @@ export const userInfoSlice = createSlice({
     groups: [] as Group[],
     newMsg: {} as AllMsg,
     historyMsg: {} as AllMsg,
-    groupMember: [] as UserInfo[]
+    groupMember: [] as UserInfo[],
+    friends: [] as (UserInfo & { groupId: string; groupName: string })[]
   },
   reducers: {
     setUserInfo: (state, action: { payload: UserInfo }) => {
@@ -50,10 +51,12 @@ export const userInfoSlice = createSlice({
       state,
       action: { payload: { groupId: string; hadNewMsg: boolean } }
     ) => {
-      state.groups.forEach((item) => {
+      state.groups = state.groups.map((item) => {
         if (item.groupId === action.payload.groupId) {
           item.hadNewMsg = action.payload.hadNewMsg;
+          return item;
         }
+        return item;
       });
     },
     setGroupMember: (state, action: { payload: UserInfo[] }) => {
@@ -124,6 +127,31 @@ export const userInfoSlice = createSlice({
       state.historyMsg[action.payload.room].find(
         (item) => item.id === action.payload.msgId
       )!.dislikes = action.payload.dislikes;
+    },
+    setFriends: (
+      state,
+      action: {
+        payload: (UserInfo & { groupId: string; groupName: string })[] | Group;
+      }
+    ) => {
+      if (action.payload instanceof Array) {
+        state.friends = action.payload;
+      } else {
+        state.friends = state.friends.map((item) => {
+          if (
+            item.username === (action.payload as Group).authorBy ||
+            item.username === (action.payload as Group).toUsername
+          ) {
+            return {
+              ...item,
+              groupId: (action.payload as Group).groupId,
+              groupName: (action.payload as Group).groupName
+            };
+          } else {
+            return item;
+          }
+        });
+      }
     }
   }
 });
@@ -140,7 +168,8 @@ export const {
   setMsgLikes,
   setMsgDislikes,
   setAddGroupMember,
-  setAddGroups
+  setAddGroups,
+  setFriends
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

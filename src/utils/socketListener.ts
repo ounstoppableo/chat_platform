@@ -9,7 +9,8 @@ import {
   setMsgLikes,
   setMsgDislikes,
   setAddGroupMember,
-  setAddGroups
+  setAddGroups,
+  setFriends
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getTotalMsg } from '@/service/getGroupInfo';
@@ -129,7 +130,7 @@ const socketListener = (
           type: msg.groupInfo.type
         });
       }
-
+      dispatch(setFriends(msg.groupInfo));
       dispatch(setAddGroups(msg.groupInfo));
     }
   });

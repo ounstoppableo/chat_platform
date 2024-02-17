@@ -1,18 +1,13 @@
 import { Group, UserInfo } from '@/redux/userInfo/userInfo.type';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import {
-  CheckOutlined,
-  CloseOutlined,
-  NotificationOutlined,
-  RightOutlined
-} from '@ant-design/icons';
+import { RightOutlined } from '@ant-design/icons';
 import { useSystemInfo } from './hooks/systemInfo.tsx';
 import { useGetFriend } from './hooks/friend.tsx';
 import { useAddGroup } from './hooks/addGroup.tsx';
 import { useContext, useEffect } from 'react';
 import { getGroups } from '@/service/addRelationLogic.ts';
-import userInfo, { setGroups } from '@/redux/userInfo/userInfo.ts';
+import { setGroups } from '@/redux/userInfo/userInfo.ts';
 import socketContext from '@/context/socketContext.ts';
 
 const ChatRelation = (props: any) => {
@@ -27,8 +22,24 @@ const ChatRelation = (props: any) => {
     if (msgOrRelation === 'msg') {
       getGroups().then((res) => {
         if (res.code === 200) {
-          res.data.result.sort();
-          dispatch(setGroups(res.data.result));
+          //确保groups原来的属性不丢失，比如hadNewMsg
+          dispatch(
+            setGroups(
+              res.data.result.map((item: Group) => {
+                const group = groups.find(
+                  (group) => item.groupId === group.groupId
+                );
+                if (group) {
+                  return {
+                    ...item,
+                    hadNewMsg: group.hadNewMsg
+                  };
+                } else {
+                  return item;
+                }
+              })
+            )
+          );
           socket.current.emit &&
             socket.current.emit('joinRoom', res.data.result);
         }
@@ -48,9 +59,6 @@ const ChatRelation = (props: any) => {
   };
 
   const arr: any[] = [];
-  const newGroups = [...groups].sort((a: Group, b: Group) => {
-    return dayjs(b.time).unix() - dayjs(a.time).unix();
-  });
 
   const filterAvatar = (item: Group) => {
     const avatar =
@@ -71,6 +79,9 @@ const ChatRelation = (props: any) => {
     return username;
   };
 
+  const newGroups = [...groups].sort((a: Group, b: Group) => {
+    return dayjs(b.time).unix() - dayjs(a.time).unix();
+  });
   newGroups.forEach((item: Group) => {
     arr.push(
       <div
