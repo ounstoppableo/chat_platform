@@ -88,7 +88,7 @@ const Layout = () => {
                 selectedGroup.type === 'group'
                   ? 'tw-inset-x-36'
                   : 'tw-inset-x-60'
-              } tw-transition-all tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-overflow-hidden tw-gap-5 tw-p-5`}
+              } tw-transition-all tw-inset-y-20 tw-rounded-2xl tw-flex tw-bg-deepGray tw-gap-5 tw-p-5`}
             >
               <div className="tw-w-14">
                 <UserInfo
