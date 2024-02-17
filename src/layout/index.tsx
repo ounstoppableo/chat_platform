@@ -29,7 +29,7 @@ const Layout = () => {
   const at = (username?: string) => {
     if (mentions.current) {
       mentions.current.focus();
-      setInputValue(`@${username}`);
+      setInputValue(username ? `@${username}` : '@');
       const keyboardEvent = new KeyboardEvent('keyup', {
         key: 'Shift',
         shiftKey: true,

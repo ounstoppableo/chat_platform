@@ -238,7 +238,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
       </div>
       {selectedGroup.type === 'group' ? (
         <div
-          onClick={at}
+          onClick={() => at()}
           className="tw-cursor-pointer tw-w-7 tw-h-7 tw-flex tw-leading-8 tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive"
         >
           @
