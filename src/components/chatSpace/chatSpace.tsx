@@ -1,5 +1,5 @@
 import ChatInput from '@/components/chatInput/chatInput.tsx';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import InputMask from '../InputMask/InputMask.tsx';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -10,16 +10,18 @@ import {
 import dayjs from 'dayjs';
 import styles from './chatSpace.module.scss';
 import {
+  ArrowUpOutlined,
+  CloseOutlined,
   DeleteOutlined,
   DislikeFilled,
   EditOutlined,
   LikeFilled,
   LogoutOutlined,
-  RollbackOutlined
+  VerticalAlignTopOutlined
 } from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
-import useAtMemberLogic from './hooks/atMemberLogic.tsx';
+import { Msg } from '@/redux/userInfo/userInfo.type.ts';
 
 const ChatSpace = (props: any) => {
   const socket = useContext(socketContext);
@@ -31,11 +33,22 @@ const ChatSpace = (props: any) => {
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const { selectedGroup } = props;
   const chatSpaceRef = useRef<any>(null);
-  const { atFlag, atMemberVDom } = useAtMemberLogic();
   const groups = useSelector((state: any) => state.userInfo.groups);
   const currentGroup = groups.find(
     (item: any) => item.groupId === selectedGroup.groupId
   );
+  const [replyInfo, setReplyInfo] = useState<any>(null);
+
+  const closeReply = () => {
+    setReplyInfo(null);
+  };
+  const addReply = (replyInfo: {
+    username: string;
+    msg: string;
+    msgId: string;
+  }) => {
+    setReplyInfo(replyInfo);
+  };
 
   let msgArr: any = [];
 
@@ -283,12 +296,93 @@ const ChatSpace = (props: any) => {
     }
   };
 
+  //消息处理
+  const msgOpera = (msg: Msg) => {
+    if (!msg.atMembers || msg.atMembers.length === 0) {
+      return msg.msg;
+    } else {
+      const pattern = new RegExp(
+        msg.atMembers.map((item) => `@${item} `).join('|'),
+        'g'
+      );
+      // // 使用 split() 方法拆分字符串
+      let i = 0;
+      const parts = msg.msg
+        .split(pattern)
+        .reduce((acc: any, curr: any, index, array) => {
+          if (index < array.length - 1) {
+            const delimiter = (msg.msg as any).match(pattern)[index];
+            acc.push(
+              <span key={i++}>{curr}</span>,
+              <span key={i++} className="tw-text-hoverColor tw-cursor-pointer">
+                {delimiter}
+              </span>
+            );
+          } else {
+            acc.push(<span key={i++}>{curr}</span>);
+          }
+          return acc;
+        }, []);
+      return <>{parts}</>;
+    }
+  };
+  //滚动到msg的位置
+  const scrollToMsg = (dataIndex: string) => {
+    const target = document.body.querySelector(`[data-index='${dataIndex}']`);
+    target && target.scrollIntoView({ behavior: 'smooth' });
+  };
+  //获取回复消息
+  const getReplyMsg = (msg: Msg) => {
+    const replyMsg: Msg = historyMsg[selectedGroup.groupId].find(
+      (item: Msg) => item.id === msg.forMsg
+    );
+    return replyMsg ? (
+      <div
+        className={`tw-bg-[#424656] tw-break-all tw-w-fit tw-py-1 tw-px-2 tw-rounded-lg tw-text-xs tw-mt-1 tw-text-[#999999] ${
+          msg.username === userInfo.username ? 'tw-self-end' : 'tw-self-start'
+        }`}
+      >
+        {msg.username !== userInfo.username ? (
+          <>
+            <span
+              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
+              style={{ fontSize: '12px' }}
+              onClick={() => scrollToMsg(msg.forMsg)}
+            >
+              {' '}
+            </span>
+            <span> &nbsp;</span>
+          </>
+        ) : (
+          <></>
+        )}
+        <span>{replyMsg.username + ':' + replyMsg.msg}</span>
+        {msg.username === userInfo.username ? (
+          <>
+            <span>&nbsp;</span>
+            <span
+              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
+              style={{ fontSize: '12px' }}
+              onClick={() => scrollToMsg(msg.forMsg)}
+            >
+              {' '}
+            </span>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
+    ) : (
+      <></>
+    );
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
-      (item: any, index: number) => {
+      (item: Msg, index: number) => {
         return (
-          <div key={item.id + '' + index}>
+          <div key={item.id + '' + index} data-index={item.id}>
             {dateControl(index)}
             <div className="tw-flex tw-gap-2 tw-relative">
               {selectedGroup.type === 'group' ? (
@@ -296,8 +390,20 @@ const ChatSpace = (props: any) => {
                   id="opera"
                   className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
                 >
-                  <div className="tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center">
-                    <RollbackOutlined />
+                  <div
+                    onClick={() =>
+                      addReply({
+                        username: item.username,
+                        msg: item.msg,
+                        msgId: item.id
+                      })
+                    }
+                    className={`tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                  >
+                    <span
+                      className="iconfont icon-reply"
+                      style={{ fontSize: '12px' }}
+                    ></span>
                   </div>
                   <div
                     onClick={() => like(item)}
@@ -364,8 +470,9 @@ const ChatSpace = (props: any) => {
                     onMouseEnter={(e) => userOperaControl(e, item)}
                     onMouseLeave={userOperaControlForLeave}
                   >
-                    {item.msg}
+                    {msgOpera(item)}
                   </div>
+                  {getReplyMsg(item)}
                   {item.likes || item.dislikes ? (
                     <div
                       className={`tw-text-xs tw-flex tw-gap-2 tw-mt-1  ${
@@ -480,7 +587,7 @@ const ChatSpace = (props: any) => {
   const editGroupName = () => {};
 
   return selectedGroup.groupName ? (
-    <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-14 tw-relative">
+    <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
       <div className="tw-justify-between tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-px-2">
         <span>
           {selectedGroup.type === 'group'
@@ -529,20 +636,30 @@ const ChatSpace = (props: any) => {
       >
         {msgArr}
       </div>
-      <div className="tw-h-10 tw-absolute tw-inset-x-5 tw-bottom-4 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
+      {replyInfo ? (
+        <div className="tw-mx-5 tw-flex tw-gap-2 tw-bg-chatSpaceFooter tw-rounded-lg tw-mb-1 tw-text-xs tw-py-1 tw-px-2 tw-text-textGrayColor">
+          <span className="tw-break-all tw-flex-1">
+            {replyInfo.username + ':' + replyInfo.msg}
+          </span>
+          <span
+            className="tw-w-5 tw-flex tw-justify-center tw-items-center tw-cursor-pointer"
+            onClick={closeReply}
+          >
+            <CloseOutlined />
+          </span>
+        </div>
+      ) : (
+        <></>
+      )}
+      <div className="tw-h-10 tw-relative tw-mx-5 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
         <ChatInput
           selectedGroup={selectedGroup}
           toName={groupNamePreOpera(selectedGroup.groupName)}
+          replyInfo={replyInfo}
+          closeReply={closeReply}
         ></ChatInput>
         <InputMask></InputMask>
       </div>
-      {atFlag ? (
-        <div className="tw-absolute tw-bottom-16 tw-p-2 tw-flex tw-flex-col tw-gap-0.5 tw-overflow-y-auto tw-left-14 tw-min-w-100px tw-max-h-40 tw-bg-messageBackground tw-shadow-circle tw-rounded-lg">
-          {atMemberVDom}
-        </div>
-      ) : (
-        <> </>
-      )}
     </div>
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>

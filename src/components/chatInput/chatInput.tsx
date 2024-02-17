@@ -8,8 +8,8 @@ import {
   RocketTwoTone,
   SmileOutlined
 } from '@ant-design/icons';
-import { useContext, useEffect, useState } from 'react';
-import { Input, UploadProps, message, Upload } from 'antd';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Input, UploadProps, message, Upload, Mentions } from 'antd';
 import emoji from 'emojilib';
 import styles from './chatInput.module.scss';
 import { RcFile } from 'antd/es/upload';
@@ -20,11 +20,15 @@ import socketContext from '@/context/socketContext';
 import inputLogicContext from '@/context/inputLogicContext';
 
 const ChatInput = (props: any) => {
-  const { selectedGroup, toName } = props;
+  const { selectedGroup, toName, replyInfo, closeReply } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const userInfo: UserInfo = useSelector((state: any) => state.userInfo.data);
   const { inputValue, setInputValue } = useContext(inputLogicContext);
+  const groupMember: UserInfo[] = useSelector(
+    (state: any) => state.userInfo.groupMember
+  );
+  const atMembers = useRef<string[]>([]);
 
   const [msgFlag, setMsgFlag] = useState(false);
   const [emjFlag, setEmjFlag] = useState(false);
@@ -38,10 +42,13 @@ const ChatInput = (props: any) => {
     setEmjFlag(!emjFlag);
   };
   const addEmj = (emj: any) => {
-    setInputValue(inputValue + emj);
+    if (inputValue.length === 500) return message.error('超过字数限制！');
+    return setInputValue(inputValue + emj);
   };
   const inputChange = (e: any) => {
-    setInputValue(e.currentTarget.value);
+    setInputValue(
+      e.currentTarget ? e.currentTarget.value.slice(0, 500) : e.slice(0, 500)
+    );
   };
   const at = () => {
     setInputValue(inputValue + '@');
@@ -108,9 +115,13 @@ const ChatInput = (props: any) => {
       room: selectedGroup.groupId,
       msg: inputValue,
       time: new Date(),
-      avatar: userInfo.avatar
+      avatar: userInfo.avatar,
+      atMembers: atMembers.current,
+      forMsg: replyInfo && replyInfo.msgId
     });
     setInputValue('');
+    closeReply();
+    atMembers.current = [];
   };
 
   //发送消息的回调(p2p)
@@ -144,6 +155,48 @@ const ChatInput = (props: any) => {
       document.removeEventListener('click', callback);
     };
   }, [emjFlag]);
+
+  useEffect(() => {
+    setInputValue('');
+    atMembers.current = [];
+  }, [selectedGroup]);
+
+  //提及的options
+  const mentionOptions = [...groupMember]
+    .filter((item) => item.username !== userInfo.username)
+    .sort((a: UserInfo, b: UserInfo) => +a.uid - +b.uid)
+    .map((item: UserInfo, index: number) => {
+      return {
+        value: item.username,
+        label: (
+          <div
+            className={`${
+              index === 0 ? 'tw-bg-[#2b5281]' : ''
+            } tw-h-10 tw-white tw-flex tw-gap-2 tw-items-center tw-cursor-pointer hover:tw-bg-lightHoverColor tw-rounded-lg tw-p-1`}
+          >
+            <img
+              src={'/public' + item.avatar}
+              className="tw-h-full tw-rounded-full tw-object-cover"
+              alt=""
+            />
+            <div className="tw-text-white">{item.username}</div>
+          </div>
+        ),
+        key: item.uid,
+        className: '',
+        style: {
+          padding: 0,
+          paddingTop: index === 0 ? 0 : '4px'
+        }
+      };
+    });
+  const mentionOnSelect = (e: any) => {
+    if (inputValue.length + e.value.length >= 498)
+      return message.error('超过字数限制！');
+    return atMembers.current.includes(e.value)
+      ? null
+      : atMembers.current.push(e.value);
+  };
   return (
     <>
       <div
@@ -153,13 +206,30 @@ const ChatInput = (props: any) => {
         {msgFlag ? <AudioOutlined /> : <MessageOutlined />}
       </div>
       <div className="tw-flex-1">
-        <Input
-          value={inputValue}
-          placeholder="来聊点什么吧~"
-          onChange={inputChange}
-          className="customInput"
-          disabled={!userInfo.isLogin}
-        />
+        {selectedGroup.type === 'group' ? (
+          <Mentions
+            value={inputValue}
+            className="customMentions"
+            placeholder="来聊点什么吧~"
+            autoSize={{ minRows: 1, maxRows: 1 }}
+            notFoundContent={<div className="tw-text-white">没找到Ta啦~</div>}
+            disabled={!userInfo.isLogin}
+            onChange={inputChange}
+            autoFocus={true}
+            options={mentionOptions}
+            onSelect={mentionOnSelect}
+            popupClassName="customMentionsPopup"
+          />
+        ) : (
+          <Input
+            value={inputValue}
+            placeholder="来聊点什么吧~"
+            autoFocus={true}
+            onChange={inputChange}
+            className="customInput"
+            disabled={!userInfo.isLogin}
+          />
+        )}
       </div>
       <div
         id="showEmjSelect"

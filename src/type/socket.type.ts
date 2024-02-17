@@ -44,6 +44,8 @@ export interface ClientToServerEvents {
     msg: string;
     time: Date;
     avatar: string;
+    atMembers?: string[];
+    forMsg?: string;
   }) => void;
   likeSbMsg: (msg: {
     username: string;

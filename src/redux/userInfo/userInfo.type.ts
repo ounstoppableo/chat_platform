@@ -34,4 +34,6 @@ export type Msg = {
   likes: number;
   dislikes: number;
   username: string;
+  atMembers: string[];
+  forMsg: string;
 };

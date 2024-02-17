@@ -59,17 +59,42 @@
 }
 .customInput {
     &::placeholder{
-        color:#a8abb2;
+        color:#a8abb2 !important;
     }
-    background-color: #424654;
-    color: white;
+    background-color: #424654 !important;
+    color: white !important;
     border-color: #424654;
     padding: 4px;
     &:disabled {
         background-color: #424654 !important;
-        border-color: #424654;
-        color: white;
+        border-color: #424654 !important;
+        color: white !important;
     }
+}
+
+.customMentions {
+    border-color: #424654;
+    background-color: #424654;
+    &>textarea {
+        &::placeholder{
+            color:#a8abb2;
+        }
+        background-color: #424654;
+        color: white;
+        border-color: #424654;
+        padding: 4px;
+        &::-webkit-scrollbar{
+            width: 0;
+        }
+    }
+    &.ant-mentions-disabled {
+        border:none !important;
+    }
+}
+.customMentionsPopup {
+    background-color: #383c4b;
+    box-shadow: 0 0 6px rgb(0,0,0,0.4);
+    padding: 6px;
 }
 //激活态阴影
 //rgba(22, 119, 255,0.1)
