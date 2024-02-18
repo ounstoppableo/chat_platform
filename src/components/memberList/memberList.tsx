@@ -5,7 +5,7 @@ import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import { addFriend } from '@/service/addRelationLogic';
 import { getGroupMember } from '@/service/getGroupInfo';
 import { PlusOutlined, UserDeleteOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import { Button, Popconfirm, message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -83,15 +83,20 @@ const MemberList = (props: any) => {
           <span>添加好友</span>
         </div>
         {currentGroup.authorBy === userInfo.username ? (
-          <div
-            onClick={() => kickOut(username)}
-            className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          <Popconfirm
+            title="踢出群聊"
+            description="您真的要踢Ta出群吗?"
+            onConfirm={() => kickOut(username)}
+            okText="确认"
+            cancelText="取消"
           >
-            <span>
-              <UserDeleteOutlined />
-            </span>
-            <span>踢出群聊</span>
-          </div>
+            <div className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full">
+              <span>
+                <UserDeleteOutlined />
+              </span>
+              <span>踢出群聊</span>
+            </div>
+          </Popconfirm>
         ) : (
           <></>
         )}
