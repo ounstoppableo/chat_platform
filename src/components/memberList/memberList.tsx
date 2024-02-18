@@ -1,9 +1,10 @@
+import socketContext from '@/context/socketContext';
 import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
 import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import { addFriend } from '@/service/addRelationLogic';
 import { getGroupMember } from '@/service/getGroupInfo';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserDeleteOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const MemberList = (props: any) => {
   const { selectedGroup, at } = props;
+  const socket = useContext(socketContext);
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
@@ -19,6 +21,10 @@ const MemberList = (props: any) => {
   const onlineNum = groupMember.filter(
     (item: any) => !!item.isOnline === true
   ).length;
+  const groups = useSelector((state: any) => state.userInfo.groups);
+  const currentGroup = groups.find(
+    (item: any) => item.groupId === selectedGroup.groupId
+  );
   const dispatch = useDispatch();
   useEffect(() => {
     getGroupMember(selectedGroup.groupId).then((res) => {
@@ -27,6 +33,15 @@ const MemberList = (props: any) => {
       }
     });
   }, [selectedGroup]);
+
+  //踢出群聊
+  const kickOut = (kickOutUsername: string) => {
+    socket.current.emit('kickOutGroup', {
+      group: currentGroup,
+      kickOutUsername
+    });
+    setMenu(<></>);
+  };
 
   //鼠标右键事件的回调
   const [menu, setMenu] = useState(<></>);
@@ -47,26 +62,39 @@ const MemberList = (props: any) => {
     };
     setMenu(
       <div
-        className={`tw-text-xs tw-absolute tw-w-24 tw-h-16 tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
+        className={`tw-text-xs tw-absolute tw-w-24 tw-h-fit tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
         style={{ top: e.clientY + 'px', left: e.clientX + 'px' }}
         id="menberListMenu"
       >
         <div
           onClick={() => at(username)}
-          className="tw-pl-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
         >
           <span>@</span>
           <span>艾特Ta</span>
         </div>
         <div
           onClick={toAddFriend}
-          className="tw-pl-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
         >
           <span>
             <PlusOutlined />
           </span>
           <span>添加好友</span>
         </div>
+        {currentGroup.authorBy === userInfo.username ? (
+          <div
+            onClick={() => kickOut(username)}
+            className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          >
+            <span>
+              <UserDeleteOutlined />
+            </span>
+            <span>踢出群聊</span>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     );
   };

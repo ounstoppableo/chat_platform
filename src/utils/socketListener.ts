@@ -1,5 +1,4 @@
 import {
-  setGroups,
   setHadNewMsg,
   setNewMsg,
   setNewGroupMsg,
@@ -10,7 +9,10 @@ import {
   setMsgDislikes,
   setAddGroupMember,
   setAddGroups,
-  setFriends
+  setFriends,
+  setDelGroup,
+  setDelGroupMember,
+  setEditGroupName
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getTotalMsg } from '@/service/getGroupInfo';
@@ -28,15 +30,14 @@ const socketListener = (
   //初次连接，用于初始化用户信息
   socket.on('connect', () => {
     dispatch(setUserInfo(userData));
-    dispatch(setGroups(userData.groups));
     getTotalMsg(userData.username).then((res) => {
       if (res.code === 200) {
         dispatch(
           setHistoryMessage({ msgs: res.data, groupId: '', opera: 'init' })
         );
-        socket.emit('joinRoom', userData.groups);
       }
     });
+    socket.emit('joinRoom', userData.groups);
   });
 
   //接收到消息
@@ -134,6 +135,87 @@ const socketListener = (
       dispatch(setAddGroups(msg.groupInfo));
     }
   });
+  //删除群组
+  socket.on('delGroup', (msg) => {
+    if (msg.success) {
+      if (userData.username === msg.groupInfo.authorBy) {
+        message.success('删除群聊成功！');
+      } else {
+        if (
+          JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+          msg.groupInfo.groupId
+        ) {
+          switchGroup({});
+        }
+      }
+    }
+    dispatch(setDelGroup(msg.groupInfo.groupId));
+  });
+  //退出群组
+  socket.on('exitGroup', (msg) => {
+    if (msg.success) {
+      if (userData.username === msg.username) {
+        message.success('退出群聊成功！');
+        dispatch(setDelGroup(msg.groupInfo.groupId));
+      } else {
+        if (
+          JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+          msg.groupInfo.groupId
+        ) {
+          dispatch(setDelGroupMember(msg.username));
+        }
+      }
+    }
+  });
+  //修改群名
+  socket.on('editGroupName', (msg) => {
+    if (msg.success) {
+      if (userData.username === msg.groupInfo.authorBy) {
+        message.success('修改群名成功！');
+        switchGroup({
+          ...JSON.parse(localStorage.getItem('currGroup') || '{}'),
+          groupName: msg.newName
+        });
+      } else {
+        if (
+          JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+          msg.groupInfo.groupId
+        ) {
+          switchGroup({
+            ...JSON.parse(localStorage.getItem('currGroup') || '{}'),
+            groupName: msg.newName
+          });
+        }
+      }
+    }
+    dispatch(setEditGroupName({ group: msg.groupInfo, newName: msg.newName }));
+  });
+
+  //踢出群聊
+  socket.on('kickOutGroup', (msg) => {
+    if (msg.success) {
+      if (userData.username === msg.groupInfo.authorBy) {
+        message.success('踢出群聊成功！');
+        dispatch(setDelGroupMember(msg.kickOutUsername));
+      } else if (userData.username === msg.kickOutUsername) {
+        if (
+          JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+          msg.groupInfo.groupId
+        ) {
+          switchGroup({});
+        }
+        dispatch(setDelGroup(msg.groupInfo.groupId));
+      } else {
+        if (
+          JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+          msg.groupInfo.groupId
+        ) {
+          dispatch(setDelGroupMember(msg.kickOutUsername));
+        }
+      }
+    }
+  });
+
   socket.on('error', (err: any) => {
     message.error('与服务器连接失败');
   });

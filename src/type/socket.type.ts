@@ -34,6 +34,22 @@ export interface ServerToClientEvents {
     groupId: string;
     groupInfo?: Group;
   }) => void;
+  delGroup: (msg: { success: boolean; groupInfo: Group }) => void;
+  exitGroup: (msg: {
+    success: boolean;
+    groupInfo: Group;
+    username: string;
+  }) => void;
+  editGroupName: (msg: {
+    success: boolean;
+    groupInfo: Group;
+    newName: string;
+  }) => void;
+  kickOutGroup: (msg: {
+    success: boolean;
+    groupInfo: Group;
+    kickOutUsername: string;
+  }) => void;
   error: (err: any) => void;
   clientError: (err: { msg: string }) => void;
 }
@@ -80,4 +96,7 @@ export interface ClientToServerEvents {
     toAvatar: string;
   }) => void;
   delGroup: (msg: Group) => void;
+  exitGroup: (msg: Group) => void;
+  editGroupName: (msg: { group: Group; newName: string }) => void;
+  kickOutGroup: (msg: { group: Group; kickOutUsername: string }) => void;
 }

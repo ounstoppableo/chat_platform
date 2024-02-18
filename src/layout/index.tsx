@@ -6,7 +6,7 @@ import loginFlagContext from '@/context/loginFlagContext';
 import Login from '@/components/login/login.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { userConfirm } from '@/service/login';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
@@ -14,6 +14,8 @@ import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
 import InputLogicContext from '@/context/inputLogicContext';
+import { getGroups } from '@/service/addRelationLogic';
+import { setGroups } from '@/redux/userInfo/userInfo';
 
 const Layout = () => {
   const [inputValue, setInputValue] = useState('');
@@ -25,6 +27,7 @@ const Layout = () => {
     groupId: '1',
     type: 'group'
   });
+  const groups = useSelector((state: any) => state.userInfo.groups);
   const mentions = useRef<any>(null);
   const at = (username?: string) => {
     if (mentions.current) {
@@ -99,6 +102,7 @@ const Layout = () => {
       });
     };
   }, []);
+
   return (
     <socketContext.Provider value={socket}>
       <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
@@ -130,6 +134,7 @@ const Layout = () => {
               <div className="tw-flex-1 tw-min-w-minChatSpace tw-overflow-hidden">
                 <ChatSpace
                   selectedGroup={selectedGroup}
+                  switchGroup={switchGroup}
                   at={at}
                   ref={mentions}
                 />

@@ -105,11 +105,11 @@ const useRelationCtrl = (props: any) => {
         if (res.code === 200) {
           setData(
             res.data.result.filter((item: any) => {
-              let isHad = false;
-              groupMember.forEach((gmItem: any) => {
-                isHad = gmItem.username === item.username;
-              });
-              return !isHad;
+              return groupMember.find((gmItem: any) => {
+                return gmItem.username === item.username;
+              })
+                ? false
+                : true;
             })
           );
         }

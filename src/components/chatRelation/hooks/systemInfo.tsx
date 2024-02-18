@@ -83,8 +83,16 @@ export const useSystemInfo = (props: any) => {
         );
         message.success('添加成功！');
         soket.current.emit('joinRoom', systemMsg.groupId);
-        setConfirmDisabled(false);
+      } else if (res.code === 405) {
+        delSystemInfo(systemMsg.msgId).then((res) => {
+          if (res.code === 200) {
+            setSystemInfo(
+              systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
+            );
+          }
+        });
       }
+      setConfirmDisabled(false);
     });
   };
   //取消加群
@@ -130,7 +138,7 @@ export const useSystemInfo = (props: any) => {
       <div
         key={item.msgId}
         className={`tw-h-16 tw-rounded-lg
-         tw-flex tw-p-3 tw-gap-3 tw-items-center tw-bg-lightGray`}
+         tw-flex tw-p-3 tw-gap-3 tw-items-center tw-bg-lightGray tw-mb-2`}
       >
         <div className="tw-w-10 tw-h-10 tw-rounded-full tw-overflow-hidden">
           <div className="tw-w-full tw-h-full tw-flex tw-justify-center tw-items-center tw-text-[25px] tw-bg-[#fea356]">
@@ -143,11 +151,11 @@ export const useSystemInfo = (props: any) => {
             <button
               className="tw-text-[#00CC66]"
               disabled={confirmDisabled}
-              onClick={() =>
+              onClick={() => {
                 item.type === 'addFriend'
                   ? confirmAddFriend(item.msgId, item.fromName, item.toName)
-                  : confirmAddGroup(item)
-              }
+                  : confirmAddGroup(item);
+              }}
             >
               <CheckOutlined />
             </button>

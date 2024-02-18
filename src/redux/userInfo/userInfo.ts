@@ -152,6 +152,25 @@ export const userInfoSlice = createSlice({
           }
         });
       }
+    },
+    setDelGroup: (state, action: { payload: string }) => {
+      state.groups = state.groups.filter(
+        (item) => item.groupId !== action.payload
+      );
+    },
+    setDelGroupMember: (state, action: { payload: string }) => {
+      state.groupMember = state.groupMember.filter(
+        (item) => item.username !== action.payload
+      );
+    },
+    setEditGroupName: (
+      state,
+      action: { payload: { group: Group; newName: string } }
+    ) => {
+      const temp = state.groups.find(
+        (item) => item.groupId === action.payload.group.groupId
+      );
+      temp ? (temp.groupName = action.payload.newName) : null;
     }
   }
 });
@@ -169,7 +188,10 @@ export const {
   setMsgDislikes,
   setAddGroupMember,
   setAddGroups,
-  setFriends
+  setFriends,
+  setDelGroup,
+  setDelGroupMember,
+  setEditGroupName
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

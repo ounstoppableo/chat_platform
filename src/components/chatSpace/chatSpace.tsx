@@ -20,6 +20,7 @@ import {
 import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
 import { Msg } from '@/redux/userInfo/userInfo.type.ts';
+import { Input, Modal, Popconfirm, message } from 'antd';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -29,13 +30,15 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const init = useRef(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: any) => state.userInfo.data);
-  const { selectedGroup, at } = props;
+  const { selectedGroup, at, switchGroup } = props;
   const chatSpaceRef = useRef<any>(null);
   const groups = useSelector((state: any) => state.userInfo.groups);
   const currentGroup = groups.find(
     (item: any) => item.groupId === selectedGroup.groupId
   );
+  const [openEditGroupName, setOpenEditGroupName] = useState(false);
   const [replyInfo, setReplyInfo] = useState<any>(null);
+  const [newGroupName, setNewGroupName] = useState('');
 
   const closeReply = () => {
     setReplyInfo(null);
@@ -578,11 +581,36 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   };
 
   //删除群聊
-  const deleteGroup = () => {};
+  const deleteGroup = () => {
+    socket.current.emit('delGroup', currentGroup);
+    switchGroup({});
+  };
   //退出群聊
-  const exitGroup = () => {};
+  const exitGroup = () => {
+    socket.current.emit('exitGroup', currentGroup);
+    switchGroup({});
+  };
   //修改群名
-  const editGroupName = () => {};
+  const editGroupName = () => {
+    setOpenEditGroupName(true);
+  };
+  const checkEditGroupName = () => {
+    if (newGroupName.length === 0) return message.error('请正确输入群名！');
+    socket.current.emit('editGroupName', {
+      group: currentGroup,
+      newName: newGroupName
+    });
+    setOpenEditGroupName(false);
+    setNewGroupName('');
+    return 1;
+  };
+  const cancelEditGroupName = () => {
+    setOpenEditGroupName(false);
+    setNewGroupName('');
+  };
+  const changeNewGroupName = (e: any) => {
+    setNewGroupName(e.currentTarget.value.slice(0, 20));
+  };
 
   return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
@@ -607,21 +635,35 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           userInfo.username &&
           currentGroup.type === 'group' ? (
             currentGroup.authorBy === userInfo.username ? (
-              <button
+              <Popconfirm
                 title="删除群聊"
-                onClick={deleteGroup}
-                className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#ff4d4f]"
+                description="您真的要删除该群聊吗?"
+                onConfirm={deleteGroup}
+                okText="确认"
+                cancelText="取消"
               >
-                <DeleteOutlined />
-              </button>
+                <button
+                  title="删除群聊"
+                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#ff4d4f]"
+                >
+                  <DeleteOutlined />
+                </button>
+              </Popconfirm>
             ) : (
-              <button
-                onClick={exitGroup}
+              <Popconfirm
                 title="退出群聊"
-                className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#f69220]"
+                description="您真的要退出该群聊吗?"
+                onConfirm={exitGroup}
+                okText="确认"
+                cancelText="取消"
               >
-                <LogoutOutlined />
-              </button>
+                <button
+                  title="退出群聊"
+                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#f69220]"
+                >
+                  <LogoutOutlined />
+                </button>
+              </Popconfirm>
             )
           ) : (
             <></>
@@ -660,6 +702,41 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         ></ChatInput>
         <InputMask></InputMask>
       </div>
+      <Modal
+        open={openEditGroupName}
+        className="customModal"
+        okText="确认"
+        cancelText="取消"
+        closeIcon={null}
+        footer={
+          <div className="tw-flex tw-gap-3 tw-justify-center">
+            <button
+              onClick={cancelEditGroupName}
+              className="tw-border tw-border-[#4c4d4f] hover:tw-border-[#213d5b] hover:tw-text-[#409eff] tw-text-white tw-w-fit hover:tw-bg-[#18222c] tw-bg-transparent tw-rounded tw-px-4 tw-py-1.5  tw-self-end"
+            >
+              取消
+            </button>
+            <button
+              onClick={checkEditGroupName}
+              // disabled={confirmDisabled}
+              className="tw-text-white tw-w-fit hover:tw-bg-btnHoverColor tw-bg-btnColor tw-rounded tw-px-4 tw-py-1.5 tw-self-end"
+            >
+              确认
+            </button>
+          </div>
+        }
+      >
+        <div className="tw-flex tw-flex-col tw-justify-center tw-items-center tw-gap-2">
+          <div className="tw-text-white">请输入新的群名</div>
+          <div>
+            <Input
+              value={newGroupName}
+              onChange={changeNewGroupName}
+              className="customInput"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>
