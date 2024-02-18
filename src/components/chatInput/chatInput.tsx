@@ -19,7 +19,7 @@ import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
 import inputLogicContext from '@/context/inputLogicContext';
 
-const ChatInput = React.forwardRef((props: any, ref) => {
+const ChatInput = React.forwardRef((props: any, mentions) => {
   const { selectedGroup, toName, replyInfo, closeReply, at } = props;
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
@@ -28,6 +28,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
   );
+  const timer = useRef<any>(null);
   const atMembers = useRef<string[]>([]);
 
   const [msgFlag, setMsgFlag] = useState(false);
@@ -107,32 +108,48 @@ const ChatInput = React.forwardRef((props: any, ref) => {
 
   //发送消息的回调(群)
   const sendMsgToGroup = () => {
-    if (!userInfo.isLogin) loginControl.showLoginForm();
-    socket.current.emit('msgToServer', {
-      room: selectedGroup.groupId,
-      msg: inputValue,
-      time: new Date(),
-      avatar: userInfo.avatar,
-      atMembers: atMembers.current,
-      forMsg: replyInfo && replyInfo.msgId
-    });
-    setInputValue('');
-    closeReply();
-    atMembers.current = [];
+    if (!timer.current) {
+      if (!userInfo.isLogin) loginControl.showLoginForm();
+      socket.current.emit('msgToServer', {
+        room: selectedGroup.groupId,
+        msg: inputValue,
+        time: new Date(),
+        avatar: userInfo.avatar,
+        atMembers: atMembers.current,
+        forMsg: replyInfo && replyInfo.msgId
+      });
+      setInputValue('');
+      closeReply();
+      atMembers.current = [];
+      timer.current = setTimeout(() => {
+        clearTimeout(timer.current);
+        timer.current = null;
+      }, 3000);
+    } else {
+      message.error('发送速度太快了o,请3秒后再发~');
+    }
   };
 
   //发送消息的回调(p2p)
   const sendMsgForP2P = () => {
-    if (!userInfo.isLogin) loginControl.showLoginForm();
-    socket.current.emit('p2pChat', {
-      fromName: userInfo.username,
-      toName: toName,
-      msg: inputValue,
-      time: new Date(),
-      fromAvatar: userInfo.avatar,
-      toAvatar: selectedGroup.toAvatar
-    });
-    setInputValue('');
+    if (!timer.current) {
+      if (!userInfo.isLogin) loginControl.showLoginForm();
+      socket.current.emit('p2pChat', {
+        fromName: userInfo.username,
+        toName: toName,
+        msg: inputValue,
+        time: new Date(),
+        fromAvatar: userInfo.avatar,
+        toAvatar: selectedGroup.toAvatar
+      });
+      setInputValue('');
+      timer.current = setTimeout(() => {
+        clearTimeout(timer.current);
+        timer.current = null;
+      }, 3000);
+    } else {
+      message.error('发送速度太快了o,请3秒后再发~');
+    }
   };
 
   //添加全局点击事件
@@ -167,6 +184,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
         value: item.username,
         label: (
           <div
+            data-mentionsitem={item.username}
             className={`${
               index === 0 ? 'tw-bg-[#2b5281]' : ''
             } tw-h-10 tw-white tw-flex tw-gap-2 tw-items-center tw-cursor-pointer hover:tw-bg-lightHoverColor tw-rounded-lg tw-p-1`}
@@ -194,6 +212,37 @@ const ChatInput = React.forwardRef((props: any, ref) => {
       ? null
       : atMembers.current.push(e.value);
   };
+  //点击空格事件后触发选择
+  useEffect(() => {
+    const callback = (e: any) => {
+      //确定@对象
+      if (e.code === 'Space') {
+        const clickEvent = new Event('click', { bubbles: true });
+        document
+          .querySelector(`[data-menu-list="true"]`)
+          ?.children[0].dispatchEvent(clickEvent);
+      }
+    };
+    if ((mentions as any)?.current) {
+      (mentions as any)?.current.textarea.addEventListener('keyup', callback);
+    }
+    return () => {
+      if ((mentions as any)?.current) {
+        (mentions as any)?.current.textarea.removeEventListener(
+          'keyup',
+          callback
+        );
+      }
+    };
+  }, []);
+
+  const enterCallback = (e: any) => {
+    //回车发送消息
+    if (e.code === 'Enter') {
+      selectedGroup.type === 'group' ? sendMsgToGroup() : sendMsgForP2P();
+    }
+  };
+
   return (
     <>
       <div
@@ -205,7 +254,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
       <div className="tw-flex-1">
         {selectedGroup.type === 'group' ? (
           <Mentions
-            ref={ref as any}
+            ref={mentions as any}
             value={inputValue}
             className="customMentions"
             placeholder="来聊点什么吧~"
@@ -215,6 +264,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
             onChange={inputChange}
             autoFocus={true}
             options={mentionOptions}
+            onKeyUp={enterCallback}
             onSelect={mentionOnSelect}
             popupClassName="customMentionsPopup"
           />
@@ -224,6 +274,7 @@ const ChatInput = React.forwardRef((props: any, ref) => {
             placeholder="来聊点什么吧~"
             autoFocus={true}
             onChange={inputChange}
+            onKeyUp={enterCallback}
             className="customInput"
             disabled={!userInfo.isLogin}
           />

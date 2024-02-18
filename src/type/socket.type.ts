@@ -79,4 +79,5 @@ export interface ClientToServerEvents {
     fromAvatar: string;
     toAvatar: string;
   }) => void;
+  delGroup: (msg: Group) => void;
 }

@@ -38,6 +38,14 @@ const Layout = () => {
       requestAnimationFrame(() => {
         mentions.current.textarea.dispatchEvent(keyboardEvent);
       });
+      if (username) {
+        requestAnimationFrame(() => {
+          const clickEvent = new Event('click', { bubbles: true });
+          document
+            .querySelector(`[data-mentionsitem="${username}"]`)
+            ?.dispatchEvent(clickEvent);
+        });
+      }
     }
   };
   //初始化

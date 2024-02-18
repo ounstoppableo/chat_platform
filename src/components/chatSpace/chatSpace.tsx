@@ -21,7 +21,7 @@ import socketContext from '@/context/socketContext.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
 import { Msg } from '@/redux/userInfo/userInfo.type.ts';
 
-const ChatSpace = React.forwardRef((props: any, ref) => {
+const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
   const loginControl = useContext(loginFlagContext);
   const newMsg = useSelector((state: any) => state.userInfo.newMsg);
@@ -651,7 +651,7 @@ const ChatSpace = React.forwardRef((props: any, ref) => {
       )}
       <div className="tw-h-10 tw-relative tw-mx-5 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
         <ChatInput
-          ref={ref}
+          ref={mentions}
           selectedGroup={selectedGroup}
           toName={groupNamePreOpera(selectedGroup.groupName)}
           replyInfo={replyInfo}
