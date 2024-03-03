@@ -13,6 +13,7 @@ import {
   CloseOutlined,
   DeleteOutlined,
   DislikeFilled,
+  DownOutlined,
   EditOutlined,
   LikeFilled,
   LogoutOutlined
@@ -39,6 +40,20 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const [openEditGroupName, setOpenEditGroupName] = useState(false);
   const [replyInfo, setReplyInfo] = useState<any>(null);
   const [newGroupName, setNewGroupName] = useState('');
+  const scrollToBottomTimer = useRef<any>(null);
+
+  const [unReadMentionMsg, setUnReadMentionMsg] = useState<{
+    count: number;
+    targetId: any[];
+  }>({ count: 0, targetId: [] });
+  const [unReadReplyMsg, setUnReadReplyMsg] = useState<{
+    count: number;
+    targetId: any[];
+  }>({ count: 0, targetId: [] });
+  const [unReadNewMsg, setUnReadNewMsg] = useState<{
+    count: number;
+    targetId: any[];
+  }>({ count: 0, targetId: [] });
 
   const closeReply = () => {
     setReplyInfo(null);
@@ -530,6 +545,58 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       newMsg[selectedGroup.groupId] &&
       newMsg[selectedGroup.groupId].length !== 0
     ) {
+      if (chatSpaceRef.current && chatSpaceRef.current.lastElementChild) {
+        const lastDomRect =
+          chatSpaceRef.current.lastElementChild.getBoundingClientRect();
+        if (
+          document.getElementById('chatInputContainer')!.getBoundingClientRect()
+            .y -
+            lastDomRect.y -
+            lastDomRect.height -
+            20 <
+          0
+        ) {
+          newMsg[selectedGroup.groupId]
+            .filter((msg: Msg) => msg.username !== userInfo.username)
+            .forEach((item: Msg) => {
+              if (item.atMembers?.includes(userInfo.username)) {
+                const targetId = unReadMentionMsg.targetId.map((item) => item);
+                targetId.push(item.id);
+                setUnReadMentionMsg({
+                  count: unReadMentionMsg.count + 1,
+                  targetId: targetId
+                });
+              }
+              if (
+                (
+                  item.forMsg &&
+                  historyMsg[selectedGroup.groupId].find(
+                    (msg: Msg) => msg.id === item.forMsg
+                  )
+                )?.username === userInfo.username ||
+                (
+                  item.forMsg &&
+                  newMsg[selectedGroup.groupId].find(
+                    (msg: Msg) => msg.id === item.forMsg
+                  )
+                )?.username === userInfo.username
+              ) {
+                const targetId = unReadReplyMsg.targetId.map((item) => item);
+                targetId.push(item.id);
+                setUnReadReplyMsg({
+                  count: unReadReplyMsg.count + 1,
+                  targetId: targetId
+                });
+              }
+              const targetId = unReadNewMsg.targetId.map((item) => item);
+              targetId.push(item.id);
+              setUnReadNewMsg({
+                count: unReadNewMsg.count + 1,
+                targetId: targetId
+              });
+            });
+        }
+      }
       dispatch(
         setHistoryMessage({
           groupId: selectedGroup.groupId,
@@ -612,6 +679,146 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     setNewGroupName(e.currentTarget.value.slice(0, 20));
   };
 
+  const clickToScrollToNewMsg = () => {
+    if (!scrollToBottomTimer.current) {
+      const targetId = unReadNewMsg.targetId.map((item) => item);
+      const scollToMsgId = targetId.shift();
+      chatSpaceRef.current
+        ? chatSpaceRef
+            .current!.querySelector(`[data-index='${scollToMsgId}']`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'end',
+              inline: 'nearest'
+            })
+        : null;
+      setUnReadNewMsg({ count: targetId.length, targetId: targetId });
+      scrollToBottomTimer.current = setTimeout(() => {
+        clearTimeout(scrollToBottomTimer.current);
+        scrollToBottomTimer.current = null;
+      }, 500);
+    } else {
+      message.warning('操作太快啦!休息一下吧~');
+    }
+  };
+  const clickToScrollToMentionMsg = () => {
+    if (!scrollToBottomTimer.current) {
+      const targetId = unReadMentionMsg.targetId.map((item) => item);
+      const scollToMsgId = targetId.shift();
+      chatSpaceRef.current
+        ? chatSpaceRef
+            .current!.querySelector(`[data-index='${scollToMsgId}']`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'end',
+              inline: 'nearest'
+            })
+        : null;
+      setUnReadMentionMsg({ count: targetId.length, targetId: targetId });
+      scrollToBottomTimer.current = setTimeout(() => {
+        clearTimeout(scrollToBottomTimer.current);
+        scrollToBottomTimer.current = null;
+      }, 500);
+    } else {
+      message.warning('操作太快啦!休息一下吧~');
+    }
+  };
+  const clickToScrollToReplyMsg = () => {
+    if (!scrollToBottomTimer.current) {
+      const targetId = unReadReplyMsg.targetId.map((item) => item);
+      const scollToMsgId = targetId.shift();
+      chatSpaceRef.current
+        ? chatSpaceRef
+            .current!.querySelector(`[data-index='${scollToMsgId}']`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'end',
+              inline: 'nearest'
+            })
+        : null;
+      setUnReadReplyMsg({ count: targetId.length, targetId: targetId });
+      scrollToBottomTimer.current = setTimeout(() => {
+        clearTimeout(scrollToBottomTimer.current);
+        scrollToBottomTimer.current = null;
+      }, 500);
+    } else {
+      message.warning('操作太快啦!休息一下吧~');
+    }
+  };
+
+  //监控滚动反馈新消息提示
+  useEffect(() => {
+    const callback = () => {
+      if (unReadNewMsg.count !== 0) {
+        unReadNewMsg.targetId.forEach((item: any) => {
+          const itemDom = chatSpaceRef.current.querySelector(
+            `[data-index='${item}']`
+          );
+          if (itemDom) {
+            const itemDomRect = itemDom.getBoundingClientRect();
+            const chatInputContainerY = document
+              .getElementById('chatInputContainer')!
+              .getBoundingClientRect().y;
+            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
+              const targetId = unReadNewMsg.targetId.filter(
+                (id) => id !== item
+              );
+              setUnReadNewMsg({ count: targetId.length, targetId });
+            }
+          }
+        });
+      }
+      if (unReadMentionMsg.count !== 0) {
+        unReadMentionMsg.targetId.forEach((item: any) => {
+          const itemDom = chatSpaceRef.current.querySelector(
+            `[data-index='${item}']`
+          );
+          if (itemDom) {
+            const itemDomRect = itemDom.getBoundingClientRect();
+            const chatInputContainerY = document
+              .getElementById('chatInputContainer')!
+              .getBoundingClientRect().y;
+            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
+              const targetId = unReadMentionMsg.targetId.filter(
+                (id) => id !== item
+              );
+              setUnReadMentionMsg({ count: targetId.length, targetId });
+            }
+          }
+        });
+      }
+      if (unReadReplyMsg.count !== 0) {
+        unReadReplyMsg.targetId.forEach((item: any) => {
+          const itemDom = chatSpaceRef.current.querySelector(
+            `[data-index='${item}']`
+          );
+          if (itemDom) {
+            const itemDomRect = itemDom.getBoundingClientRect();
+            const chatInputContainerY = document
+              .getElementById('chatInputContainer')!
+              .getBoundingClientRect().y;
+            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
+              const targetId = unReadReplyMsg.targetId.filter(
+                (id) => id !== item
+              );
+              setUnReadReplyMsg({ count: targetId.length, targetId });
+            }
+          }
+        });
+      }
+    };
+    chatSpaceRef.current?.addEventListener('scroll', callback);
+    return () => {
+      chatSpaceRef.current?.removeEventListener('scroll', callback);
+    };
+  }, [unReadMentionMsg, unReadNewMsg, unReadReplyMsg]);
+  //切换群组时清空unReadMsg
+  useEffect(() => {
+    setUnReadMentionMsg({ count: 0, targetId: [] });
+    setUnReadNewMsg({ count: 0, targetId: [] });
+    setUnReadReplyMsg({ count: 0, targetId: [] });
+  }, [selectedGroup]);
+
   return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
       <div className="tw-justify-between tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-px-2">
@@ -691,7 +898,10 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       ) : (
         <></>
       )}
-      <div className="tw-h-10 tw-relative tw-mx-5 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg">
+      <div
+        id="chatInputContainer"
+        className="tw-h-10 tw-relative tw-mx-5 tw-bg-chatSpaceFooter tw-rounded-lg tw-flex tw-items-center tw-px-2 tw-gap-0.5 tw-text-lg"
+      >
         <ChatInput
           ref={mentions}
           selectedGroup={selectedGroup}
@@ -737,6 +947,47 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           </div>
         </div>
       </Modal>
+      <div className="tw-absolute tw-right-6 tw-bottom-[70px] tw-flex tw-flex-col tw-gap-2">
+        {unReadNewMsg.count > 0 ? (
+          <div
+            onClick={clickToScrollToNewMsg}
+            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
+          >
+            {unReadNewMsg.count}&nbsp;条新消息&nbsp;
+            <span className="tw-text-[12px]">
+              <DownOutlined />
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
+        {unReadMentionMsg.count > 0 ? (
+          <div
+            onClick={clickToScrollToMentionMsg}
+            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
+          >
+            {unReadMentionMsg.count}&nbsp;条@信息&nbsp;
+            <span className="tw-text-[12px]">
+              <DownOutlined />
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
+        {unReadReplyMsg.count > 0 ? (
+          <div
+            onClick={clickToScrollToReplyMsg}
+            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
+          >
+            {unReadReplyMsg.count}&nbsp;条回复信息&nbsp;
+            <span className="tw-text-[12px]">
+              <DownOutlined />
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
     </div>
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>
