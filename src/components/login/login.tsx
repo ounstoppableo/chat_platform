@@ -25,18 +25,18 @@ const Login = (props: any) => {
     'username'
   );
   const dispatch = useDispatch();
-  const loginCf = async () => {
-    const res = await userConfirm();
-    if (res.code === 200) {
-      if (socket.current.disconnect) await socket.current.disconnect();
-      socket.current = io('https://localhost:3000', {
-        auth: {
-          token: getToken()
-        }
-      });
-      socketListener(socket.current, dispatch, res.data);
-    }
-  };
+  // const loginCf = async () => {
+  //   const res = await userConfirm();
+  //   if (res.code === 200) {
+  //     if (socket.current.disconnect) await socket.current.disconnect();
+  //     socket.current = io('https://localhost:3000', {
+  //       auth: {
+  //         token: getToken()
+  //       }
+  //     });
+  //     socketListener(socket.current, dispatch, res.data);
+  //   }
+  // };
   const loginAntiMulClick = useRef(false);
 
   const [userInfo, setUserInfo] = useState<{
@@ -79,7 +79,8 @@ const Login = (props: any) => {
           localStorage.setItem('token', res.token);
           message.success('登录成功');
           loginControl.closeLoginForm();
-          loginCf();
+          // loginCf();
+          location.reload();
         } else {
           loginAntiMulClick.current = false;
         }

@@ -115,7 +115,7 @@ export const useSystemInfo = (props: any) => {
         ) : (
           <div className=" tw-w-full tw-break-all">{`${item.toName}已拒绝添加您为好友。`}</div>
         );
-    } else {
+    } else if (item.type === 'addGroupMember') {
       dom =
         item.done === 'padding' ? (
           <div className=" tw-w-full tw-break-all">
@@ -129,6 +129,27 @@ export const useSystemInfo = (props: any) => {
             <span className="tw-text-hoverColor">{item.groupName}</span>。
           </div>
         );
+    } else if (item.type === 'kickOutGroup' && item.done === 'success') {
+      dom = (
+        <div className=" tw-w-full tw-break-all">
+          {`${item.fromName}已将您踢出群聊`}&nbsp;
+          {<span className="tw-text-hoverColor">{item.groupName}</span>}！
+        </div>
+      );
+    } else if (item.type === 'exitGroup' && item.done === 'success') {
+      dom = (
+        <div className=" tw-w-full tw-break-all">
+          {`${item.fromName}退出群聊`}&nbsp;
+          {<span className="tw-text-hoverColor">{item.groupName}</span>}！
+        </div>
+      );
+    } else if (item.type === 'delGroup' && item.done === 'success') {
+      dom = (
+        <div className=" tw-w-full tw-break-all">
+          {<span className="tw-text-hoverColor">{item.groupName}</span>}&nbsp;
+          {'群聊已解散'}！
+        </div>
+      );
     }
     return dom;
   };

@@ -1,3 +1,4 @@
+import { Group } from '@/redux/userInfo/userInfo.type';
 import http from '@/utils/http';
 
 export const addFriend = (username: string) => {
@@ -59,5 +60,12 @@ export const rejectJoinGroup = (systemMsg: any) => {
   return http('/api/rejectJoinGroup', {
     method: 'POST',
     body: { systemMsg }
+  });
+};
+
+export const closeChat = (group: Group) => {
+  return http('/api/closeChat', {
+    method: 'POST',
+    body: { group }
   });
 };

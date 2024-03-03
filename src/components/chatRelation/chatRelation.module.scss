@@ -1,0 +1,12 @@
+.delBtnShow {
+    &>.delBtn {
+        transform: scaleX(0);
+        transform-origin: right center;
+        transition: all 0.3s ease;
+    }
+    &:hover {
+        &>.delBtn {
+            transform: scaleX(1);
+        }
+    }
+}

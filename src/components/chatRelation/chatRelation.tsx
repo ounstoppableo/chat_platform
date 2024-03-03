@@ -1,14 +1,15 @@
 import { Group, UserInfo } from '@/redux/userInfo/userInfo.type';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import { RightOutlined } from '@ant-design/icons';
+import { CloseOutlined, RightOutlined } from '@ant-design/icons';
 import { useSystemInfo } from './hooks/systemInfo.tsx';
 import { useGetFriend } from './hooks/friend.tsx';
 import { useAddGroup } from './hooks/addGroup.tsx';
 import { useContext, useEffect } from 'react';
-import { getGroups } from '@/service/addRelationLogic.ts';
+import { closeChat, getGroups } from '@/service/addRelationLogic.ts';
 import { setGroups } from '@/redux/userInfo/userInfo.ts';
 import socketContext from '@/context/socketContext.ts';
+import styles from './chatRelation.module.scss';
 
 const ChatRelation = (props: any) => {
   const { selectedGroup, switchGroup, msgOrRelation } = props;
@@ -79,6 +80,19 @@ const ChatRelation = (props: any) => {
     return username;
   };
 
+  //关闭对话框
+  const toCloseChat = (e: any, group: Group) => {
+    e.stopPropagation();
+    closeChat(group).then((res) => {
+      if (res.code === 200) {
+        dispatch(
+          setGroups(groups.filter((item) => item.groupId !== group.groupId))
+        );
+        if (selectedGroup.groupId === group.groupId) switchGroup({});
+      }
+    });
+  };
+
   const newGroups = [...groups].sort((a: Group, b: Group) => {
     return dayjs(b.time).unix() - dayjs(a.time).unix();
   });
@@ -86,7 +100,9 @@ const ChatRelation = (props: any) => {
     arr.push(
       <div
         key={item.groupId}
-        className={`tw-h-16 tw-rounded-lg ${
+        className={`${
+          styles.delBtnShow
+        } tw-overflow-hidden tw-relative tw-h-16 tw-rounded-lg ${
           selectedGroup.groupId === item.groupId
             ? 'tw-bg-chatRelationActive'
             : 'tw-bg-lightGray'
@@ -128,6 +144,20 @@ const ChatRelation = (props: any) => {
         <div className="tw-w-fit tw-text-textGrayColor tw-text-xs tw-flex tw-items-center">
           {timeFilter(item.time)}
         </div>
+        {item.type === 'p2p' ? (
+          <div
+            className={`${styles.delBtn} tw-cursor-default tw-absolute tw-bg-[rgba(0,0,0,0.4)] tw-h-full tw-right-0 tw-flex tw-justify-center tw-items-center tw-overflow-hidden tw-w-[14%]`}
+          >
+            <span
+              onClick={(e) => toCloseChat(e, item)}
+              className="tw-text-[#ff4d4f] tw-text-base tw-cursor-pointer"
+            >
+              <CloseOutlined />
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     );
   });
