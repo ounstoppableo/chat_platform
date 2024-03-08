@@ -22,7 +22,7 @@ import { Msg } from '@/redux/userInfo/userInfo.type.ts';
 import { Input, Modal, Popconfirm, message } from 'antd';
 import useReplyLogic from './hooks/useReplyLogic.tsx';
 import useOperaLogic from './hooks/useOperaLogic.tsx';
-import useGroupManageLogic from './hooks/usegroupManageLogic.tsx';
+import useGroupManageLogic from './hooks/useGroupManageLogic.tsx';
 import useNewMsgTipLogic from './hooks/useNewMsgTipLogic.tsx';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
@@ -179,6 +179,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
             <div className="tw-flex tw-gap-2 tw-relative">
               {selectedGroup.type === 'group' ? (
                 <div
+                  data-opera-index={item.id}
                   id="opera"
                   className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
                 >
@@ -260,7 +261,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                         : 'tw-rounded-tr-none'
                     } tw-w-fit tw-max-w-full tw-break-words`}
                     onMouseEnter={(e) => userOperaControl(e, item)}
-                    onMouseLeave={userOperaControlForLeave}
+                    onMouseLeave={(e) => userOperaControlForLeave(e, item)}
                   >
                     {msgOpera(item)}
                   </div>

@@ -1,16 +1,20 @@
 import loginFlagContext from '@/context/loginFlagContext';
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 
 const useOperaLogic = (props: any) => {
   const loginControl = useContext(loginFlagContext);
   const { chatSpaceRef, userInfo, socket } = props;
+  const timer = useRef<any>({});
+  const timer2 = useRef<any>({});
   //点赞回复操作台的未知控制
   const userOperaControl = (e: any, item: any) => {
     const operaEle =
       e.target.parentElement.parentElement.parentElement.querySelector(
-        '#opera'
+        `[data-opera-index='${item.id}']`
       );
     if (!operaEle) return;
+    if (timer.current[item.id]) clearTimeout(timer.current[item.id]);
+    if (timer2.current[item.id]) clearTimeout(timer2.current[item.id]);
     operaEle.style.display = 'flex';
     requestAnimationFrame(() => {
       const nextSbling = e.target.nextElementSibling;
@@ -36,7 +40,7 @@ const useOperaLogic = (props: any) => {
             operaEle.style.top = 'auto';
             operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
           } else {
-            operaEle.style.top = 0 + 'px';
+            operaEle.style.top = -4 + 'px';
           }
         }
       } else {
@@ -59,7 +63,7 @@ const useOperaLogic = (props: any) => {
             operaEle.style.top = 'auto';
             operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
           } else {
-            operaEle.style.top = '0';
+            operaEle.style.top = '-4px';
           }
         }
       }
@@ -69,16 +73,20 @@ const useOperaLogic = (props: any) => {
       });
     });
   };
-  const userOperaControlForLeave = (e: any) => {
+  const userOperaControlForLeave = (e: any, item: any) => {
     const operaEle =
       e.target.parentElement.parentElement.parentElement.querySelector(
-        '#opera'
+        `[data-opera-index='${item.id}']`
       );
     if (!operaEle) return;
-    operaEle.classList.remove('opacity100');
-    setTimeout(() => {
-      operaEle.style.transition = 'none';
-      operaEle.style.display = '';
+    timer.current[item.id] = setTimeout(() => {
+      operaEle.classList.remove('opacity100');
+      timer2.current[item.id] = setTimeout(() => {
+        operaEle.style.transition = 'none';
+        operaEle.style.display = '';
+        timer2.current[item.id] = undefined;
+      }, 200);
+      timer.current[item.id] = undefined;
     }, 200);
   };
 
