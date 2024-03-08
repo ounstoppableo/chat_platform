@@ -124,7 +124,7 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
       timer.current = setTimeout(() => {
         clearTimeout(timer.current);
         timer.current = null;
-      }, 3000);
+      }, 1500);
     } else {
       message.error('发送速度太快了o,请3秒后再发~');
     }
@@ -146,7 +146,7 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
       timer.current = setTimeout(() => {
         clearTimeout(timer.current);
         timer.current = null;
-      }, 3000);
+      }, 1500);
     } else {
       message.error('发送速度太快了o,请3秒后再发~');
     }
