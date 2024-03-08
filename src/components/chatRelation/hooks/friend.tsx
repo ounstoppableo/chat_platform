@@ -33,7 +33,9 @@ export const useGetFriend = (props: any) => {
     });
   };
 
-  const sortedFriends = [...friends].sort();
+  const sortedFriends = [...friends].sort((a: any, b: any) => {
+    return b.isOnline - a.isOnline;
+  });
   const friendsDom = sortedFriends.map((item: any) => {
     return (
       <div

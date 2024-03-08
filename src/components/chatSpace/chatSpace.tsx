@@ -13,19 +13,20 @@ import {
   CloseOutlined,
   DeleteOutlined,
   DislikeFilled,
-  DownOutlined,
   EditOutlined,
   LikeFilled,
   LogoutOutlined
 } from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
-import loginFlagContext from '@/context/loginFlagContext.ts';
 import { Msg } from '@/redux/userInfo/userInfo.type.ts';
 import { Input, Modal, Popconfirm, message } from 'antd';
+import useReplyLogic from './hooks/useReplyLogic.tsx';
+import useOperaLogic from './hooks/useOperaLogic.tsx';
+import useGroupManageLogic from './hooks/usegroupManageLogic.tsx';
+import useNewMsgTipLogic from './hooks/useNewMsgTipLogic.tsx';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
-  const loginControl = useContext(loginFlagContext);
   const newMsg = useSelector((state: any) => state.userInfo.newMsg);
   const historyMsg = useSelector((state: any) => state.userInfo.historyMsg);
   const init = useRef(false);
@@ -38,212 +39,37 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     (item: any) => item.groupId === selectedGroup.groupId
   );
   const [openEditGroupName, setOpenEditGroupName] = useState(false);
-  const [replyInfo, setReplyInfo] = useState<any>(null);
+
   const [newGroupName, setNewGroupName] = useState('');
   const scrollToBottomTimer = useRef<any>(null);
+  const hadNewMsg = useRef(false);
 
-  const [unReadMentionMsg, setUnReadMentionMsg] = useState<{
-    count: number;
-    targetId: any[];
-  }>({ count: 0, targetId: [] });
-  const [unReadReplyMsg, setUnReadReplyMsg] = useState<{
-    count: number;
-    targetId: any[];
-  }>({ count: 0, targetId: [] });
-  const [unReadNewMsg, setUnReadNewMsg] = useState<{
-    count: number;
-    targetId: any[];
-  }>({ count: 0, targetId: [] });
-
-  const closeReply = () => {
-    setReplyInfo(null);
-  };
-  const addReply = (replyInfo: {
-    username: string;
-    msg: string;
-    msgId: string;
-  }) => {
-    setReplyInfo(replyInfo);
-  };
+  //回复模块
+  const { replyInfo, closeReply, addReply, getReplyMsg } = useReplyLogic({
+    historyMsg,
+    selectedGroup,
+    userInfo
+  });
 
   let msgArr: any = [];
 
-  //获取点赞信息
-  const getHadLikes = (msgId: string | number) => {
-    const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
-    return likeList[msgId] ? true : false;
-  };
-  const getHadDislikes = (msgId: string | number) => {
-    const dislikeList = JSON.parse(localStorage.getItem('dislikeList') || '{}');
-    return dislikeList[msgId] ? true : false;
-  };
+  //操作台逻辑
+  const {
+    userOperaControlForLeave,
+    userOperaControl,
+    like,
+    dislike,
+    getHadLikes,
+    getHadDislikes
+  } = useOperaLogic({
+    userInfo,
+    chatSpaceRef,
+    socket
+  });
 
-  //点赞回复操作台的未知控制
-  const userOperaControl = (e: any, item: any) => {
-    const operaEle =
-      e.target.parentElement.parentElement.parentElement.querySelector(
-        '#opera'
-      );
-    if (!operaEle) return;
-    operaEle.style.display = 'flex';
-    requestAnimationFrame(() => {
-      const nextSbling = e.target.nextElementSibling;
-      const { height: operaEleH, width: operaEleW } =
-        operaEle.getBoundingClientRect();
-      const {
-        x: chatSpaceX,
-        y: chatSpaceY,
-        width: chatSpaceW
-      } = chatSpaceRef.current.getBoundingClientRect();
-      const {
-        x: msgSpaceX,
-        y: msgSpaceY,
-        width: msgSpaceW
-      } = e.target.getBoundingClientRect();
-      if (item.username === userInfo.username) {
-        if (msgSpaceX - chatSpaceX - operaEleW - 24 > operaEleW) {
-          operaEle.style.top = nextSbling ? '35%' : '45%';
-          operaEle.style.left = msgSpaceX - chatSpaceX - operaEleW - 24 + 'px';
-        } else {
-          operaEle.style.left = msgSpaceX - chatSpaceX - 20 + 'px';
-          if (msgSpaceY - chatSpaceY < operaEleH + 2) {
-            operaEle.style.top = 'auto';
-            operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
-          } else {
-            operaEle.style.top = 0 + 'px';
-          }
-        }
-      } else {
-        if (
-          chatSpaceW - (msgSpaceX - chatSpaceX) - operaEleW - msgSpaceW - 24 >
-          operaEleW
-        ) {
-          operaEle.style.top = nextSbling ? '35%' : '45%';
-          operaEle.style.right =
-            chatSpaceW -
-            (msgSpaceX - chatSpaceX) -
-            operaEleW -
-            msgSpaceW -
-            28 +
-            'px';
-        } else {
-          operaEle.style.right =
-            chatSpaceW - (msgSpaceX - chatSpaceX) - msgSpaceW - 24 + 'px';
-          if (msgSpaceY - chatSpaceY < operaEleH + 4) {
-            operaEle.style.top = 'auto';
-            operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
-          } else {
-            operaEle.style.top = '0';
-          }
-        }
-      }
-      requestAnimationFrame(() => {
-        operaEle.style.transition = 'all 0.2s ease-in-out';
-        operaEle.classList.add('opacity100');
-      });
-    });
-  };
-  const userOperaControlForLeave = (e: any) => {
-    const operaEle =
-      e.target.parentElement.parentElement.parentElement.querySelector(
-        '#opera'
-      );
-    if (!operaEle) return;
-    operaEle.classList.remove('opacity100');
-    setTimeout(() => {
-      operaEle.style.transition = 'none';
-      operaEle.style.display = '';
-    }, 200);
-  };
-
-  //点赞逻辑
-  const like = (item: any) => {
-    if (!userInfo.isLogin) return loginControl.showLoginForm();
-    const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
-    const dislikeList = JSON.parse(localStorage.getItem('dislikeList') || '{}');
-    if (likeList[item.id]) {
-      socket.current.emit('cancelLikeSbMsg', {
-        room: item.room,
-        username: item.username,
-        msgId: item.id,
-        likes: item.likes
-      });
-      localStorage.setItem(
-        'likeList',
-        JSON.stringify(Object.assign(likeList, { [item.id]: false }))
-      );
-    } else {
-      if (dislikeList[item.id]) {
-        socket.current.emit('cancelDislikeSbMsg', {
-          room: item.room,
-          username: item.username,
-          msgId: item.id,
-          dislikes: item.dislikes
-        });
-        localStorage.setItem(
-          'dislikeList',
-          JSON.stringify(Object.assign(dislikeList, { [item.id]: false }))
-        );
-      }
-      socket.current.emit('likeSbMsg', {
-        room: item.room,
-        username: item.username,
-        msgId: item.id,
-        likes: item.likes
-      });
-      localStorage.setItem(
-        'likeList',
-        JSON.stringify(Object.assign(likeList, { [item.id]: true }))
-      );
-    }
-
-    return null;
-  };
-  const dislike = (item: any) => {
-    if (!userInfo.isLogin) return loginControl.showLoginForm();
-    const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
-    const dislikeList = JSON.parse(localStorage.getItem('dislikeList') || '{}');
-    if (dislikeList[item.id]) {
-      socket.current.emit('cancelDislikeSbMsg', {
-        room: item.room,
-        username: item.username,
-        msgId: item.id,
-        dislikes: item.dislikes
-      });
-      localStorage.setItem(
-        'dislikeList',
-        JSON.stringify(Object.assign(dislikeList, { [item.id]: false }))
-      );
-    } else {
-      if (likeList[item.id]) {
-        socket.current.emit('cancelLikeSbMsg', {
-          room: item.room,
-          username: item.username,
-          msgId: item.id,
-          likes: item.likes
-        });
-        localStorage.setItem(
-          'likeList',
-          JSON.stringify(Object.assign(likeList, { [item.id]: false }))
-        );
-      }
-      socket.current.emit('dislikeSbMsg', {
-        room: item.room,
-        username: item.username,
-        msgId: item.id,
-        dislikes: item.dislikes
-      });
-      localStorage.setItem(
-        'dislikeList',
-        JSON.stringify(Object.assign(dislikeList, { [item.id]: true }))
-      );
-    }
-    return null;
-  };
   const getTodayTimeStamp = () => {
     return dayjs(dayjs(new Date()).format('YYYY-MM-DD 00:00:00')).unix();
   };
-
   //消息头日期控制
   const dateControl = (msgIndex: any) => {
     const curr = historyMsg[selectedGroup.groupId][msgIndex];
@@ -341,56 +167,6 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         }, []);
       return <>{parts}</>;
     }
-  };
-  //滚动到msg的位置
-  const scrollToMsg = (dataIndex: string) => {
-    const target = document.body.querySelector(`[data-index='${dataIndex}']`);
-    target && target.scrollIntoView({ behavior: 'smooth' });
-  };
-  //获取回复消息
-  const getReplyMsg = (msg: Msg) => {
-    const replyMsg: Msg = historyMsg[selectedGroup.groupId].find(
-      (item: Msg) => item.id === msg.forMsg
-    );
-    return replyMsg ? (
-      <div
-        className={`tw-bg-[#424656] tw-break-all tw-w-fit tw-py-1 tw-px-2 tw-rounded-lg tw-text-xs tw-mt-1 tw-text-[#999999] ${
-          msg.username === userInfo.username ? 'tw-self-end' : 'tw-self-start'
-        }`}
-      >
-        {msg.username !== userInfo.username ? (
-          <>
-            <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
-              style={{ fontSize: '12px' }}
-              onClick={() => scrollToMsg(msg.forMsg)}
-            >
-              {' '}
-            </span>
-            <span> &nbsp;</span>
-          </>
-        ) : (
-          <></>
-        )}
-        <span>{replyMsg.username + ':' + replyMsg.msg}</span>
-        {msg.username === userInfo.username ? (
-          <>
-            <span>&nbsp;</span>
-            <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
-              style={{ fontSize: '12px' }}
-              onClick={() => scrollToMsg(msg.forMsg)}
-            >
-              {' '}
-            </span>
-          </>
-        ) : (
-          <></>
-        )}
-      </div>
-    ) : (
-      <></>
-    );
   };
 
   //添加聊天记录
@@ -620,7 +396,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   useEffect(() => {
     scrollToBottom();
   }, [selectedGroup]);
-  //修复首次加载不滑动到底部的问题,以及自己发送的消息需要滚动到底部
+  //修复首次加载不滑动到底部的问题
   useEffect(() => {
     if (
       historyMsg[selectedGroup.groupId] &&
@@ -630,194 +406,67 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       scrollToBottom();
       init.current = true;
     }
+  }, [historyMsg]);
+  //自己发消息则滚动到底部
+  useEffect(() => {
+    if (
+      newMsg[selectedGroup.groupId] &&
+      newMsg[selectedGroup.groupId].length !== 0 &&
+      newMsg[selectedGroup.groupId][newMsg[selectedGroup.groupId].length - 1]
+        .username === userInfo.username
+    ) {
+      hadNewMsg.current = true;
+    }
     if (
       historyMsg[selectedGroup.groupId] &&
       historyMsg[selectedGroup.groupId].length !== 0 &&
       historyMsg[selectedGroup.groupId][
         historyMsg[selectedGroup.groupId].length - 1
-      ].username === userInfo.username
+      ].username === userInfo.username &&
+      hadNewMsg.current
     ) {
+      requestAnimationFrame(() => {
+        hadNewMsg.current = false;
+      });
       scrollToBottom();
     }
-  }, [historyMsg]);
+  }, [newMsg, historyMsg]);
 
-  //群名预处理（p2p专用）
-  const groupNamePreOpera = (groupName: string) => {
-    const temp = groupName.split('&&&');
-    return userInfo.username === temp[0] ? temp[1] : temp[0];
-  };
+  //群控制逻辑
+  const {
+    groupNamePreOpera,
+    deleteGroup,
+    editGroupName,
+    exitGroup,
+    checkEditGroupName,
+    cancelEditGroupName,
+    changeNewGroupName
+  } = useGroupManageLogic({
+    socket,
+    userInfo,
+    switchGroup,
+    currentGroup,
+    setOpenEditGroupName,
+    newGroupName,
+    message,
+    setNewGroupName
+  });
 
-  //删除群聊
-  const deleteGroup = () => {
-    socket.current.emit('delGroup', currentGroup);
-    switchGroup({});
-  };
-  //退出群聊
-  const exitGroup = () => {
-    socket.current.emit('exitGroup', currentGroup);
-    switchGroup({});
-  };
-  //修改群名
-  const editGroupName = () => {
-    setOpenEditGroupName(true);
-  };
-  const checkEditGroupName = () => {
-    if (newGroupName.length === 0) return message.error('请正确输入群名！');
-    socket.current.emit('editGroupName', {
-      group: currentGroup,
-      newName: newGroupName
-    });
-    setOpenEditGroupName(false);
-    setNewGroupName('');
-    return 1;
-  };
-  const cancelEditGroupName = () => {
-    setOpenEditGroupName(false);
-    setNewGroupName('');
-  };
-  const changeNewGroupName = (e: any) => {
-    setNewGroupName(e.currentTarget.value.slice(0, 20));
-  };
-
-  const clickToScrollToNewMsg = () => {
-    if (!scrollToBottomTimer.current) {
-      const targetId = unReadNewMsg.targetId.map((item) => item);
-      const scollToMsgId = targetId.shift();
-      chatSpaceRef.current
-        ? chatSpaceRef
-            .current!.querySelector(`[data-index='${scollToMsgId}']`)
-            ?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'end',
-              inline: 'nearest'
-            })
-        : null;
-      setUnReadNewMsg({ count: targetId.length, targetId: targetId });
-      scrollToBottomTimer.current = setTimeout(() => {
-        clearTimeout(scrollToBottomTimer.current);
-        scrollToBottomTimer.current = null;
-      }, 500);
-    } else {
-      message.warning('操作太快啦!休息一下吧~');
-    }
-  };
-  const clickToScrollToMentionMsg = () => {
-    if (!scrollToBottomTimer.current) {
-      const targetId = unReadMentionMsg.targetId.map((item) => item);
-      const scollToMsgId = targetId.shift();
-      chatSpaceRef.current
-        ? chatSpaceRef
-            .current!.querySelector(`[data-index='${scollToMsgId}']`)
-            ?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'end',
-              inline: 'nearest'
-            })
-        : null;
-      setUnReadMentionMsg({ count: targetId.length, targetId: targetId });
-      scrollToBottomTimer.current = setTimeout(() => {
-        clearTimeout(scrollToBottomTimer.current);
-        scrollToBottomTimer.current = null;
-      }, 500);
-    } else {
-      message.warning('操作太快啦!休息一下吧~');
-    }
-  };
-  const clickToScrollToReplyMsg = () => {
-    if (!scrollToBottomTimer.current) {
-      const targetId = unReadReplyMsg.targetId.map((item) => item);
-      const scollToMsgId = targetId.shift();
-      chatSpaceRef.current
-        ? chatSpaceRef
-            .current!.querySelector(`[data-index='${scollToMsgId}']`)
-            ?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'end',
-              inline: 'nearest'
-            })
-        : null;
-      setUnReadReplyMsg({ count: targetId.length, targetId: targetId });
-      scrollToBottomTimer.current = setTimeout(() => {
-        clearTimeout(scrollToBottomTimer.current);
-        scrollToBottomTimer.current = null;
-      }, 500);
-    } else {
-      message.warning('操作太快啦!休息一下吧~');
-    }
-  };
-
-  //监控滚动反馈新消息提示
-  useEffect(() => {
-    const callback = () => {
-      if (unReadNewMsg.count !== 0) {
-        unReadNewMsg.targetId.forEach((item: any) => {
-          const itemDom = chatSpaceRef.current.querySelector(
-            `[data-index='${item}']`
-          );
-          if (itemDom) {
-            const itemDomRect = itemDom.getBoundingClientRect();
-            const chatInputContainerY = document
-              .getElementById('chatInputContainer')!
-              .getBoundingClientRect().y;
-            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
-              const targetId = unReadNewMsg.targetId.filter(
-                (id) => id !== item
-              );
-              setUnReadNewMsg({ count: targetId.length, targetId });
-            }
-          }
-        });
-      }
-      if (unReadMentionMsg.count !== 0) {
-        unReadMentionMsg.targetId.forEach((item: any) => {
-          const itemDom = chatSpaceRef.current.querySelector(
-            `[data-index='${item}']`
-          );
-          if (itemDom) {
-            const itemDomRect = itemDom.getBoundingClientRect();
-            const chatInputContainerY = document
-              .getElementById('chatInputContainer')!
-              .getBoundingClientRect().y;
-            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
-              const targetId = unReadMentionMsg.targetId.filter(
-                (id) => id !== item
-              );
-              setUnReadMentionMsg({ count: targetId.length, targetId });
-            }
-          }
-        });
-      }
-      if (unReadReplyMsg.count !== 0) {
-        unReadReplyMsg.targetId.forEach((item: any) => {
-          const itemDom = chatSpaceRef.current.querySelector(
-            `[data-index='${item}']`
-          );
-          if (itemDom) {
-            const itemDomRect = itemDom.getBoundingClientRect();
-            const chatInputContainerY = document
-              .getElementById('chatInputContainer')!
-              .getBoundingClientRect().y;
-            if (itemDomRect.y + itemDomRect.height / 2 < chatInputContainerY) {
-              const targetId = unReadReplyMsg.targetId.filter(
-                (id) => id !== item
-              );
-              setUnReadReplyMsg({ count: targetId.length, targetId });
-            }
-          }
-        });
-      }
-    };
-    chatSpaceRef.current?.addEventListener('scroll', callback);
-    return () => {
-      chatSpaceRef.current?.removeEventListener('scroll', callback);
-    };
-  }, [unReadMentionMsg, unReadNewMsg, unReadReplyMsg]);
-  //切换群组时清空unReadMsg
-  useEffect(() => {
-    setUnReadMentionMsg({ count: 0, targetId: [] });
-    setUnReadNewMsg({ count: 0, targetId: [] });
-    setUnReadReplyMsg({ count: 0, targetId: [] });
-  }, [selectedGroup]);
+  //新消息提示逻辑
+  const {
+    unReadNewMsg,
+    unReadReplyMsg,
+    unReadMentionMsg,
+    setUnReadMentionMsg,
+    setUnReadReplyMsg,
+    setUnReadNewMsg,
+    newMsgTipDom
+  } = useNewMsgTipLogic({
+    scrollToBottomTimer,
+    chatSpaceRef,
+    message,
+    selectedGroup
+  });
 
   return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
@@ -949,47 +598,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           </div>
         </div>
       </Modal>
-      <div className="tw-absolute tw-right-6 tw-bottom-[70px] tw-flex tw-flex-col tw-gap-2">
-        {unReadNewMsg.count > 0 ? (
-          <div
-            onClick={clickToScrollToNewMsg}
-            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
-          >
-            {unReadNewMsg.count}&nbsp;条新消息&nbsp;
-            <span className="tw-text-[12px]">
-              <DownOutlined />
-            </span>
-          </div>
-        ) : (
-          <></>
-        )}
-        {unReadMentionMsg.count > 0 ? (
-          <div
-            onClick={clickToScrollToMentionMsg}
-            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
-          >
-            {unReadMentionMsg.count}&nbsp;条@信息&nbsp;
-            <span className="tw-text-[12px]">
-              <DownOutlined />
-            </span>
-          </div>
-        ) : (
-          <></>
-        )}
-        {unReadReplyMsg.count > 0 ? (
-          <div
-            onClick={clickToScrollToReplyMsg}
-            className=" tw-border-[#2790f5] tw-border tw-bg-[#323644] tw-text-[14px] tw-text-[#2790f5] hover:tw-bg-[#1a1c22]  tw-cursor-pointer tw-h-7  tw-flex tw-justify-center tw-items-center tw-px-4 tw-rounded-[28px]"
-          >
-            {unReadReplyMsg.count}&nbsp;条回复信息&nbsp;
-            <span className="tw-text-[12px]">
-              <DownOutlined />
-            </span>
-          </div>
-        ) : (
-          <></>
-        )}
-      </div>
+      {newMsgTipDom}
     </div>
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>
