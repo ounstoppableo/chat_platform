@@ -428,8 +428,11 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     ) {
       requestAnimationFrame(() => {
         hadNewMsg.current = false;
+        scrollToBottom();
+        requestAnimationFrame(() => {
+          clearUnReadMsg();
+        });
       });
-      scrollToBottom();
     }
   }, [newMsg, historyMsg]);
 
@@ -461,7 +464,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     setUnReadMentionMsg,
     setUnReadReplyMsg,
     setUnReadNewMsg,
-    newMsgTipDom
+    newMsgTipDom,
+    clearUnReadMsg
   } = useNewMsgTipLogic({
     scrollToBottomTimer,
     chatSpaceRef,

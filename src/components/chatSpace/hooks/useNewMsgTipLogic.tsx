@@ -148,11 +148,14 @@ const useNewMsgTipLogic = (props: any) => {
       chatSpaceRef.current?.removeEventListener('scroll', callback);
     };
   }, [unReadMentionMsg, unReadNewMsg, unReadReplyMsg]);
-  //切换群组时清空unReadMsg
-  useEffect(() => {
+  const clearUnReadMsg = () => {
     setUnReadMentionMsg({ count: 0, targetId: [] });
     setUnReadNewMsg({ count: 0, targetId: [] });
     setUnReadReplyMsg({ count: 0, targetId: [] });
+  };
+  //切换群组时清空unReadMsg
+  useEffect(() => {
+    clearUnReadMsg();
   }, [selectedGroup]);
   const newMsgTipDom = (
     <div className="tw-absolute tw-right-6 tw-bottom-[70px] tw-flex tw-flex-col tw-gap-2">
@@ -207,7 +210,8 @@ const useNewMsgTipLogic = (props: any) => {
     setUnReadMentionMsg,
     setUnReadReplyMsg,
     setUnReadNewMsg,
-    newMsgTipDom
+    newMsgTipDom,
+    clearUnReadMsg
   };
 };
 export default useNewMsgTipLogic;
