@@ -224,7 +224,7 @@ const ChatRelation = (props: any) => {
       </div>
       {showRelation ? (
         <div
-          className={`tw-origin-top tw-transition-all tw-border-b tw-border-[#363637] tw-pb-3 tw-overflow-hidden tw-animate-unfold`}
+          className={`tw-origin-top tw-transition-all tw-border-b tw-border-[#363637] tw-flex tw-flex-col tw-gap-1.5 tw-pb-3 tw-overflow-hidden tw-animate-unfold`}
         >
           {friendsDom.length === 0 ? '暂无数据~' : friendsDom}
         </div>

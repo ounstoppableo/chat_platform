@@ -823,13 +823,14 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
       <div className="tw-justify-between tw-h-12 tw-w-full tw-bg-chatSpaceHeader tw-text-base tw-flex tw-items-center tw-px-2">
         <span>
-          {selectedGroup.type === 'group'
+          {selectedGroup.type === 'group' && Number(selectedGroup.groupId) !== 1
             ? selectedGroup.groupName
             : groupNamePreOpera(selectedGroup.groupName)}
           &nbsp;
           {currentGroup &&
           currentGroup.authorBy === userInfo.username &&
-          currentGroup.type === 'group' ? (
+          currentGroup.type === 'group' &&
+          Number(selectedGroup.groupId) !== 1 ? (
             <span onClick={editGroupName} className="tw-cursor-pointer">
               <EditOutlined />
             </span>
@@ -840,7 +841,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         <div>
           {currentGroup &&
           userInfo.username &&
-          currentGroup.type === 'group' ? (
+          currentGroup.type === 'group' &&
+          Number(selectedGroup.groupId) !== 1 ? (
             currentGroup.authorBy === userInfo.username ? (
               <Popconfirm
                 title="删除群聊"

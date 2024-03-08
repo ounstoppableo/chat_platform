@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const MemberList = (props: any) => {
   const { selectedGroup, at } = props;
   const socket = useContext(socketContext);
+  const friends = useSelector((state: any) => state.userInfo.friends);
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
@@ -73,15 +74,19 @@ const MemberList = (props: any) => {
           <span>@</span>
           <span>艾特Ta</span>
         </div>
-        <div
-          onClick={toAddFriend}
-          className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
-        >
-          <span>
-            <PlusOutlined />
-          </span>
-          <span>添加好友</span>
-        </div>
+        {friends.find((friend: any) => friend.username === username) ? (
+          <></>
+        ) : (
+          <div
+            onClick={toAddFriend}
+            className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          >
+            <span>
+              <PlusOutlined />
+            </span>
+            <span>添加好友</span>
+          </div>
+        )}
         {currentGroup.authorBy === userInfo.username ? (
           <Popconfirm
             title="踢出群聊"

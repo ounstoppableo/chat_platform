@@ -33,7 +33,8 @@ export const useGetFriend = (props: any) => {
     });
   };
 
-  const friendsDom = friends.map((item: any) => {
+  const sortedFriends = [...friends].sort();
+  const friendsDom = sortedFriends.map((item: any) => {
     return (
       <div
         key={item.uid}
