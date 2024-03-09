@@ -12,7 +12,7 @@ const useReplyLogic = (props: any) => {
         inline: 'nearest'
       });
   };
-  const { historyMsg, selectedGroup, userInfo } = props;
+  const { historyMsg, selectedGroup, userInfo, openImg } = props;
   const [replyInfo, setReplyInfo] = useState<any>(null);
   const closeReply = () => {
     setReplyInfo(null);
@@ -31,14 +31,14 @@ const useReplyLogic = (props: any) => {
     );
     return replyMsg ? (
       <div
-        className={`tw-bg-[#424656] tw-break-all tw-w-fit tw-py-1 tw-px-2 tw-rounded-lg tw-text-xs tw-mt-1 tw-text-[#999999] ${
+        className={`tw-flex tw-gap-1 tw-bg-[#424656] tw-break-all tw-w-fit tw-py-1 tw-px-2 tw-rounded-lg tw-text-xs tw-mt-1 tw-text-[#999999] ${
           msg.username === userInfo.username ? 'tw-self-end' : 'tw-self-start'
         }`}
       >
         {msg.username !== userInfo.username ? (
           <>
             <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
+              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white tw-flex tw-items-center"
               style={{ fontSize: '12px' }}
               onClick={() => scrollToMsg(msg.forMsg)}
             >
@@ -49,12 +49,26 @@ const useReplyLogic = (props: any) => {
         ) : (
           <></>
         )}
-        <span>{replyMsg.username + ':' + replyMsg.msg}</span>
+        <span className="nowrap tw-flex tw-items-center">
+          {replyMsg.username + ':'}
+        </span>
+        {replyMsg.type === 'picture' ? (
+          <span>
+            <img
+              onClick={openImg}
+              src={'/public' + replyMsg.src || ''}
+              className="tw-object-contain tw-w-full tw-rounded-lg"
+              alt=""
+            />
+          </span>
+        ) : (
+          <span>{replyMsg.msg}</span>
+        )}
         {msg.username === userInfo.username ? (
           <>
             <span>&nbsp;</span>
             <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white"
+              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white tw-flex tw-items-center"
               style={{ fontSize: '12px' }}
               onClick={() => scrollToMsg(msg.forMsg)}
             >

@@ -12,6 +12,11 @@ function App() {
   return (
     <ConfigProvider>
       <RouterProvider router={router} />
+      <div id="imgOpenOverlay">
+        <div className="imgOpenContainer">
+          <img src="" alt="" id="fullScreenImage" />
+        </div>
+      </div>
     </ConfigProvider>
   );
 }

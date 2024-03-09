@@ -26,6 +26,7 @@ import useGroupManageLogic from './hooks/useGroupManageLogic.tsx';
 import useNewMsgTipLogic from './hooks/useNewMsgTipLogic.tsx';
 import useMenuLogic from './hooks/useMenuLogic.tsx';
 import { createPortal } from 'react-dom';
+import useOpenImgLogic from './hooks/useOpenImgLogic.tsx';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -46,11 +47,14 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const scrollToBottomTimer = useRef<any>(null);
   const hadNewMsg = useRef(false);
 
+  //图片打开逻辑
+  const { openImg } = useOpenImgLogic();
   //回复模块
   const { replyInfo, closeReply, addReply, getReplyMsg } = useReplyLogic({
     historyMsg,
     selectedGroup,
-    userInfo
+    userInfo,
+    openImg
   });
 
   let msgArr: any = [];
@@ -293,7 +297,18 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                     onMouseLeave={(e) => userOperaControlForLeave(e, item)}
                     onContextMenu={(e) => contextMenuCb(e, item)}
                   >
-                    {msgOpera(item)}
+                    {item.type === 'picture' ? (
+                      <div className="tw-w-full">
+                        <img
+                          onClick={openImg}
+                          src={'/public' + item.src}
+                          className="tw-object-contain tw-w-full  tw-rounded-lg"
+                          alt=""
+                        />
+                      </div>
+                    ) : (
+                      msgOpera(item)
+                    )}
                   </div>
                   {getReplyMsg(item)}
                   {item.likes || item.dislikes ? (

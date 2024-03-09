@@ -73,22 +73,47 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
 
   //图片上传的配置
   const selectPicProps: UploadProps = {
-    name: 'selectPictures',
-    action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
+    name: 'image',
+    action: '/api/uploadImage',
     showUploadList: false,
+    accept: 'image/*',
+    withCredentials: true,
     beforeUpload: (file: RcFile) => {
-      const isJpgOrPng =
-        file.type === 'image/jpeg' || file.type === 'image/png';
-      if (!isJpgOrPng) {
-        message.error('请选择图片类型的文件!');
-      }
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isLt2M) {
         message.error('文件大小不能超过2MB!');
       }
-      return isJpgOrPng && isLt2M;
+      return isLt2M;
     },
-    onChange: () => {}
+    onChange: (e: any) => {
+      if (e.file.status === 'done') {
+        if (e.file.response.code === 200) {
+          selectedGroup.type === 'group'
+            ? socket.current.emit('msgToServer', {
+                room: selectedGroup.groupId,
+                msg: '[图片]',
+                time: new Date(),
+                avatar: userInfo.avatar,
+                atMembers: atMembers.current,
+                forMsg: replyInfo && replyInfo.msgId,
+                type: 'picture',
+                src: e.file.response.data.src
+              })
+            : socket.current.emit('p2pChat', {
+                fromName: userInfo.username,
+                toName: toName,
+                msg: '[图片]',
+                time: new Date(),
+                fromAvatar: userInfo.avatar,
+                toAvatar: selectedGroup.toAvatar,
+                type: 'picture',
+                src: e.file.response.data.src
+              });
+        } else {
+          message.error(e.file.response.msg);
+        }
+      }
+    }
   };
 
   //上传文件的配置

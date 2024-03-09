@@ -63,6 +63,8 @@ export interface ClientToServerEvents {
     avatar: string;
     atMembers?: string[];
     forMsg?: string;
+    type?: string;
+    src?: string;
   }) => void;
   likeSbMsg: (msg: {
     username: string;
@@ -95,6 +97,8 @@ export interface ClientToServerEvents {
     time: Date;
     fromAvatar: string;
     toAvatar: string;
+    type?: string;
+    src?: string;
   }) => void;
   delGroup: (msg: Group) => void;
   exitGroup: (msg: Group) => void;

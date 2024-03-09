@@ -37,4 +37,5 @@ export type Msg = {
   atMembers: string[];
   forMsg: string;
   type: string;
+  src?: string;
 };
