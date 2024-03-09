@@ -14,13 +14,7 @@ const useNewMsgTipLogic = (props: any) => {
     count: number;
     targetId: any[];
   }>({ count: 0, targetId: [] });
-  const {
-    scrollToBottomTimer,
-    chatSpaceRef,
-    message,
-    selectedGroup,
-    historyMsg
-  } = props;
+  const { scrollToBottomTimer, chatSpaceRef, message, selectedGroup } = props;
   const clickToScrollToNewMsg = () => {
     if (!scrollToBottomTimer.current) {
       const targetId = unReadNewMsg.targetId.map((item: any) => item);

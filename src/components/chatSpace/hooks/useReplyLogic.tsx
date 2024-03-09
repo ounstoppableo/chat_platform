@@ -35,20 +35,6 @@ const useReplyLogic = (props: any) => {
           msg.username === userInfo.username ? 'tw-self-end' : 'tw-self-start'
         }`}
       >
-        {msg.username !== userInfo.username ? (
-          <>
-            <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white tw-flex tw-items-center"
-              style={{ fontSize: '12px' }}
-              onClick={() => scrollToMsg(msg.forMsg)}
-            >
-              {' '}
-            </span>
-            <span> &nbsp;</span>
-          </>
-        ) : (
-          <></>
-        )}
         <span className="nowrap tw-flex tw-items-center">
           {replyMsg.username + ':'}
         </span>
@@ -64,20 +50,16 @@ const useReplyLogic = (props: any) => {
         ) : (
           <span>{replyMsg.msg}</span>
         )}
-        {msg.username === userInfo.username ? (
-          <>
-            <span>&nbsp;</span>
-            <span
-              className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white tw-flex tw-items-center"
-              style={{ fontSize: '12px' }}
-              onClick={() => scrollToMsg(msg.forMsg)}
-            >
-              {' '}
-            </span>
-          </>
-        ) : (
-          <></>
-        )}
+        <>
+          <span>&nbsp;</span>
+          <span
+            className="iconfont icon-arrow-to-top tw-cursor-pointer tw-text-white tw-flex tw-items-center"
+            style={{ fontSize: '12px' }}
+            onClick={() => scrollToMsg(msg.forMsg)}
+          >
+            {' '}
+          </span>
+        </>
       </div>
     ) : (
       <></>

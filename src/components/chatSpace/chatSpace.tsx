@@ -27,6 +27,7 @@ import useNewMsgTipLogic from './hooks/useNewMsgTipLogic.tsx';
 import useMenuLogic from './hooks/useMenuLogic.tsx';
 import { createPortal } from 'react-dom';
 import useOpenImgLogic from './hooks/useOpenImgLogic.tsx';
+import usePictureLoadLogic from './hooks/usePictureLoadLogic.tsx';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -49,13 +50,6 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
 
   //图片打开逻辑
   const { openImg } = useOpenImgLogic();
-  //回复模块
-  const { replyInfo, closeReply, addReply, getReplyMsg } = useReplyLogic({
-    historyMsg,
-    selectedGroup,
-    userInfo,
-    openImg
-  });
 
   let msgArr: any = [];
 
@@ -193,6 +187,67 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     }
   };
 
+  //聊天空间默认卷到底部，切换群组触发
+  const scrollToBottom = () => {
+    chatSpaceRef.current
+      ? (chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight)
+      : null;
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedGroup]);
+  //修复首次加载不滑动到底部的问题
+  useEffect(() => {
+    if (
+      historyMsg[selectedGroup.groupId] &&
+      historyMsg[selectedGroup.groupId].length !== 0 &&
+      !init.current
+    ) {
+      scrollToBottom();
+      init.current = true;
+    }
+  }, [historyMsg]);
+  //自己发消息则滚动到底部
+  useEffect(() => {
+    if (
+      newMsg[selectedGroup.groupId] &&
+      newMsg[selectedGroup.groupId].length !== 0 &&
+      newMsg[selectedGroup.groupId][newMsg[selectedGroup.groupId].length - 1]
+        .username === userInfo.username
+    ) {
+      hadNewMsg.current = true;
+    }
+    if (
+      historyMsg[selectedGroup.groupId] &&
+      historyMsg[selectedGroup.groupId].length !== 0 &&
+      historyMsg[selectedGroup.groupId][
+        historyMsg[selectedGroup.groupId].length - 1
+      ].username === userInfo.username &&
+      hadNewMsg.current
+    ) {
+      requestAnimationFrame(() => {
+        hadNewMsg.current = false;
+        scrollToBottom();
+        requestAnimationFrame(() => {
+          clearUnReadMsg();
+        });
+      });
+    }
+  }, [newMsg, historyMsg]);
+
+  //图片加载后滚动到底部的逻辑
+  const { picLoadAndScrollLogic } = usePictureLoadLogic({
+    scrollToBottom,
+    unReadNewMsg
+  });
+  //回复模块
+  const { replyInfo, closeReply, addReply, getReplyMsg } = useReplyLogic({
+    historyMsg,
+    selectedGroup,
+    userInfo,
+    openImg
+  });
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
@@ -301,6 +356,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       <div className="tw-w-full">
                         <img
                           onClick={openImg}
+                          onLoad={() => picLoadAndScrollLogic(item)}
                           src={'/public' + item.src}
                           className="tw-object-contain tw-w-full  tw-rounded-lg"
                           alt=""
@@ -432,54 +488,6 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       );
     }
   }, [newMsg, selectedGroup]);
-
-  //聊天空间默认卷到底部，切换群组触发
-  const scrollToBottom = () => {
-    chatSpaceRef.current
-      ? (chatSpaceRef.current!.scrollTop = chatSpaceRef.current.scrollHeight)
-      : null;
-  };
-  useEffect(() => {
-    scrollToBottom();
-  }, [selectedGroup]);
-  //修复首次加载不滑动到底部的问题
-  useEffect(() => {
-    if (
-      historyMsg[selectedGroup.groupId] &&
-      historyMsg[selectedGroup.groupId].length !== 0 &&
-      !init.current
-    ) {
-      scrollToBottom();
-      init.current = true;
-    }
-  }, [historyMsg]);
-  //自己发消息则滚动到底部
-  useEffect(() => {
-    if (
-      newMsg[selectedGroup.groupId] &&
-      newMsg[selectedGroup.groupId].length !== 0 &&
-      newMsg[selectedGroup.groupId][newMsg[selectedGroup.groupId].length - 1]
-        .username === userInfo.username
-    ) {
-      hadNewMsg.current = true;
-    }
-    if (
-      historyMsg[selectedGroup.groupId] &&
-      historyMsg[selectedGroup.groupId].length !== 0 &&
-      historyMsg[selectedGroup.groupId][
-        historyMsg[selectedGroup.groupId].length - 1
-      ].username === userInfo.username &&
-      hadNewMsg.current
-    ) {
-      requestAnimationFrame(() => {
-        hadNewMsg.current = false;
-        scrollToBottom();
-        requestAnimationFrame(() => {
-          clearUnReadMsg();
-        });
-      });
-    }
-  }, [newMsg, historyMsg]);
 
   //群控制逻辑
   const {
