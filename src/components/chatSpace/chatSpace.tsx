@@ -227,10 +227,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     ) {
       requestAnimationFrame(() => {
         hadNewMsg.current = false;
+        clearUnReadMsg();
         scrollToBottom();
-        requestAnimationFrame(() => {
-          clearUnReadMsg();
-        });
       });
     }
   }, [newMsg, historyMsg]);

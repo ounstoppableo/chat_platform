@@ -155,7 +155,9 @@ const useNewMsgTipLogic = (props: any) => {
   };
   //切换群组时清空unReadMsg
   useEffect(() => {
-    clearUnReadMsg();
+    requestAnimationFrame(() => {
+      clearUnReadMsg();
+    });
   }, [selectedGroup]);
   const newMsgTipDom = (
     <div className="tw-absolute tw-right-6 tw-bottom-[70px] tw-flex tw-flex-col tw-gap-2">
