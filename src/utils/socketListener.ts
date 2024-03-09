@@ -12,7 +12,8 @@ import {
   setFriends,
   setDelGroup,
   setDelGroupMember,
-  setEditGroupName
+  setEditGroupName,
+  setWithdrawMsg
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getTotalMsg } from '@/service/getGroupInfo';
@@ -214,6 +215,12 @@ const socketListener = (
         }
       }
     }
+  });
+
+  //撤回消息
+  socket.on('withdrawMsg', (msg) => {
+    if (msg.username === userData.username) message.success('撤回成功！');
+    dispatch(setWithdrawMsg(msg));
   });
 
   socket.on('error', (err: any) => {

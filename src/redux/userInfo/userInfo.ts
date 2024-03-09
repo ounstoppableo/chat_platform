@@ -171,6 +171,30 @@ export const userInfoSlice = createSlice({
         (item) => item.groupId === action.payload.group.groupId
       );
       temp ? (temp.groupName = action.payload.newName) : null;
+    },
+    setWithdrawMsg: (state, action: { payload: Msg }) => {
+      const newMsgItem = state.newMsg[action.payload.room]?.find(
+        (item) => item.id === action.payload.id
+      );
+      const historyMsgItem = state.historyMsg[action.payload.room]?.find(
+        (item) => item.id === action.payload.id
+      );
+      if (newMsgItem) {
+        newMsgItem.type = 'withdraw';
+      }
+      if (historyMsgItem) {
+        historyMsgItem.type = 'withdraw';
+      }
+    },
+    setDelMsg: (
+      state,
+      action: { payload: { groupId: string; msgId: string } }
+    ) => {
+      state.historyMsg[action.payload.groupId] = state.historyMsg[
+        action.payload.groupId
+      ].filter((item) => {
+        return +item.id !== +action.payload.msgId;
+      });
     }
   }
 });
@@ -191,7 +215,9 @@ export const {
   setFriends,
   setDelGroup,
   setDelGroupMember,
-  setEditGroupName
+  setEditGroupName,
+  setWithdrawMsg,
+  setDelMsg
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

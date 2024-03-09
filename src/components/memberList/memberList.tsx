@@ -65,7 +65,7 @@ const MemberList = (props: any) => {
       <div
         className={`tw-text-xs tw-absolute tw-w-24 tw-h-fit tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
         style={{ top: e.clientY + 'px', left: e.clientX + 'px' }}
-        id="menberListMenu"
+        id="memberListMenu"
       >
         <div
           onClick={() => at(username)}
@@ -111,11 +111,9 @@ const MemberList = (props: any) => {
   //清除菜单
   useEffect(() => {
     const cb = (e: any) => {
-      e.preventDefault();
-      e.stopPropagation();
       if (
-        (!e.target.closest('#menberListMenu') && e.type === 'click') ||
-        (!e.target.closest('.menberListItem') && e.type === 'contextmenu')
+        (!e.target.closest('#memberListMenu') && e.type === 'click') ||
+        (!e.target.closest('#memberListMenu') && e.type === 'contextmenu')
       ) {
         setMenu(<></>);
       }
@@ -124,6 +122,7 @@ const MemberList = (props: any) => {
     window.addEventListener('contextmenu', cb);
     return () => {
       window.removeEventListener('click', cb);
+      window.removeEventListener('contextmenu', cb);
     };
   }, []);
 
@@ -134,7 +133,7 @@ const MemberList = (props: any) => {
     memberArr.push(
       <div
         key={item.uid}
-        className="menberListItem hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+        className="hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
         onContextMenu={(e) => contextMenuCb(e, item.username)}
       >
         <div

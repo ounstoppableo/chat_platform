@@ -24,6 +24,8 @@ import useReplyLogic from './hooks/useReplyLogic.tsx';
 import useOperaLogic from './hooks/useOperaLogic.tsx';
 import useGroupManageLogic from './hooks/useGroupManageLogic.tsx';
 import useNewMsgTipLogic from './hooks/useNewMsgTipLogic.tsx';
+import useMenuLogic from './hooks/useMenuLogic.tsx';
+import { createPortal } from 'react-dom';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -52,6 +54,24 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   });
 
   let msgArr: any = [];
+
+  //新消息提示逻辑
+  const {
+    unReadNewMsg,
+    unReadReplyMsg,
+    unReadMentionMsg,
+    setUnReadMentionMsg,
+    setUnReadReplyMsg,
+    setUnReadNewMsg,
+    newMsgTipDom,
+    clearUnReadMsg
+  } = useNewMsgTipLogic({
+    scrollToBottomTimer,
+    chatSpaceRef,
+    message,
+    selectedGroup,
+    historyMsg
+  });
 
   //操作台逻辑
   const {
@@ -173,7 +193,16 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
       (item: Msg, index: number) => {
-        return (
+        return item.type === 'withdraw' ? (
+          <div
+            key={item.id + '' + index}
+            data-index={item.id}
+            className="tw-text-[#8b8b8d] tw-text-xs tw-text-center tw-select-none tw-cursor-default"
+          >
+            {userInfo.username === item.username ? '您' : `"${item.username}"`}
+            撤回了一条消息
+          </div>
+        ) : (
           <div key={item.id + '' + index} data-index={item.id}>
             {dateControl(index)}
             <div className="tw-flex tw-gap-2 tw-relative">
@@ -259,9 +288,10 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       item.username !== userInfo.username
                         ? 'tw-rounded-tl-none'
                         : 'tw-rounded-tr-none'
-                    } tw-w-fit tw-max-w-full tw-break-words`}
+                    } tw-w-fit tw-max-w-full tw-break-words tw-cursor-default`}
                     onMouseEnter={(e) => userOperaControl(e, item)}
                     onMouseLeave={(e) => userOperaControlForLeave(e, item)}
+                    onContextMenu={(e) => contextMenuCb(e, item)}
                   >
                     {msgOpera(item)}
                   </div>
@@ -456,22 +486,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     setNewGroupName
   });
 
-  //新消息提示逻辑
-  const {
-    unReadNewMsg,
-    unReadReplyMsg,
-    unReadMentionMsg,
-    setUnReadMentionMsg,
-    setUnReadReplyMsg,
-    setUnReadNewMsg,
-    newMsgTipDom,
-    clearUnReadMsg
-  } = useNewMsgTipLogic({
-    scrollToBottomTimer,
-    chatSpaceRef,
-    message,
-    selectedGroup
-  });
+  //右键菜单
+  const { menu, contextMenuCb } = useMenuLogic();
 
   return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
@@ -604,6 +620,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         </div>
       </Modal>
       {newMsgTipDom}
+      {createPortal(menu, document.body)}
     </div>
   ) : (
     <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg"></div>

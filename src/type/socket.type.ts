@@ -50,6 +50,7 @@ export interface ServerToClientEvents {
     groupInfo: Group;
     kickOutUsername: string;
   }) => void;
+  withdrawMsg: (msg: Msg) => void;
   error: (err: any) => void;
   clientError: (err: { msg: string }) => void;
 }
@@ -99,4 +100,5 @@ export interface ClientToServerEvents {
   exitGroup: (msg: Group) => void;
   editGroupName: (msg: { group: Group; newName: string }) => void;
   kickOutGroup: (msg: { group: Group; kickOutUsername: string }) => void;
+  withdrawMsg: (msg: Msg) => void;
 }

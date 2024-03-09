@@ -36,4 +36,5 @@ export type Msg = {
   username: string;
   atMembers: string[];
   forMsg: string;
+  type: string;
 };
