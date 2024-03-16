@@ -38,4 +38,6 @@ export type Msg = {
   forMsg: string;
   type: string;
   src?: string;
+  fileName?: string;
+  fileSize?: string;
 };

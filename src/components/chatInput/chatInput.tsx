@@ -145,17 +145,50 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
 
   //上传文件的配置
   const selectFolderProps: UploadProps = {
-    name: 'selectFolder',
-    action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
+    name: 'file',
+    action: '/api/uploadFile',
     showUploadList: false,
     beforeUpload: (file: RcFile) => {
-      const isLt2M = file.size / 1024 / 1024 < 5;
+      const isLt2M = file.size < 1024 * 1024 * 10;
       if (!isLt2M) {
-        message.error('文件大小不能超过5MB!');
+        message.error('文件大小不能超过10MB!');
       }
       return isLt2M;
     },
-    onChange: () => {}
+    onChange: (e: any) => {
+      if (e.file.status === 'done') {
+        if (e.file.response.code === 200) {
+          selectedGroup.type === 'group'
+            ? socket.current.emit('msgToServer', {
+                room: selectedGroup.groupId,
+                msg: '[文件]',
+                time: new Date(),
+                avatar: userInfo.avatar,
+                atMembers: [],
+                forMsg: replyInfo && replyInfo.msgId,
+                type: 'file',
+                src: e.file.response.data.src,
+                fileName: e.file.response.data.originalname,
+                fileSize: e.file.response.data.size
+              })
+            : socket.current.emit('p2pChat', {
+                fromName: userInfo.username,
+                toName: toName,
+                msg: '[文件]',
+                time: new Date(),
+                fromAvatar: userInfo.avatar,
+                toAvatar: selectedGroup.toAvatar,
+                type: 'file',
+                src: e.file.response.data.src,
+                fileName: e.file.response.data.originalname,
+                fileSize: e.file.response.data.size
+              });
+          closeReply();
+        } else {
+          message.error(e.file.response.msg);
+        }
+      }
+    }
   };
 
   //发送消息的回调(群)

@@ -13,7 +13,17 @@ import {
   CloseOutlined,
   DeleteOutlined,
   DislikeFilled,
+  DownloadOutlined,
   EditOutlined,
+  FileExcelOutlined,
+  FileImageOutlined,
+  FileMarkdownOutlined,
+  FilePdfOutlined,
+  FilePptOutlined,
+  FileTextOutlined,
+  FileUnknownOutlined,
+  FileWordOutlined,
+  FileZipOutlined,
   LikeFilled,
   LogoutOutlined
 } from '@ant-design/icons';
@@ -246,6 +256,47 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     openImg
   });
 
+  //根据文件后缀选择文件图标
+  const selectFileIconBySuffix = (fileName: string) => {
+    if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+      return <FileExcelOutlined className="tw-text-[#109968]" />;
+    } else if (
+      fileName.endsWith('.gif') ||
+      fileName.endsWith('.png') ||
+      fileName.endsWith('.jpg') ||
+      fileName.endsWith('.jpeg') ||
+      fileName.endsWith('.bmp') ||
+      fileName.endsWith('.tiff') ||
+      fileName.endsWith('.tif') ||
+      fileName.endsWith('.webp') ||
+      fileName.endsWith('.svg')
+    ) {
+      return <FileImageOutlined className="tw-text-[#7c878e]" />;
+    } else if (fileName.endsWith('.md')) {
+      return <FileMarkdownOutlined className="tw-text-[#a8a8a8]" />;
+    } else if (fileName.endsWith('.pdf')) {
+      return <FilePdfOutlined className="tw-text-[#df4023]" />;
+    } else if (fileName.endsWith('.ppt')) {
+      return <FilePptOutlined className="tw-text-[#bd8cfc]" />;
+    } else if (fileName.endsWith('.txt')) {
+      return <FileTextOutlined className="" />;
+    } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      return <FileWordOutlined className="tw-text-[#3a74d1]" />;
+    } else if (
+      fileName.endsWith('.zip') ||
+      fileName.endsWith('.7z') ||
+      fileName.endsWith('.rar') ||
+      fileName.endsWith('.tar') ||
+      fileName.endsWith('.gz') ||
+      fileName.endsWith('.bz2') ||
+      fileName.endsWith('.xz') ||
+      fileName.endsWith('.iso')
+    ) {
+      return <FileZipOutlined className="tw-text-[#0078d7]" />;
+    }
+    return <FileUnknownOutlined className="tw-text-[#7c878e]" />;
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
@@ -359,6 +410,47 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                           className="tw-object-contain tw-w-full  tw-rounded-lg"
                           alt=""
                         />
+                      </div>
+                    ) : item.type === 'file' ? (
+                      <div className="tw-flex tw-gap-3 tw-justify-start tw-items-center tw-max-w-[300px] ">
+                        <div className="tw-text-4xl">
+                          {selectFileIconBySuffix(item.fileName || '')}
+                        </div>
+                        <div className="tw-flex tw-flex-col tw-overflow-hidden tw-whitespace-nowrap">
+                          <div
+                            title={item.fileName}
+                            className="tw-text-sm tw-text-ellipsis tw-overflow-hidden"
+                          >
+                            {item.fileName?.endsWith('html') ||
+                            item.fileName?.endsWith('pdf') ? (
+                              <a
+                                href={'/public' + item.src}
+                                target="blank"
+                                className="tw-text-white hover:tw-text-hoverColor"
+                              >
+                                {item.fileName}
+                              </a>
+                            ) : (
+                              <a
+                                href={'/public' + item.src}
+                                className="tw-text-white hover:tw-text-hoverColor"
+                                download={item.fileName}
+                              >
+                                {item.fileName}
+                              </a>
+                            )}
+                          </div>
+                          <div className="tw-text-xs">{item.fileSize}</div>
+                        </div>
+                        <div className="tw-text-lg tw-cursor-pointer">
+                          <a
+                            href={'/public' + item.src}
+                            className="tw-text-white hover:tw-text-hoverColor"
+                            download={item.fileName}
+                          >
+                            <DownloadOutlined />
+                          </a>
+                        </div>
                       </div>
                     ) : (
                       msgOpera(item)

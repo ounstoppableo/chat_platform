@@ -65,6 +65,8 @@ export interface ClientToServerEvents {
     forMsg?: string;
     type?: string;
     src?: string;
+    fileName?: string;
+    fileSize?: string;
   }) => void;
   likeSbMsg: (msg: {
     username: string;
@@ -99,6 +101,8 @@ export interface ClientToServerEvents {
     toAvatar: string;
     type?: string;
     src?: string;
+    fileName?: string;
+    fileSize?: string;
   }) => void;
   delGroup: (msg: Group) => void;
   exitGroup: (msg: Group) => void;
