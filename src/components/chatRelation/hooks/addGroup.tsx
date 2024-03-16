@@ -2,6 +2,7 @@ import { toCreateGroup } from '@/service/addRelationLogic';
 import { validateString } from '@/utils/validateString';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Upload, message } from 'antd';
+import { RcFile } from 'antd/es/upload';
 import { useEffect, useRef, useState } from 'react';
 
 export const useAddGroup = () => {
@@ -37,7 +38,13 @@ export const useAddGroup = () => {
     }
     return 1;
   };
-  const beforeUpload = () => {};
+  const beforeUpload = (file: RcFile) => {
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('文件大小不能超过2MB!');
+    }
+    return isLt2M;
+  };
   const handleChange = (e: any) => {
     if (e.file.status === 'done') {
       setLoading(false);

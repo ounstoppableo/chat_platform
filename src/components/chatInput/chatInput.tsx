@@ -18,6 +18,9 @@ import { UserInfo } from '@/redux/userInfo/userInfo.type';
 import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
 import inputLogicContext from '@/context/inputLogicContext';
+import { useMemeLogic } from './hook/useMemeLogic.tsx';
+import { getMeme } from '@/service/msgControl';
+import { createPortal } from 'react-dom';
 
 const ChatInput = React.forwardRef((props: any, mentions) => {
   const { selectedGroup, toName, replyInfo, closeReply, at } = props;
@@ -35,12 +38,24 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
   const [emjFlag, setEmjFlag] = useState(false);
   // const [inputValue, setInputValue] = useState('');
   const [emjOrMyFav, setEmjOrMyFav] = useState(true);
+
   const emojiBoard = [];
   const handleMshMethod = () => {
     setMsgFlag(!msgFlag);
   };
   const handleEmj = () => {
     setEmjFlag(!emjFlag);
+    if (!emjOrMyFav) {
+      getMeme().then((res) => {
+        if (res.code === 200) {
+          setMyFavList(
+            res.data.result.map((item: any) => {
+              return { memeUrl: item.memeUrl, id: item.id };
+            })
+          );
+        }
+      });
+    }
   };
   const addEmj = (emj: any) => {
     if (inputValue.length === 500) return message.error('超过字数限制！');
@@ -53,6 +68,17 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
   };
   const selectEmjOrMyFav = (tips: string) => {
     tips === 'emj' ? setEmjOrMyFav(true) : setEmjOrMyFav(false);
+    if (tips !== 'emj') {
+      getMeme().then((res) => {
+        if (res.code === 200) {
+          setMyFavList(
+            res.data.result.map((item: any) => {
+              return { memeUrl: item.memeUrl, id: item.id };
+            })
+          );
+        }
+      });
+    }
   };
 
   //表情选择板
@@ -94,7 +120,7 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
                 msg: '[图片]',
                 time: new Date(),
                 avatar: userInfo.avatar,
-                atMembers: atMembers.current,
+                atMembers: [],
                 forMsg: replyInfo && replyInfo.msgId,
                 type: 'picture',
                 src: e.file.response.data.src
@@ -109,6 +135,7 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
                 type: 'picture',
                 src: e.file.response.data.src
               });
+          closeReply();
         } else {
           message.error(e.file.response.msg);
         }
@@ -268,8 +295,20 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
     }
   };
 
+  const { MyFavBoard, setMyFavList, menu } = useMemeLogic({
+    message,
+    selectedGroup,
+    socket,
+    userInfo,
+    closeReply,
+    setEmjFlag,
+    toName,
+    replyInfo
+  });
+
   return (
     <>
+      {createPortal(menu, document.body)}
       <div
         onClick={handleMshMethod}
         className="tw-cursor-pointer tw-w-7 tw-h-7 tw-flex tw-justify-center tw-items-center tw-rounded-lg hover:tw-bg-chatInputActive"
@@ -356,10 +395,10 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
       {emjFlag ? (
         <div
           id="emjSelect"
-          className="tw-absolute tw-bottom-12 tw-right-0 tw-rounded-lg tw-w-96 tw-bg-deepGray tw-border-8 tw-border-b-4 tw-border-deepGray"
+          className="tw-absolute tw-z-max tw-bottom-12 tw-right-0 tw-rounded-lg tw-w-96 tw-bg-deepGray tw-border-8 tw-border-b-4 tw-border-deepGray"
         >
           <div className="tw-flex tw-flex-wrap tw-gap-0.5 tw-w-full tw-h-60 tw-overflow-auto tw-pb-8">
-            {emjOrMyFav ? emojiBoard : ''}
+            {emjOrMyFav ? emojiBoard : MyFavBoard()}
           </div>
           <div className="tw-flex tw-gap-1 tw-absolute tw-pt-1 tw-bottom-0 tw-inset-x-0 tw-bg-deepGray tw-border-t-2 tw-border-lightGray">
             <div

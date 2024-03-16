@@ -1,11 +1,15 @@
 import loginFlagContext from '@/context/loginFlagContext';
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 const useOperaLogic = (props: any) => {
   const loginControl = useContext(loginFlagContext);
   const { chatSpaceRef, userInfo, socket } = props;
   const timer = useRef<any>({});
   const timer2 = useRef<any>({});
+  const currentDom = useRef<any>(null);
+  //位置计算
+  const positionCalculate = () => {};
+
   //点赞回复操作台的未知控制
   const userOperaControl = (e: any, item: any) => {
     const operaEle =
@@ -15,6 +19,7 @@ const useOperaLogic = (props: any) => {
     if (!operaEle) return;
     if (timer.current[item.id]) clearTimeout(timer.current[item.id]);
     if (timer2.current[item.id]) clearTimeout(timer2.current[item.id]);
+    currentDom.current = operaEle;
     operaEle.style.display = 'flex';
     requestAnimationFrame(() => {
       const nextSbling = e.target.nextElementSibling;
@@ -89,6 +94,19 @@ const useOperaLogic = (props: any) => {
       timer.current[item.id] = undefined;
     }, 200);
   };
+
+  //监听滚动事件
+  // useEffect(() => {
+  //   const callback = () => {
+  //     if (currentDom.current?.style.display === 'flex') {
+  //       console.log(1111);
+  //     }
+  //   };
+  //   chatSpaceRef.current.addEventListener('scroll', callback);
+  //   return () => {
+  //     chatSpaceRef.current.removeEventListener('scroll', callback);
+  //   };
+  // }, []);
 
   //点赞逻辑
   const like = (item: any) => {

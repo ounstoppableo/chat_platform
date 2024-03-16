@@ -1,13 +1,14 @@
 import socketContext from '@/context/socketContext';
 import { setDelMsg } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
-import { delMsg } from '@/service/msgControl';
+import { addMeme, delMsg } from '@/service/msgControl';
 import {
   CopyOutlined,
   DeleteOutlined,
-  RollbackOutlined
+  RollbackOutlined,
+  SmileOutlined
 } from '@ant-design/icons';
-import { Popconfirm, message } from 'antd';
+import { message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -40,6 +41,14 @@ const useMenuLogic = () => {
       });
       setMenu(<></>);
     };
+    const toAddMeme = (url: string) => {
+      addMeme(url).then((res: any) => {
+        if (res.code === 200) {
+          message.success('添加成功！');
+        }
+      });
+      setMenu(<></>);
+    };
     setMenu(
       <div
         className={`tw-z-[99999] tw-text-xs tw-absolute tw-w-24 tw-h-fit tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
@@ -64,6 +73,19 @@ const useMenuLogic = () => {
               <RollbackOutlined />
             </span>
             <span>撤回消息</span>
+          </div>
+        ) : (
+          <></>
+        )}
+        {msg.type === 'picture' && msg.src ? (
+          <div
+            onClick={() => toAddMeme(msg.src!)}
+            className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          >
+            <span>
+              <SmileOutlined />
+            </span>
+            <span>添加表情</span>
           </div>
         ) : (
           <></>
