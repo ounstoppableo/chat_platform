@@ -25,10 +25,12 @@ import {
   FileWordOutlined,
   FileZipOutlined,
   LikeFilled,
-  LogoutOutlined
+  LogoutOutlined,
+  MessageOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 import socketContext from '@/context/socketContext.ts';
-import { Msg } from '@/redux/userInfo/userInfo.type.ts';
+import { Group, Msg, UserInfo } from '@/redux/userInfo/userInfo.type.ts';
 import { Input, Modal, Popconfirm, message } from 'antd';
 import useReplyLogic from './hooks/useReplyLogic.tsx';
 import useOperaLogic from './hooks/useOperaLogic.tsx';
@@ -57,6 +59,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const [newGroupName, setNewGroupName] = useState('');
   const scrollToBottomTimer = useRef<any>(null);
   const hadNewMsg = useRef(false);
+  const [userInfoBg, setUserInfoBg] = useState<string>('');
+  const groupMember = useSelector((state: any) => state.userInfo.groupMember);
 
   //图片打开逻辑
   const { openImg } = useOpenImgLogic();
@@ -297,10 +301,70 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     return <FileUnknownOutlined className="tw-text-[#7c878e]" />;
   };
 
+  //计算图片主色调
+  const calculatePrimeColor = (imgUrl: string) => {
+    // 创建一个新的 Canvas 元素
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imgUrl;
+
+    img.onload = () => {
+      // 设置 Canvas 的尺寸与图像相同
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // 在 Canvas 上绘制图像
+      ctx!.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // 获取图像像素数据
+      const imageData = ctx!.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      ).data;
+
+      // 计算图像中出现频率最高的颜色
+      const colorMap: any = {};
+      let maxCount = 0;
+      let dominantColor = [0, 0, 0]; // 初始主色调为黑色
+      for (let i = 0; i < imageData.length; i += 4) {
+        const r = imageData[i];
+        const g = imageData[i + 1];
+        const b = imageData[i + 2];
+        const brightness = (r + g + b) / 3; // 计算亮度
+
+        if (brightness > 200) {
+          // 仅考虑亮度较高的颜色
+          const key = r + ',' + g + ',' + b;
+          if (!colorMap[key]) {
+            colorMap[key] = 0;
+          }
+          colorMap[key]++;
+          if (colorMap[key] > maxCount) {
+            maxCount = colorMap[key];
+            dominantColor = [r, g, b];
+          }
+        }
+      }
+
+      // 将 RGB 值转换为 CSS 格式的颜色字符串
+      const rgbString = 'rgba(' + dominantColor.join(',') + ')';
+      setUserInfoBg(rgbString);
+    };
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
       (item: Msg, index: number) => {
+        const groupMemberItem: UserInfo = groupMember.find(
+          (member: UserInfo) => item.username === member.username
+        );
+        const group: Group = groups.find(
+          (group: Group) => group.groupId === selectedGroup.groupId
+        );
         return item.type === 'withdraw' ? (
           <div
             key={item.id + '' + index}
@@ -313,7 +377,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         ) : (
           <div key={item.id + '' + index} data-index={item.id}>
             {dateControl(index)}
-            <div className="tw-flex tw-gap-2 tw-relative">
+            <div className={`tw-flex tw-gap-2 tw-relative ${styles.parent}`}>
               {selectedGroup.type === 'group' ? (
                 <div
                   data-opera-index={item.id}
@@ -357,12 +421,73 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
               ) : (
                 <></>
               )}
-              <div className="tw-w-10">
+              {item.username !== userInfo.username ? (
+                <div
+                  className={`tw-cursor-default tw-absolute tw-w-fit tw-h-[170px] tw-left-[8%] tw-z-max tw-rounded-lg tw-overflow-hidden tw-bg-[#272a37] ${styles.info}`}
+                >
+                  <div
+                    className={`tw-h-[30%]`}
+                    style={{ backgroundColor: userInfoBg }}
+                  ></div>
+                  <div className="tw-absolute tw-translate-y-[-50%] tw-left-2 tw-w-16 tw-h-16 tw-rounded-full tw-overflow-hidden tw-border-[4px] tw-border-[#272a37]">
+                    <img
+                      src={'/public' + groupMemberItem?.avatar}
+                      alt=""
+                      className="tw-object-cover"
+                    />
+                  </div>
+                  {groupMemberItem.isOnline ? (
+                    <div
+                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#adff2f] tw-top-[40%] tw-left-[54px] tw-right-0`}
+                    ></div>
+                  ) : (
+                    <div
+                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#dfdfdf] tw-top-[40%] tw-left-[54px] tw-right-0`}
+                    ></div>
+                  )}
+
+                  <div className="tw-mt-1 tw-h-7 tw-flex tw-pr-2 tw-justify-end tw-gap-2">
+                    <span className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor">
+                      <UserAddOutlined />
+                    </span>
+                    <span className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor">
+                      <MessageOutlined />
+                    </span>
+                  </div>
+                  <div className="tw-ml-2 tw-mr-8 tw-text-lg">
+                    {groupMemberItem?.username}
+                    <span className="tw-text-[#919191]">
+                      #{groupMemberItem?.uid}
+                    </span>
+                  </div>
+                  <div className="tw-ml-2 tw-mb-2">
+                    {group?.authorBy === groupMemberItem?.username ? (
+                      <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[#fffbe6] tw-text-[#d48806] tw-border-[#ffe58f] tw-border-2 tw-p-1">
+                        创建者
+                      </span>
+                    ) : (
+                      <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[#111b26] tw-text-[#177ddc] tw-border-[#153450] tw-border-2 tw-p-1">
+                        群成员
+                      </span>
+                    )}
+                  </div>
+                  <div className="tw-ml-2 tw-text-[14px] tw-text-[#6b7280]">
+                    <span>所在城市：</span>
+                    <span>{groupMemberItem.region}</span>
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
+              <div className={`tw-w-10`}>
                 {item.username !== userInfo.username ? (
                   <img
                     src={'/public' + item.avatar}
                     alt=""
-                    className="tw-w-10 tw-rounded-full tw-object-contain"
+                    onMouseEnter={() =>
+                      calculatePrimeColor('/public' + item.avatar)
+                    }
+                    className={`tw-w-10 tw-rounded-full tw-object-contain  ${styles.showInfo}`}
                   />
                 ) : (
                   <></>

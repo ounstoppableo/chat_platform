@@ -4,6 +4,7 @@ export interface UserInfo {
   username: string;
   isLogin?: boolean;
   isOnline?: boolean;
+  region?: boolean;
 }
 
 export interface Group {

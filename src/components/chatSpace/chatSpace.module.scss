@@ -12,3 +12,22 @@
         }
     }
 }
+
+.parent {
+    &>.info {
+       opacity: 0;
+       z-index: -1;
+       transition: all 0.2s linear;
+       transform: translateY(-80%);
+    }
+    &>.info:hover {
+        opacity: 1;
+        z-index: 99999;
+    }
+    &:has(.showInfo:hover) {
+        &>.info {
+            opacity: 1;
+            z-index: 99999;
+        }
+    }
+}
