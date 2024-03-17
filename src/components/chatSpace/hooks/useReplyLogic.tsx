@@ -1,5 +1,6 @@
+import loginFlagContext from '@/context/loginFlagContext';
 import { Msg } from '@/redux/userInfo/userInfo.type';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 const useReplyLogic = (props: any) => {
   //滚动到msg的位置
@@ -14,6 +15,7 @@ const useReplyLogic = (props: any) => {
   };
   const { historyMsg, selectedGroup, userInfo, openImg } = props;
   const [replyInfo, setReplyInfo] = useState<any>(null);
+  const loginControl = useContext(loginFlagContext);
   const closeReply = () => {
     setReplyInfo(null);
   };
@@ -22,7 +24,8 @@ const useReplyLogic = (props: any) => {
     msg: string;
     msgId: string;
   }) => {
-    setReplyInfo(replyInfo);
+    if (!userInfo.isLogin) return loginControl.showLoginForm();
+    return setReplyInfo(replyInfo);
   };
   //获取回复消息
   const getReplyMsg = (msg: Msg) => {

@@ -7,6 +7,17 @@ export interface UserInfo {
   region?: boolean;
 }
 
+export interface SystemInfo {
+  done: string;
+  fromName: string;
+  groupId: string;
+  groupName: string;
+  hadRead: boolean;
+  msgId: number;
+  toName: string;
+  type: 'addFriend';
+}
+
 export interface Group {
   authorBy: string;
   groupName: string;

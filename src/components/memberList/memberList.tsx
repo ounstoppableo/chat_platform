@@ -1,8 +1,7 @@
 import socketContext from '@/context/socketContext';
 import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
-import { UserInfo } from '@/redux/userInfo/userInfo.type';
-import { addFriend } from '@/service/addRelationLogic';
+import { Group, UserInfo } from '@/redux/userInfo/userInfo.type';
 import { getGroupMember } from '@/service/getGroupInfo';
 import { PlusOutlined, UserDeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, message } from 'antd';
@@ -23,7 +22,7 @@ const MemberList = (props: any) => {
     (item: any) => !!item.isOnline === true
   ).length;
   const groups = useSelector((state: any) => state.userInfo.groups);
-  const currentGroup = groups.find(
+  const currentGroup: Group = groups.find(
     (item: any) => item.groupId === selectedGroup.groupId
   );
   const dispatch = useDispatch();
@@ -52,14 +51,8 @@ const MemberList = (props: any) => {
     if (username === userInfo.username) return;
     if (!userInfo.isLogin) return;
     const toAddFriend = () => {
-      addFriend(username).then((res) => {
-        if (res.code === 200) {
-          if (res.data.type === 1) {
-            message.success(res.data.msg);
-          } else message.info(res.data.msg);
-          setMenu(<></>);
-        }
-      });
+      socket.current.emit('addFriend', { targetUsername: username });
+      setMenu(<></>);
     };
     setMenu(
       <div
@@ -159,7 +152,8 @@ const MemberList = (props: any) => {
   const { show } = useRelationCtrl({
     groupMember,
     groupId: selectedGroup.groupId,
-    groupName: selectedGroup.groupName
+    groupName: selectedGroup.groupName,
+    authorBy: currentGroup?.authorBy
   });
   const addMember = () => {
     show();

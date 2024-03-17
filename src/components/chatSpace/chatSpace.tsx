@@ -436,7 +436,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       className="tw-object-cover"
                     />
                   </div>
-                  {groupMemberItem.isOnline ? (
+                  {groupMemberItem?.isOnline ? (
                     <div
                       className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#adff2f] tw-top-[40%] tw-left-[54px] tw-right-0`}
                     ></div>
@@ -473,7 +473,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                   </div>
                   <div className="tw-ml-2 tw-text-[14px] tw-text-[#6b7280]">
                     <span>所在城市：</span>
-                    <span>{groupMemberItem.region}</span>
+                    <span>{groupMemberItem?.region}</span>
                   </div>
                 </div>
               ) : (

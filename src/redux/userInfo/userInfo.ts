@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { AllMsg, Group, Msg, UserInfo } from './userInfo.type';
+import { AllMsg, Group, Msg, UserInfo, SystemInfo } from './userInfo.type';
 export const userInfoSlice = createSlice({
   name: 'userInfo',
   initialState: {
@@ -8,7 +8,8 @@ export const userInfoSlice = createSlice({
     newMsg: {} as AllMsg,
     historyMsg: {} as AllMsg,
     groupMember: [] as UserInfo[],
-    friends: [] as (UserInfo & { groupId: string; groupName: string })[]
+    friends: [] as (UserInfo & { groupId: string; groupName: string })[],
+    systemInfo: [] as SystemInfo[]
   },
   reducers: {
     setUserInfo: (state, action: { payload: UserInfo }) => {
@@ -63,7 +64,11 @@ export const userInfoSlice = createSlice({
       state.groupMember = action.payload;
     },
     setAddGroupMember: (state, action: { payload: UserInfo }) => {
-      state.groupMember.push(action.payload);
+      state.groupMember.find(
+        (item) => item.username === action.payload.username
+      )
+        ? null
+        : state.groupMember.push(action.payload);
     },
     setUserStatus: (
       state,
@@ -195,6 +200,32 @@ export const userInfoSlice = createSlice({
       ].filter((item) => {
         return +item.id !== +action.payload.msgId;
       });
+    },
+    setSystemInfo: (
+      state,
+      action: {
+        payload: SystemInfo[] | SystemInfo | { type: 'delete'; msgId: number };
+      }
+    ) => {
+      if (
+        (action.payload as { type: 'delete'; msgId: number }).type === 'delete'
+      ) {
+        state.systemInfo = state.systemInfo.filter(
+          (item: any) =>
+            item.msgId !==
+            (action.payload as { type: 'delete'; msgId: number }).msgId
+        );
+      } else {
+        if (action.payload instanceof Array) {
+          state.systemInfo = action.payload;
+        } else {
+          state.systemInfo.find(
+            (item) => item.msgId === (action.payload as SystemInfo).msgId
+          )
+            ? null
+            : state.systemInfo.unshift(action.payload as SystemInfo);
+        }
+      }
     }
   }
 });
@@ -217,7 +248,8 @@ export const {
   setDelGroupMember,
   setEditGroupName,
   setWithdrawMsg,
-  setDelMsg
+  setDelMsg,
+  setSystemInfo
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

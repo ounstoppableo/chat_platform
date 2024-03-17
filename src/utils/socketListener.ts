@@ -13,9 +13,11 @@ import {
   setDelGroup,
   setDelGroupMember,
   setEditGroupName,
-  setWithdrawMsg
+  setWithdrawMsg,
+  setSystemInfo
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
+import { getFriends } from '@/service/addRelationLogic';
 import { getTotalMsg } from '@/service/getGroupInfo';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
 import { message } from 'antd';
@@ -221,6 +223,70 @@ const socketListener = (
   socket.on('withdrawMsg', (msg) => {
     if (msg.username === userData.username) message.success('撤回成功！');
     dispatch(setWithdrawMsg(msg));
+  });
+
+  //添加好友
+  socket.on('addFriend', (msg) => {
+    if (msg.data) {
+      dispatch(setSystemInfo(msg.data));
+    } else {
+      if (msg.type === 1) {
+        message.success(msg.msg);
+      } else message.info(msg.msg);
+    }
+  });
+  //接受好友申请
+  socket.on('acceptAddFriend', (msg) => {
+    if (msg.toName === userData.username) {
+      dispatch(setSystemInfo({ type: 'delete', msgId: msg.msgId }));
+      message.success('添加成功！');
+    }
+    getFriends().then((res) => {
+      if (res.code === 200) {
+        dispatch(setFriends(res.data.result));
+      }
+    });
+  });
+  //拒绝好友申请
+  socket.on('rejectAddFriend', (msg) => {
+    if (msg.toName === userData.username) {
+      dispatch(setSystemInfo({ type: 'delete', msgId: msg.msgId as number }));
+      message.success('已拒绝');
+    }
+    if (msg.data) {
+      dispatch(setSystemInfo(msg.data));
+    }
+  });
+
+  //添加群成员
+  socket.on('addGroupMember', (msg) => {
+    if (msg.data) {
+      dispatch(setSystemInfo(msg.data));
+    } else {
+      message.success('成功发送邀请！');
+    }
+  });
+  //拒绝加群
+  socket.on('rejectJoinGroup', (msg) => {
+    if (msg.systemMsg.toName === userData.username) {
+      dispatch(
+        setSystemInfo({ type: 'delete', msgId: msg.systemMsg.msgId as number })
+      );
+      message.success('已拒绝');
+    } else {
+      dispatch(setSystemInfo(msg.systemMsg));
+    }
+  });
+
+  //有人加入群组
+  socket.on('joinRoom', (msg) => {
+    if (
+      JSON.parse(localStorage.getItem('currGroup') || '{}').groupId ===
+        msg.groupId &&
+      msg.userInfo
+    ) {
+      dispatch(setAddGroupMember(msg.userInfo));
+    }
   });
 
   socket.on('error', (err: any) => {

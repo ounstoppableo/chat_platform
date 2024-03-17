@@ -1,12 +1,14 @@
+import socketContext from '@/context/socketContext';
 import { addGroupMember, getFriends } from '@/service/addRelationLogic';
 import { Modal, Transfer, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 const useRelationCtrl = (props: any) => {
-  const { groupMember, groupId, groupName } = props;
+  const { groupMember, groupId, groupName, authorBy } = props;
   const [data, setData] = useState([]);
   const [modal, setModal] = useState<any>(null);
   const [targetKeys, setTargetKeys] = useState([]);
+  const socket = useContext(socketContext);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const onChange = (nextTargetKeys: any) => {
     setTargetKeys(nextTargetKeys);
@@ -28,13 +30,14 @@ const useRelationCtrl = (props: any) => {
     reset();
   };
   const onConfirm = () => {
-    addGroupMember(groupId, targetKeys, groupName).then((res) => {
-      if (res.code === 200) {
-        message.success('成功发送邀请！');
-        modal.destroy();
-        reset();
-      }
+    socket.current.emit('addGroupMember', {
+      groupId,
+      targetsUsernames: targetKeys,
+      groupName,
+      authorBy
     });
+    modal.destroy();
+    reset();
   };
 
   const modalOptions = {

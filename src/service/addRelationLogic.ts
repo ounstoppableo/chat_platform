@@ -1,12 +1,12 @@
 import { Group } from '@/redux/userInfo/userInfo.type';
 import http from '@/utils/http';
 
-export const addFriend = (username: string) => {
-  return http(`/api/addFriend`, {
-    method: 'POST',
-    body: { username }
-  });
-};
+// export const addFriend = (username: string) => {
+//   return http(`/api/addFriend`, {
+//     method: 'POST',
+//     body: { username }
+//   });
+// };
 export const getSystemInfo = () => {
   return http('/api/getSystemMsg');
 };

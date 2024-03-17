@@ -1,3 +1,4 @@
+import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
 import { setDelMsg } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
@@ -16,6 +17,7 @@ const useMenuLogic = () => {
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const socket = useContext(socketContext);
   const [menu, setMenu] = useState(<></>);
+  const loginControl = useContext(loginFlagContext);
   const dispatch = useDispatch();
   const contextMenuCb = (e: any, msg: Msg) => {
     e.preventDefault();
@@ -31,6 +33,8 @@ const useMenuLogic = () => {
       setMenu(<></>);
     };
     const toDelMsg = () => {
+      setMenu(<></>);
+      if (!userInfo.isLogin) return loginControl.showLoginForm();
       delMsg(msg.id, msg.room).then((res) => {
         if (res.code === 200) {
           message.success('删除消息成功！');
@@ -39,15 +43,17 @@ const useMenuLogic = () => {
           );
         }
       });
-      setMenu(<></>);
+      return null;
     };
     const toAddMeme = (url: string) => {
+      setMenu(<></>);
+      if (!userInfo.isLogin) return loginControl.showLoginForm();
       addMeme(url).then((res: any) => {
         if (res.code === 200) {
           message.success('添加成功！');
         }
       });
-      setMenu(<></>);
+      return null;
     };
     setMenu(
       <div

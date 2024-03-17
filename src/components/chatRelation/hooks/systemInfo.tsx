@@ -1,12 +1,10 @@
 import socketContext from '@/context/socketContext';
+import { setSystemInfo } from '@/redux/userInfo/userInfo';
+import { SystemInfo } from '@/redux/userInfo/userInfo.type';
 import {
-  acceptAddFriend,
   acceptJoinGroup,
   delSystemInfo,
-  getFriends,
-  getSystemInfo,
-  rejectAddFriend,
-  rejectJoinGroup
+  getSystemInfo
 } from '@/service/addRelationLogic';
 import {
   CheckOutlined,
@@ -15,14 +13,19 @@ import {
 } from '@ant-design/icons';
 import { message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const useSystemInfo = (props: any) => {
-  const { msgOrRelation, setFriends } = props;
+  const { msgOrRelation } = props;
+  const socket = useContext(socketContext);
   const soket = useContext(socketContext);
   const [confirmDisabled, setConfirmDisabled] = useState(false);
   //展开系统消息列表
   const [showSystemInfo, setShowSystemInfo] = useState(false);
-  const [systemInfo, setSystemInfo] = useState([]);
+  const systemInfo: SystemInfo[] = useSelector(
+    (state: any) => state.userInfo.systemInfo
+  );
+  const dispatch = useDispatch();
   const toShowSystemInfo = () => {
     setShowSystemInfo(!showSystemInfo);
   };
@@ -30,7 +33,7 @@ export const useSystemInfo = (props: any) => {
     if (msgOrRelation === 'relation') {
       getSystemInfo().then((res) => {
         if (res.code === 200) {
-          setSystemInfo(res.data.result);
+          dispatch(setSystemInfo(res.data.result));
           if (res.data.result.length !== 0) setShowSystemInfo(true);
         }
       });
@@ -42,33 +45,20 @@ export const useSystemInfo = (props: any) => {
     fromName: string,
     toName: string
   ) => {
-    acceptAddFriend({ msgId, fromName, toName }).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
-        message.success('添加成功！');
-        getFriends().then((res) => {
-          if (res.code === 200) {
-            setFriends(res.data.result);
-          }
-        });
-      }
-    });
+    socket.current.emit('acceptAddFriend', { msgId, fromName, toName });
   };
   //取消添加好友
-  const cancelAddFriend = (msgId: string) => {
-    rejectAddFriend(msgId).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
-        message.success('已拒绝');
-      }
-    });
+  const cancelAddFriend = (msgId: number, fromName: string, toName: string) => {
+    socket.current.emit('rejectAddFriend', { msgId, fromName, toName });
   };
 
   //删除系统信息
   const toDelSystemInfo = (msgId: string) => {
     delSystemInfo(msgId).then((res) => {
       if (res.code === 200) {
-        setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId));
+        dispatch(
+          setSystemInfo(systemInfo.filter((item: any) => item.msgId !== msgId))
+        );
       }
     });
   };
@@ -78,16 +68,20 @@ export const useSystemInfo = (props: any) => {
     setConfirmDisabled(true);
     acceptJoinGroup(systemMsg).then((res) => {
       if (res.code === 200) {
-        setSystemInfo(
-          systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
+        dispatch(
+          setSystemInfo(
+            systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
+          )
         );
         message.success('添加成功！');
         soket.current.emit('joinRoom', systemMsg.groupId);
       } else if (res.code === 405) {
         delSystemInfo(systemMsg.msgId).then((res) => {
           if (res.code === 200) {
-            setSystemInfo(
-              systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
+            dispatch(
+              setSystemInfo(
+                systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
+              )
             );
           }
         });
@@ -97,14 +91,7 @@ export const useSystemInfo = (props: any) => {
   };
   //取消加群
   const cancelAddGroup = (systemMsg: any) => {
-    rejectJoinGroup(systemMsg).then((res) => {
-      if (res.code === 200) {
-        setSystemInfo(
-          systemInfo.filter((item: any) => item.msgId !== systemMsg.msgId)
-        );
-        message.success('已拒绝');
-      }
-    });
+    socket.current.emit('rejectJoinGroup', { systemMsg });
   };
   const systemMsg = (item: any) => {
     let dom = <></>;
@@ -184,7 +171,7 @@ export const useSystemInfo = (props: any) => {
               className="tw-text-[#FF6666]"
               onClick={() =>
                 item.type === 'addFriend'
-                  ? cancelAddFriend(item.msgId)
+                  ? cancelAddFriend(item.msgId, item.fromName, item.toName)
                   : cancelAddGroup(item)
               }
             >

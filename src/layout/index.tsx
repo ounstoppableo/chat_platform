@@ -14,8 +14,6 @@ import { Group } from '@/redux/userInfo/userInfo.type';
 import socketListener from '@/utils/socketListener';
 import { ClientToServerEvents, ServerToClientEvents } from '@/type/socket.type';
 import InputLogicContext from '@/context/inputLogicContext';
-import { getGroups } from '@/service/addRelationLogic';
-import { setGroups } from '@/redux/userInfo/userInfo';
 
 const Layout = () => {
   const [inputValue, setInputValue] = useState('');
