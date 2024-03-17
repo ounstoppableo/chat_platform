@@ -327,26 +327,21 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       ).data;
 
       // 计算图像中出现频率最高的颜色
-      const colorMap: any = {};
+      const colorMap = {} as any;
       let maxCount = 0;
       let dominantColor = [0, 0, 0]; // 初始主色调为黑色
       for (let i = 0; i < imageData.length; i += 4) {
         const r = imageData[i];
         const g = imageData[i + 1];
         const b = imageData[i + 2];
-        const brightness = (r + g + b) / 3; // 计算亮度
-
-        if (brightness > 200) {
-          // 仅考虑亮度较高的颜色
-          const key = r + ',' + g + ',' + b;
-          if (!colorMap[key]) {
-            colorMap[key] = 0;
-          }
-          colorMap[key]++;
-          if (colorMap[key] > maxCount) {
-            maxCount = colorMap[key];
-            dominantColor = [r, g, b];
-          }
+        const key = r + ',' + g + ',' + b;
+        if (!colorMap[key]) {
+          colorMap[key] = 0;
+        }
+        colorMap[key]++;
+        if (colorMap[key] > maxCount) {
+          maxCount = colorMap[key];
+          dominantColor = [r, g, b];
         }
       }
 
