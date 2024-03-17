@@ -156,8 +156,11 @@ const socketListener = (
           switchGroup({});
         }
       }
+      dispatch(setDelGroup(msg.groupInfo.groupId));
     }
-    dispatch(setDelGroup(msg.groupInfo.groupId));
+    if (msg.systemMsg) {
+      dispatch(setSystemInfo(msg.systemMsg));
+    }
   });
   //退出群组
   socket.on('exitGroup', (msg) => {
@@ -173,6 +176,9 @@ const socketListener = (
           dispatch(setDelGroupMember(msg.username));
         }
       }
+    }
+    if (msg.systemMsg) {
+      dispatch(setSystemInfo(msg.systemMsg));
     }
   });
   //修改群名
@@ -221,6 +227,9 @@ const socketListener = (
           dispatch(setDelGroupMember(msg.kickOutUsername));
         }
       }
+    }
+    if (msg.systemMsg) {
+      dispatch(setSystemInfo(msg.systemMsg));
     }
   });
 

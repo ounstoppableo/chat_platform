@@ -39,11 +39,16 @@ export interface ServerToClientEvents {
     groupId: string;
     groupInfo?: Group;
   }) => void;
-  delGroup: (msg: { success: boolean; groupInfo: Group }) => void;
+  delGroup: (msg: {
+    success: boolean;
+    groupInfo: Group;
+    systemMsg: SystemInfo;
+  }) => void;
   exitGroup: (msg: {
     success: boolean;
     groupInfo: Group;
     username: string;
+    systemMsg: SystemInfo;
   }) => void;
   editGroupName: (msg: {
     success: boolean;
@@ -54,6 +59,7 @@ export interface ServerToClientEvents {
     success: boolean;
     groupInfo: Group;
     kickOutUsername: string;
+    systemMsg: SystemInfo;
   }) => void;
   withdrawMsg: (msg: Msg) => void;
   error: (err: any) => void;
