@@ -391,49 +391,6 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           <div key={item.id + '' + index} data-index={item.id}>
             {dateControl(index)}
             <div className={`tw-flex tw-gap-2 tw-relative ${styles.parent}`}>
-              {selectedGroup.type === 'group' ? (
-                <div
-                  data-opera-index={item.id}
-                  id="opera"
-                  className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
-                >
-                  <div
-                    onClick={() =>
-                      addReply({
-                        username: item.username,
-                        msg: item.msg,
-                        msgId: item.id
-                      })
-                    }
-                    className={`tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
-                  >
-                    <span
-                      className="iconfont icon-reply"
-                      style={{ fontSize: '12px' }}
-                    ></span>
-                  </div>
-                  <div
-                    onClick={() => like(item)}
-                    className={`${
-                      getHadLikes(item.id) ? 'tw-text-love' : 'tw-text-white'
-                    } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
-                  >
-                    <LikeFilled />
-                  </div>
-                  <div
-                    onClick={() => dislike(item)}
-                    className={`${
-                      getHadDislikes(item.id)
-                        ? 'tw-text-disLove'
-                        : 'tw-text-white'
-                    } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
-                  >
-                    <DislikeFilled />
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
               {item.username !== userInfo.username ? (
                 <div
                   className={`tw-cursor-default tw-absolute tw-w-fit tw-h-fit tw-left-[8%] tw-z-max tw-rounded-lg tw-overflow-hidden tw-bg-[#272a37] ${styles.info}`}
@@ -539,7 +496,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                 )}
               </div>
               <div
-                className={`tw-flex-1 tw-flex tw-flex-col tw-gap-2 tw-overflow-hidden  ${styles.showTime}`}
+                className={`tw-flex-1 tw-flex tw-flex-col tw-gap-2 ${styles.showTime}`}
               >
                 <div
                   className={`tw-text-textGrayColor tw-text-xs ${
@@ -560,13 +517,14 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                 </div>
                 <div className={`tw-flex tw-flex-col tw-w-full`}>
                   <div
+                    data-msg-index={item.id}
                     className={`${
                       item.username !== userInfo.username ? '' : 'tw-self-end'
                     } tw-bg-messageBackground tw-py-2 tw-px-4 tw-rounded-2xl ${
                       item.username !== userInfo.username
                         ? 'tw-rounded-tl-none'
                         : 'tw-rounded-tr-none'
-                    } tw-w-fit tw-max-w-full tw-break-words tw-cursor-default`}
+                    } tw-w-fit tw-max-w-full tw-break-all tw-cursor-default tw-relative`}
                     onMouseEnter={(e) => userOperaControl(e, item)}
                     onMouseLeave={(e) => userOperaControlForLeave(e, item)}
                     onContextMenu={(e) => contextMenuCb(e, item)}
@@ -624,6 +582,51 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       </div>
                     ) : (
                       msgOpera(item)
+                    )}
+                    {selectedGroup.type === 'group' ? (
+                      <div
+                        data-opera-index={item.id}
+                        id="opera"
+                        className={`tw-hidden tw-z-50 tw-px-1 tw-py-0.5 tw-gap-1 opacity0 hover:tw-opacity-100 hover:tw-flex tw-text-xs tw-absolute opacity0 tw-h-fit tw-w-fit tw-rounded-md tw-bg-messageBackground`}
+                      >
+                        <div
+                          onClick={() =>
+                            addReply({
+                              username: item.username,
+                              msg: item.msg,
+                              msgId: item.id
+                            })
+                          }
+                          className={`tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                        >
+                          <span
+                            className="iconfont icon-reply"
+                            style={{ fontSize: '12px' }}
+                          ></span>
+                        </div>
+                        <div
+                          onClick={() => like(item)}
+                          className={`${
+                            getHadLikes(item.id)
+                              ? 'tw-text-love'
+                              : 'tw-text-white'
+                          } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                        >
+                          <LikeFilled />
+                        </div>
+                        <div
+                          onClick={() => dislike(item)}
+                          className={`${
+                            getHadDislikes(item.id)
+                              ? 'tw-text-disLove'
+                              : 'tw-text-white'
+                          } tw-rounded tw-cursor-pointer hover:tw-text-hoverColor hover:tw-bg-midGray tw-p-0.5 tw-flex tw-justify-center tw-items-center`}
+                        >
+                          <DislikeFilled />
+                        </div>
+                      </div>
+                    ) : (
+                      <></>
                     )}
                   </div>
                   {getReplyMsg(item)}

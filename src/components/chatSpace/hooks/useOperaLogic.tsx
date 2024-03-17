@@ -6,23 +6,22 @@ const useOperaLogic = (props: any) => {
   const { chatSpaceRef, userInfo, socket } = props;
   const timer = useRef<any>({});
   const timer2 = useRef<any>({});
-  const currentDom = useRef<any>(null);
+  const currentMsgItem = useRef<any>(null);
   //位置计算
-  const positionCalculate = () => {};
-
-  //点赞回复操作台的未知控制
-  const userOperaControl = (e: any, item: any) => {
-    const operaEle =
-      e.target.parentElement.parentElement.parentElement.querySelector(
-        `[data-opera-index='${item.id}']`
-      );
+  const positionCalculate = () => {
+    const operaEle: any = chatSpaceRef.current.querySelector(
+      `[data-opera-index='${currentMsgItem.current?.id}']`
+    );
+    const msgEle: any = chatSpaceRef.current.querySelector(
+      `[data-msg-index='${currentMsgItem.current?.id}']`
+    );
     if (!operaEle) return;
-    if (timer.current[item.id]) clearTimeout(timer.current[item.id]);
-    if (timer2.current[item.id]) clearTimeout(timer2.current[item.id]);
-    currentDom.current = operaEle;
+    if (timer.current[currentMsgItem.current?.id])
+      clearTimeout(timer.current[currentMsgItem.current?.id]);
+    if (timer2.current[currentMsgItem.current?.id])
+      clearTimeout(timer2.current[currentMsgItem.current?.id]);
     operaEle.style.display = 'flex';
     requestAnimationFrame(() => {
-      const nextSbling = e.target.nextElementSibling;
       const { height: operaEleH, width: operaEleW } =
         operaEle.getBoundingClientRect();
       const {
@@ -34,41 +33,37 @@ const useOperaLogic = (props: any) => {
         x: msgSpaceX,
         y: msgSpaceY,
         width: msgSpaceW
-      } = e.target.getBoundingClientRect();
-      if (item.username === userInfo.username) {
+      } = msgEle.getBoundingClientRect();
+      if (currentMsgItem.current?.username === userInfo.username) {
+        //表示消息长度比较短，要显示在左右位置
         if (msgSpaceX - chatSpaceX - operaEleW - 24 > operaEleW) {
-          operaEle.style.top = nextSbling ? '35%' : '45%';
-          operaEle.style.left = msgSpaceX - chatSpaceX - operaEleW - 24 + 'px';
+          operaEle.style.top = 5 + 'px';
+          operaEle.style.left = -operaEleW - 4 + 'px';
+          //表示消息长度比较长，要显示在上下位置
         } else {
-          operaEle.style.left = msgSpaceX - chatSpaceX - 20 + 'px';
+          operaEle.style.left = 0 + 'px';
           if (msgSpaceY - chatSpaceY < operaEleH + 2) {
             operaEle.style.top = 'auto';
-            operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
+            operaEle.style.bottom = -operaEleH - 4 + 'px';
           } else {
-            operaEle.style.top = -4 + 'px';
+            operaEle.style.top = -operaEleH - 4 + 'px';
           }
         }
       } else {
+        //表示消息长度比较短，要显示在左右位置
         if (
           chatSpaceW - (msgSpaceX - chatSpaceX) - operaEleW - msgSpaceW - 24 >
           operaEleW
         ) {
-          operaEle.style.top = nextSbling ? '35%' : '45%';
-          operaEle.style.right =
-            chatSpaceW -
-            (msgSpaceX - chatSpaceX) -
-            operaEleW -
-            msgSpaceW -
-            28 +
-            'px';
+          operaEle.style.top = 5 + 'px';
+          operaEle.style.right = -operaEleW - 4 + 'px';
         } else {
-          operaEle.style.right =
-            chatSpaceW - (msgSpaceX - chatSpaceX) - msgSpaceW - 24 + 'px';
+          operaEle.style.right = 0 + 'px';
           if (msgSpaceY - chatSpaceY < operaEleH + 4) {
             operaEle.style.top = 'auto';
-            operaEle.style.bottom = (nextSbling ? -4 : -operaEleH - 4) + 'px';
+            operaEle.style.bottom = -operaEleH - 4 + 'px';
           } else {
-            operaEle.style.top = '-4px';
+            operaEle.style.top = -operaEleH - 4 + 'px';
           }
         }
       }
@@ -78,12 +73,20 @@ const useOperaLogic = (props: any) => {
       });
     });
   };
+
+  //点赞回复操作台的未知控制
+  const userOperaControl = (e: any, item: any) => {
+    currentMsgItem.current = item;
+    positionCalculate();
+  };
   const userOperaControlForLeave = (e: any, item: any) => {
-    const operaEle =
-      e.target.parentElement.parentElement.parentElement.querySelector(
-        `[data-opera-index='${item.id}']`
-      );
+    currentMsgItem.current = null;
+    const operaEle: any = document.body.querySelector(
+      `[data-opera-index='${item.id}']`
+    );
     if (!operaEle) return;
+    clearTimeout(timer.current[item.id]);
+    clearTimeout(timer2.current[item.id]);
     timer.current[item.id] = setTimeout(() => {
       operaEle.classList.remove('opacity100');
       timer2.current[item.id] = setTimeout(() => {
@@ -96,17 +99,16 @@ const useOperaLogic = (props: any) => {
   };
 
   //监听滚动事件
-  // useEffect(() => {
-  //   const callback = () => {
-  //     if (currentDom.current?.style.display === 'flex') {
-  //       console.log(1111);
-  //     }
-  //   };
-  //   chatSpaceRef.current.addEventListener('scroll', callback);
-  //   return () => {
-  //     chatSpaceRef.current.removeEventListener('scroll', callback);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const scrollCallback = (e: any) => {
+      if (!currentMsgItem.current) return;
+      positionCalculate();
+    };
+    chatSpaceRef.current.addEventListener('scroll', scrollCallback);
+    return () => {
+      chatSpaceRef.current.removeEventListener('scroll', scrollCallback);
+    };
+  }, [userInfo]);
 
   //点赞逻辑
   const like = (item: any) => {
