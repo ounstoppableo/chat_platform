@@ -40,6 +40,11 @@ const socketListener = (
         );
       }
     });
+    getFriends().then((res) => {
+      if (res.code === 200) {
+        dispatch(setFriends(res.data.result));
+      }
+    });
     socket.emit('joinRoom', userData.groups);
   });
 

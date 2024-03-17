@@ -139,7 +139,11 @@ const Layout = () => {
               </div>
               {selectedGroup.type === 'group' ? (
                 <div className="tw-w-48">
-                  <MemberList selectedGroup={selectedGroup} at={at} />
+                  <MemberList
+                    selectedGroup={selectedGroup}
+                    switchGroup={switchGroup}
+                    at={at}
+                  />
                 </div>
               ) : (
                 <></>

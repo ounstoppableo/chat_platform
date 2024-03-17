@@ -19,7 +19,10 @@ export const userInfoSlice = createSlice({
       state.groups = action.payload;
     },
     setAddGroups: (state, action: { payload: Group }) => {
-      state.groups.push(action.payload);
+      const group = state.groups.find(
+        (group) => group.groupId === action.payload.groupId
+      );
+      group ? null : state.groups.push(action.payload);
     },
     setNewMsg: (
       state,

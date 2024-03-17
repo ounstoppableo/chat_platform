@@ -3,14 +3,18 @@ import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
 import { Group, UserInfo } from '@/redux/userInfo/userInfo.type';
 import { getGroupMember } from '@/service/getGroupInfo';
-import { PlusOutlined, UserDeleteOutlined } from '@ant-design/icons';
+import {
+  MessageOutlined,
+  PlusOutlined,
+  UserDeleteOutlined
+} from '@ant-design/icons';
 import { Button, Popconfirm, message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 const MemberList = (props: any) => {
-  const { selectedGroup, at } = props;
+  const { selectedGroup, at, switchGroup } = props;
   const socket = useContext(socketContext);
   const friends = useSelector((state: any) => state.userInfo.friends);
   const memberArr: any = [];
@@ -43,6 +47,15 @@ const MemberList = (props: any) => {
     setMenu(<></>);
   };
 
+  const chat = (friendInfo: any) => {
+    switchGroup({
+      groupName: userInfo.username + '&&&' + friendInfo.username,
+      type: 'p2p',
+      toAvatar: friendInfo.avatar,
+      groupId: friendInfo.groupId
+    });
+  };
+
   //鼠标右键事件的回调
   const [menu, setMenu] = useState(<></>);
   const contextMenuCb = (e: any, username: any) => {
@@ -68,7 +81,17 @@ const MemberList = (props: any) => {
           <span>艾特Ta</span>
         </div>
         {friends.find((friend: any) => friend.username === username) ? (
-          <></>
+          <div
+            onClick={() =>
+              chat(friends.find((friend: any) => friend.username === username))
+            }
+            className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
+          >
+            <span>
+              <MessageOutlined />
+            </span>
+            <span>发送消息</span>
+          </div>
         ) : (
           <div
             onClick={toAddFriend}
@@ -80,7 +103,8 @@ const MemberList = (props: any) => {
             <span>添加好友</span>
           </div>
         )}
-        {currentGroup.authorBy === userInfo.username ? (
+        {currentGroup.authorBy === userInfo.username &&
+        currentGroup.groupId !== '1' ? (
           <Popconfirm
             title="踢出群聊"
             description="您真的要踢Ta出群吗?"

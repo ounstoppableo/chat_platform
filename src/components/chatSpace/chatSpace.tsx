@@ -61,6 +61,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const hadNewMsg = useRef(false);
   const [userInfoBg, setUserInfoBg] = useState<string>('');
   const groupMember = useSelector((state: any) => state.userInfo.groupMember);
+  const friends = useSelector((state: any) => state.userInfo.friends);
 
   //图片打开逻辑
   const { openImg } = useOpenImgLogic();
@@ -355,6 +356,20 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     };
   };
 
+  //添加好友
+  const toAddFriend = (username: string) => {
+    socket.current.emit('addFriend', { targetUsername: username });
+  };
+
+  const chat = (friendInfo: any) => {
+    switchGroup({
+      groupName: userInfo.username + '&&&' + friendInfo.username,
+      type: 'p2p',
+      toAvatar: friendInfo.avatar,
+      groupId: friendInfo.groupId
+    });
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
@@ -364,6 +379,9 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         );
         const group: Group = groups.find(
           (group: Group) => group.groupId === selectedGroup.groupId
+        );
+        const isFriend = friends?.find(
+          (friend: any) => friend.username === groupMemberItem?.username
         );
         return item.type === 'withdraw' ? (
           <div
@@ -423,10 +441,10 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
               )}
               {item.username !== userInfo.username ? (
                 <div
-                  className={`tw-cursor-default tw-absolute tw-w-fit tw-h-[170px] tw-left-[8%] tw-z-max tw-rounded-lg tw-overflow-hidden tw-bg-[#272a37] ${styles.info}`}
+                  className={`tw-cursor-default tw-absolute tw-w-fit tw-h-fit tw-left-[8%] tw-z-max tw-rounded-lg tw-overflow-hidden tw-bg-[#272a37] ${styles.info}`}
                 >
                   <div
-                    className={`tw-h-[30%]`}
+                    className={`tw-h-[50px]`}
                     style={{ backgroundColor: userInfoBg }}
                   ></div>
                   <div className="tw-absolute tw-translate-y-[-50%] tw-left-2 tw-w-16 tw-h-16 tw-rounded-full tw-overflow-hidden tw-border-[4px] tw-border-[#272a37]">
@@ -438,21 +456,46 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                   </div>
                   {groupMemberItem?.isOnline ? (
                     <div
-                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#adff2f] tw-top-[40%] tw-left-[54px] tw-right-0`}
+                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#adff2f] tw-top-[65px] tw-left-[54px] tw-right-0`}
                     ></div>
                   ) : (
                     <div
-                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#dfdfdf] tw-top-[40%] tw-left-[54px] tw-right-0`}
+                      className={`tw-w-3 tw-h-3 tw-absolute tw-rounded-full tw-bg-[#dfdfdf] tw-top-[65px] tw-left-[54px] tw-right-0`}
                     ></div>
                   )}
 
                   <div className="tw-mt-1 tw-h-7 tw-flex tw-pr-2 tw-justify-end tw-gap-2">
-                    <span className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor">
-                      <UserAddOutlined />
-                    </span>
-                    <span className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor">
-                      <MessageOutlined />
-                    </span>
+                    {isFriend ? (
+                      <>
+                        <span
+                          onClick={() => at(groupMemberItem?.username)}
+                          className=" tw-leading-[24px] tw-text-[24px] tw-cursor-pointer hover:tw-text-hoverColor"
+                        >
+                          @
+                        </span>
+                        <span
+                          onClick={() => chat(isFriend)}
+                          className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor"
+                        >
+                          <MessageOutlined />
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span
+                          onClick={() => at(groupMemberItem?.username)}
+                          className=" tw-leading-[24px] tw-text-[24px] tw-cursor-pointer hover:tw-text-hoverColor"
+                        >
+                          @
+                        </span>
+                        <span
+                          onClick={() => toAddFriend(groupMemberItem?.username)}
+                          className="tw-text-xl tw-cursor-pointer hover:tw-text-hoverColor"
+                        >
+                          <UserAddOutlined />
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div className="tw-ml-2 tw-mr-8 tw-text-lg">
                     {groupMemberItem?.username}
@@ -460,18 +503,25 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       #{groupMemberItem?.uid}
                     </span>
                   </div>
-                  <div className="tw-ml-2 tw-mb-2">
+                  <div className="tw-ml-2 tw-mb-2 tw-flex tw-gap-1">
                     {group?.authorBy === groupMemberItem?.username ? (
                       <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[#fffbe6] tw-text-[#d48806] tw-border-[#ffe58f] tw-border-2 tw-p-1">
                         创建者
                       </span>
                     ) : (
-                      <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[#111b26] tw-text-[#177ddc] tw-border-[#153450] tw-border-2 tw-p-1">
+                      <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[rgba(23,125,220,0.1)] tw-text-[rgba(23,125,220)] tw-border-[rgba(23,125,220,0.3)] tw-border-2 tw-p-1">
                         群成员
                       </span>
                     )}
+                    {isFriend ? (
+                      <span className=" tw-text-[12px] tw-rounded-lg tw-bg-[rgba(255,192,203,0.1)] tw-text-[rgba(255,192,203,1)] tw-border-[rgba(255,192,203,0.3)] tw-border-2 tw-p-1">
+                        好友
+                      </span>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                  <div className="tw-ml-2 tw-text-[14px] tw-text-[#6b7280]">
+                  <div className="tw-ml-2 tw-text-[14px] tw-mb-3 tw-text-[#6b7280]">
                     <span>所在城市：</span>
                     <span>{groupMemberItem?.region}</span>
                   </div>
