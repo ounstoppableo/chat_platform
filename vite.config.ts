@@ -38,11 +38,11 @@ export default defineConfig({
       cert: './cert/server.crt'
     },
     proxy: {
-      '/local/': {
+      '/socket/': {
         secure: false,
-        target: 'wss://localhost:3000',
+        target: 'https://localhost:3000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/local\//, '/'),
+        rewrite: (path) => path.replace(/^\/socket\//, '/'),
         ws: true
       },
       '/api': {

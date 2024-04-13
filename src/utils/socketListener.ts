@@ -68,6 +68,20 @@ const socketListener = (
           type: 'like'
         })
       );
+      const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
+      const dislikeList = JSON.parse(
+        localStorage.getItem('dislikeList') || '{}'
+      );
+      localStorage.setItem(
+        'likeList',
+        JSON.stringify(Object.assign(likeList, { [msg.msgId]: true }))
+      );
+      if (dislikeList[msg.msgId]) {
+        localStorage.setItem(
+          'dislikeList',
+          JSON.stringify(Object.assign(dislikeList, { [msg.msgId]: false }))
+        );
+      }
     }
   });
   //取消点赞
@@ -80,6 +94,11 @@ const socketListener = (
           room: msg.room,
           type: 'cancelLike'
         })
+      );
+      const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
+      localStorage.setItem(
+        'likeList',
+        JSON.stringify(Object.assign(likeList, { [msg.msgId]: false }))
       );
     }
   });
@@ -94,6 +113,20 @@ const socketListener = (
           type: 'dislike'
         })
       );
+      const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
+      const dislikeList = JSON.parse(
+        localStorage.getItem('dislikeList') || '{}'
+      );
+      if (likeList[msg.msgId]) {
+        localStorage.setItem(
+          'likeList',
+          JSON.stringify(Object.assign(likeList, { [msg.msgId]: false }))
+        );
+      }
+      localStorage.setItem(
+        'dislikeList',
+        JSON.stringify(Object.assign(dislikeList, { [msg.msgId]: true }))
+      );
     }
   });
   //取消不喜欢
@@ -106,6 +139,13 @@ const socketListener = (
           room: msg.room,
           type: 'cancelDislike'
         })
+      );
+      const dislikeList = JSON.parse(
+        localStorage.getItem('dislikeList') || '{}'
+      );
+      localStorage.setItem(
+        'dislikeList',
+        JSON.stringify(Object.assign(dislikeList, { [msg.msgId]: false }))
       );
     }
   });

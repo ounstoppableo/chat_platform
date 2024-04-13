@@ -89,10 +89,20 @@ export const userInfoSlice = createSlice({
         payload: {
           msgs: Msg[] | AllMsg;
           groupId: string;
-          opera: 'insert' | 'init';
+          opera: 'insert' | 'init' | 'unShift';
         };
       }
     ) => {
+      if (action.payload.opera === 'unShift') {
+        state.historyMsg[action.payload.groupId]
+          ? (state.historyMsg[action.payload.groupId] = [
+              ...(action.payload.msgs as Msg[]),
+              ...state.historyMsg[action.payload.groupId]
+            ])
+          : (state.historyMsg[action.payload.groupId] = [
+              ...(action.payload.msgs as Msg[])
+            ]);
+      }
       if (action.payload.opera === 'insert') {
         state.historyMsg[action.payload.groupId]
           ? (state.historyMsg[action.payload.groupId] = [
@@ -189,9 +199,11 @@ export const userInfoSlice = createSlice({
       );
       if (newMsgItem) {
         newMsgItem.type = 'withdraw';
+        newMsgItem.username = action.payload.username;
       }
       if (historyMsgItem) {
         historyMsgItem.type = 'withdraw';
+        historyMsgItem.username = action.payload.username;
       }
     },
     setDelMsg: (

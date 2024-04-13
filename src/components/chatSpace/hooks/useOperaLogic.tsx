@@ -104,9 +104,9 @@ const useOperaLogic = (props: any) => {
       if (!currentMsgItem.current) return;
       positionCalculate();
     };
-    chatSpaceRef.current.addEventListener('scroll', scrollCallback);
+    chatSpaceRef.current?.addEventListener('scroll', scrollCallback);
     return () => {
-      chatSpaceRef.current.removeEventListener('scroll', scrollCallback);
+      chatSpaceRef.current?.removeEventListener('scroll', scrollCallback);
     };
   }, [userInfo]);
 
@@ -122,10 +122,6 @@ const useOperaLogic = (props: any) => {
         msgId: item.id,
         likes: item.likes
       });
-      localStorage.setItem(
-        'likeList',
-        JSON.stringify(Object.assign(likeList, { [item.id]: false }))
-      );
     } else {
       if (dislikeList[item.id]) {
         socket.current.emit('cancelDislikeSbMsg', {
@@ -134,10 +130,6 @@ const useOperaLogic = (props: any) => {
           msgId: item.id,
           dislikes: item.dislikes
         });
-        localStorage.setItem(
-          'dislikeList',
-          JSON.stringify(Object.assign(dislikeList, { [item.id]: false }))
-        );
       }
       socket.current.emit('likeSbMsg', {
         room: item.room,
@@ -145,10 +137,6 @@ const useOperaLogic = (props: any) => {
         msgId: item.id,
         likes: item.likes
       });
-      localStorage.setItem(
-        'likeList',
-        JSON.stringify(Object.assign(likeList, { [item.id]: true }))
-      );
     }
 
     return null;
@@ -164,10 +152,6 @@ const useOperaLogic = (props: any) => {
         msgId: item.id,
         dislikes: item.dislikes
       });
-      localStorage.setItem(
-        'dislikeList',
-        JSON.stringify(Object.assign(dislikeList, { [item.id]: false }))
-      );
     } else {
       if (likeList[item.id]) {
         socket.current.emit('cancelLikeSbMsg', {
@@ -176,10 +160,6 @@ const useOperaLogic = (props: any) => {
           msgId: item.id,
           likes: item.likes
         });
-        localStorage.setItem(
-          'likeList',
-          JSON.stringify(Object.assign(likeList, { [item.id]: false }))
-        );
       }
       socket.current.emit('dislikeSbMsg', {
         room: item.room,
@@ -187,10 +167,6 @@ const useOperaLogic = (props: any) => {
         msgId: item.id,
         dislikes: item.dislikes
       });
-      localStorage.setItem(
-        'dislikeList',
-        JSON.stringify(Object.assign(dislikeList, { [item.id]: true }))
-      );
     }
     return null;
   };

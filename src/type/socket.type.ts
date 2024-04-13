@@ -129,6 +129,7 @@ export interface ClientToServerEvents {
     src?: string;
     fileName?: string;
     fileSize?: string;
+    room?: string;
   }) => void;
   delGroup: (msg: Group) => void;
   exitGroup: (msg: Group) => void;

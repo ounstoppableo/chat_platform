@@ -25,6 +25,7 @@ import {
   FileWordOutlined,
   FileZipOutlined,
   LikeFilled,
+  LoadingOutlined,
   LogoutOutlined,
   MessageOutlined,
   UserAddOutlined
@@ -40,6 +41,7 @@ import useMenuLogic from './hooks/useMenuLogic.tsx';
 import { createPortal } from 'react-dom';
 import useOpenImgLogic from './hooks/useOpenImgLogic.tsx';
 import usePictureLoadLogic from './hooks/usePictureLoadLogic.tsx';
+import { getMsgs } from '@/service/msgControl.ts';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -62,6 +64,13 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const [userInfoBg, setUserInfoBg] = useState<string>('');
   const groupMember = useSelector((state: any) => state.userInfo.groupMember);
   const friends = useSelector((state: any) => state.userInfo.friends);
+
+  //记录加载新消息前的位置
+  const preScrollOffset = useRef<number>(0);
+
+  //消息加载相关参数
+  const [msgLoading, setMsgLoading] = useState(false);
+  const [msgHadAllGet, setMsgHadAllGet] = useState(false);
 
   //图片打开逻辑
   const { openImg } = useOpenImgLogic();
@@ -379,16 +388,17 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           (friend: any) => friend.username === groupMemberItem?.username
         );
         return item.type === 'withdraw' ? (
-          <div
-            key={item.id + '' + index}
-            data-index={item.id}
-            className="tw-text-[#8b8b8d] tw-text-xs tw-text-center tw-select-none tw-cursor-default"
-          >
-            {userInfo.username === item.username ? '您' : `"${item.username}"`}
-            撤回了一条消息
+          <div key={item.id} data-index={item.id}>
+            {dateControl(index)}
+            <div className="tw-text-[#8b8b8d] tw-text-xs tw-text-center tw-select-none tw-cursor-default">
+              {userInfo.username === item.username
+                ? '您'
+                : `"${item.username}"`}
+              撤回了一条消息
+            </div>
           </div>
         ) : (
-          <div key={item.id + '' + index} data-index={item.id}>
+          <div key={item.id} data-index={item.id}>
             {dateControl(index)}
             <div className={`tw-flex tw-gap-2 tw-relative ${styles.parent}`}>
               {item.username !== userInfo.username ? (
@@ -509,7 +519,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                 >
                   <span>{item.username}</span>
                   <span>&nbsp;</span>
-                  <span>{`(${'北京'})`}</span>
+                  <span>{`(${item.region})`}</span>
                   <span>&nbsp;</span>
                   <span className="tw-text-xs tw-transition-all">
                     {dayjs(item.time).format('HH:mm')}
@@ -752,6 +762,57 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     }
   }, [newMsg, selectedGroup]);
 
+  //监控滚动到顶部事件
+  useEffect(() => {
+    const scrollCallBack = (e: any) => {
+      if (e.target.scrollTop === 0) {
+        if (
+          selectedGroup.groupId &&
+          !msgLoading &&
+          !msgHadAllGet &&
+          chatSpaceRef.current.scrollHeight !==
+            chatSpaceRef.current.offsetHeight
+        ) {
+          setMsgLoading(true);
+          preScrollOffset.current = chatSpaceRef.current.scrollHeight;
+          getMsgs(
+            selectedGroup.groupId,
+            (historyMsg[selectedGroup.groupId] &&
+              historyMsg[selectedGroup.groupId][0]?.id) ||
+              99999,
+            20
+          ).then((res) => {
+            if (res.code === 200) {
+              setMsgLoading(false);
+              if (res.data.result.length === 0) setMsgHadAllGet(true);
+              dispatch(
+                setHistoryMessage({
+                  groupId: selectedGroup.groupId,
+                  msgs: res.data.result,
+                  opera: 'unShift'
+                })
+              );
+            }
+          });
+        }
+      }
+    };
+    chatSpaceRef.current?.addEventListener('scroll', scrollCallBack);
+    return () => {
+      chatSpaceRef.current?.removeEventListener('scroll', scrollCallBack);
+    };
+  }, [historyMsg, selectedGroup, msgLoading, msgHadAllGet]);
+  useEffect(() => {
+    if (chatSpaceRef.current && preScrollOffset.current !== 0) {
+      chatSpaceRef.current.scrollTop =
+        chatSpaceRef.current.scrollHeight - preScrollOffset.current;
+      preScrollOffset.current = 0;
+    }
+  }, [historyMsg]);
+  useEffect(() => {
+    setMsgHadAllGet(false);
+  }, [selectedGroup]);
+
   //群控制逻辑
   const {
     groupNamePreOpera,
@@ -773,7 +834,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   });
 
   //右键菜单
-  const { menu, contextMenuCb } = useMenuLogic();
+  const { menu, contextMenuCb } = useMenuLogic({ currentGroup });
 
   return selectedGroup.groupName ? (
     <div className="tw-flex tw-flex-col tw-bg-lightGray tw-w-full tw-h-full tw-rounded-lg tw-overflow-hidden tw-pb-4 tw-relative">
@@ -835,10 +896,23 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           )}
         </div>
       </div>
+      <div className="tw-text-center tw-text-xs tw-text-[#999999]">
+        {msgLoading && (
+          <span>
+            <LoadingOutlined />
+            &nbsp; 加载中，请稍后~~
+          </span>
+        )}
+      </div>
       <div
         ref={chatSpaceRef}
         className="tw-flex-1 tw-flex tw-gap-5 tw-flex-col tw-px-5 tw-overflow-y-auto tw-overflow-x-hidden tw-pt-4 tw-pb-4"
       >
+        {msgHadAllGet && (
+          <div className="tw-text-center tw-text-xs tw-text-[#999999]">
+            &nbsp; 已经到顶了o~~
+          </div>
+        )}
         {msgArr}
       </div>
       {replyInfo ? (

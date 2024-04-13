@@ -225,7 +225,8 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
         msg: inputValue,
         time: new Date(),
         fromAvatar: userInfo.avatar,
-        toAvatar: selectedGroup.toAvatar
+        toAvatar: selectedGroup.toAvatar,
+        room: selectedGroup.groupId || ''
       });
       setInputValue('');
       timer.current = setTimeout(() => {

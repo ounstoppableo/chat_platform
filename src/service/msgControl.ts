@@ -18,3 +18,9 @@ export const getMeme = () => {
 export const delMeme = (id: number) => {
   return http(`/api/delMeme/${id}`, { method: 'DELETE' });
 };
+
+export const getMsgs = (groupId: string, lastMsgId: number, limit: number) => {
+  return http(
+    `/api/groupMsg/?groupId=${groupId}&lastMsgId=${lastMsgId}&limit=${limit}`
+  );
+};

@@ -13,7 +13,8 @@ import { message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-const useMenuLogic = () => {
+const useMenuLogic = (props: any) => {
+  const { currentGroup } = props;
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const socket = useContext(socketContext);
   const [menu, setMenu] = useState(<></>);
@@ -70,7 +71,9 @@ const useMenuLogic = () => {
           </span>
           <span>复制</span>
         </div>
-        {msg.username === userInfo.username ? (
+        {msg.username === userInfo.username ||
+        (currentGroup.type === 'group' &&
+          currentGroup.authorBy === userInfo.username) ? (
           <div
             onClick={withdrawMsg}
             className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"

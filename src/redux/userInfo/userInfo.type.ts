@@ -32,6 +32,7 @@ export interface Group {
   fromAvatar: string;
   toAvatar: string;
   toUsername: string;
+  isShow: number;
 }
 export type AllMsg = {
   [key: string]: Msg[];
@@ -52,4 +53,5 @@ export type Msg = {
   src?: string;
   fileName?: string;
   fileSize?: string;
+  region: string;
 };

@@ -93,9 +93,11 @@ const ChatRelation = (props: any) => {
     });
   };
 
-  const newGroups = [...groups].sort((a: Group, b: Group) => {
-    return dayjs(b.time).unix() - dayjs(a.time).unix();
-  });
+  const newGroups = groups
+    .filter((item) => item.isShow !== 0)
+    .sort((a: Group, b: Group) => {
+      return dayjs(b.time).unix() - dayjs(a.time).unix();
+    });
   newGroups.forEach((item: Group) => {
     arr.push(
       <div
