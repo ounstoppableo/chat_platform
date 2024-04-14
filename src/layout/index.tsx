@@ -82,12 +82,17 @@ const Layout = () => {
   const loginConfirm = async () => {
     const res = await userConfirm();
     if (res.code === 200) {
-      socket.current = io('https://localhost:4000', {
-        withCredentials: true,
-        auth: {
-          token: getToken()
+      socket.current = io(
+        process.env.NODE_ENV === 'dev'
+          ? 'https://localhost:4000'
+          : 'https://47.120.2.193:4000',
+        {
+          withCredentials: true,
+          auth: {
+            token: getToken()
+          }
         }
-      });
+      );
       socketListener(socket.current, dispatch, res.data, switchGroup);
     }
   };
