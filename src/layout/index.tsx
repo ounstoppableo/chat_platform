@@ -6,7 +6,7 @@ import loginFlagContext from '@/context/loginFlagContext';
 import Login from '@/components/login/login.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { userConfirm } from '@/service/login';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
 import getToken from '@/utils/getToken';
 import socketContext from '@/context/socketContext';
@@ -25,7 +25,7 @@ const Layout = () => {
     groupId: '1',
     type: 'group'
   });
-  const groups = useSelector((state: any) => state.userInfo.groups);
+  // const groups = useSelector((state: any) => state.userInfo.groups);
   const mentions = useRef<any>(null);
   const at = (username?: string) => {
     if (mentions.current) {

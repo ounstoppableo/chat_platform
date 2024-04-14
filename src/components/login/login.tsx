@@ -1,5 +1,5 @@
 import loginFlagContext from '@/context/loginFlagContext';
-import { userConfirm, userLogin } from '@/service/login';
+import { userLogin } from '@/service/login';
 import {
   CloseOutlined,
   EyeInvisibleOutlined,
@@ -11,20 +11,17 @@ import {
 import { Button, Input, message } from 'antd';
 import { useContext, useRef, useState } from 'react';
 import sha256 from 'crypto-js/sha256';
-import { useDispatch } from 'react-redux';
-import { io } from 'socket.io-client';
-import getToken from '@/utils/getToken';
-import socketContext from '@/context/socketContext';
-import socketListener from '@/utils/socketListener';
+// import { useDispatch } from 'react-redux';
+// import socketContext from '@/context/socketContext';
 import { validateString } from '@/utils/validateString';
 
 const Login = (props: any) => {
-  const socket = useContext(socketContext);
+  // const socket = useContext(socketContext);
   const { show } = props;
   const [loginMethod, setLoginMethod] = useState<'username' | 'wechat'>(
     'username'
   );
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   // const loginCf = async () => {
   //   const res = await userConfirm();
   //   if (res.code === 200) {
@@ -60,7 +57,7 @@ const Login = (props: any) => {
   };
 
   //登录逻辑
-  const loginConfirm = (e: any) => {
+  const loginConfirm = (_: any) => {
     if (!userInfo.username.trim() || !userInfo.password.trim()) {
       message.error('请正确填写用户名和密码');
       return;

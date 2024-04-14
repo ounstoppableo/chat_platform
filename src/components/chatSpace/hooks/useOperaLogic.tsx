@@ -75,11 +75,11 @@ const useOperaLogic = (props: any) => {
   };
 
   //点赞回复操作台的未知控制
-  const userOperaControl = (e: any, item: any) => {
+  const userOperaControl = (_: any, item: any) => {
     currentMsgItem.current = item;
     positionCalculate();
   };
-  const userOperaControlForLeave = (e: any, item: any) => {
+  const userOperaControlForLeave = (_: any, item: any) => {
     currentMsgItem.current = null;
     const operaEle: any = document.body.querySelector(
       `[data-opera-index='${item.id}']`
@@ -100,7 +100,7 @@ const useOperaLogic = (props: any) => {
 
   //监听滚动事件
   useEffect(() => {
-    const scrollCallback = (e: any) => {
+    const scrollCallback = (_: any) => {
       if (!currentMsgItem.current) return;
       positionCalculate();
     };

@@ -1,6 +1,6 @@
 import socketContext from '@/context/socketContext';
-import { addGroupMember, getFriends } from '@/service/addRelationLogic';
-import { Modal, Transfer, message } from 'antd';
+import { getFriends } from '@/service/addRelationLogic';
+import { Modal, Transfer } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 
 const useRelationCtrl = (props: any) => {

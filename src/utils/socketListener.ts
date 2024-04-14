@@ -343,7 +343,7 @@ const socketListener = (
     }
   });
 
-  socket.on('error', (err: any) => {
+  socket.on('error', (_: any) => {
     message.error('与服务器连接失败');
   });
   socket.on('clientError', (err) => {
