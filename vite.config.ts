@@ -40,20 +40,20 @@ export default defineConfig({
     proxy: {
       '/socket/': {
         secure: false,
-        target: 'https://localhost:3000',
+        target: 'https://localhost:4000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/socket\//, '/'),
         ws: true
       },
       '/api': {
         secure: false,
-        target: 'https://localhost:3000/user',
+        target: 'https://localhost:4000/user',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/')
       },
       '/public': {
         secure: false,
-        target: 'https://localhost:3000',
+        target: 'https://localhost:4000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/public/, '/')
       }

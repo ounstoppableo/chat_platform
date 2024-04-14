@@ -82,7 +82,7 @@ const Layout = () => {
   const loginConfirm = async () => {
     const res = await userConfirm();
     if (res.code === 200) {
-      socket.current = io('https://localhost:3000', {
+      socket.current = io('https://localhost:4000', {
         withCredentials: true,
         auth: {
           token: getToken()
