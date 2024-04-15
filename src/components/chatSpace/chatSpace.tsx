@@ -42,6 +42,7 @@ import { createPortal } from 'react-dom';
 import useOpenImgLogic from './hooks/useOpenImgLogic.tsx';
 import usePictureLoadLogic from './hooks/usePictureLoadLogic.tsx';
 import { getMsgs } from '@/service/msgControl.ts';
+import loginFlagContext from '@/context/loginFlagContext.ts';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -50,6 +51,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const init = useRef(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: any) => state.userInfo.data);
+  const loginControl = useContext(loginFlagContext);
   const { selectedGroup, at, switchGroup } = props;
   const chatSpaceRef = useRef<any>(null);
   const groups = useSelector((state: any) => state.userInfo.groups);
@@ -773,9 +775,10 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           chatSpaceRef.current.scrollHeight !==
             chatSpaceRef.current.offsetHeight
         ) {
+          if (!userInfo.isLogin) return loginControl.showLoginForm();
           setMsgLoading(true);
           preScrollOffset.current = chatSpaceRef.current.scrollHeight;
-          getMsgs(
+          return getMsgs(
             selectedGroup.groupId,
             (historyMsg[selectedGroup.groupId] &&
               historyMsg[selectedGroup.groupId][0]?.id) ||
@@ -796,6 +799,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
           });
         }
       }
+      return null;
     };
     chatSpaceRef.current?.addEventListener('scroll', scrollCallBack);
     return () => {

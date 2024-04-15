@@ -15,7 +15,7 @@ export const useGetFriend = (props: any) => {
   };
 
   useEffect(() => {
-    if (msgOrRelation === 'relation') {
+    if (msgOrRelation === 'relation' && userInfo.isLogin) {
       getFriends().then((res) => {
         if (res.code === 200) {
           dispartch(setFriends(res.data.result));

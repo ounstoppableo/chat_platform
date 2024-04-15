@@ -1,3 +1,4 @@
+import loginFlagContext from '@/context/loginFlagContext';
 import socketContext from '@/context/socketContext';
 import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
@@ -17,6 +18,7 @@ const MemberList = (props: any) => {
   const { selectedGroup, at, switchGroup } = props;
   const socket = useContext(socketContext);
   const friends = useSelector((state: any) => state.userInfo.friends);
+  const loginControl = useContext(loginFlagContext);
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
@@ -31,11 +33,13 @@ const MemberList = (props: any) => {
   );
   const dispatch = useDispatch();
   useEffect(() => {
-    getGroupMember(selectedGroup.groupId).then((res) => {
-      if (res.code === 200) {
-        dispatch(setGroupMember(res.data));
-      }
-    });
+    if (userInfo.isLogin) {
+      getGroupMember(selectedGroup.groupId).then((res) => {
+        if (res.code === 200) {
+          dispatch(setGroupMember(res.data));
+        }
+      });
+    }
   }, [selectedGroup]);
 
   //踢出群聊
@@ -180,7 +184,8 @@ const MemberList = (props: any) => {
     authorBy: currentGroup?.authorBy
   });
   const addMember = () => {
-    show();
+    if (!userInfo.isLogin) return loginControl.showLoginForm();
+    return show();
   };
 
   return (

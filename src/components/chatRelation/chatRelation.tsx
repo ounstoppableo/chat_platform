@@ -20,7 +20,7 @@ const ChatRelation = (props: any) => {
 
   //切换时更新groups
   useEffect(() => {
-    if (msgOrRelation === 'msg') {
+    if (msgOrRelation === 'msg' && userInfo.isLogin) {
       getGroups().then((res) => {
         if (res.code === 200) {
           //确保groups原来的属性不丢失，比如hadNewMsg

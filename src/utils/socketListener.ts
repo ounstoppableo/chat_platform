@@ -14,7 +14,8 @@ import {
   setDelGroupMember,
   setEditGroupName,
   setWithdrawMsg,
-  setSystemInfo
+  setSystemInfo,
+  setGroups
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getFriends } from '@/service/addRelationLogic';
@@ -40,11 +41,13 @@ const socketListener = (
         );
       }
     });
-    getFriends().then((res) => {
-      if (res.code === 200) {
-        dispatch(setFriends(res.data.result));
-      }
-    });
+    userData.isLogin &&
+      getFriends().then((res) => {
+        if (res.code === 200) {
+          dispatch(setFriends(res.data.result));
+        }
+      });
+    dispatch(setGroups(userData.groups));
     socket.emit('joinRoom', userData.groups);
   });
 

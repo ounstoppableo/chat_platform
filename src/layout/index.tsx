@@ -83,7 +83,7 @@ const Layout = () => {
     const res = await userConfirm();
     if (res.code === 200) {
       socket.current = io(
-        process.env.NODE_ENV === 'dev'
+        process.env.NODE_ENV === 'development'
           ? 'https://localhost:4000'
           : 'https://47.120.2.193:4000',
         {
