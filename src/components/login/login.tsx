@@ -112,7 +112,7 @@ const Login = (props: any) => {
         </div>
         <div>
           <img
-            src="src/assets/avatar.jpeg"
+            src="https://www.unstoppable840.cn/assets/avatar.jpeg"
             alt=""
             className="tw-object-cover tw-w-24 tw-h-24 tw-rounded-lg"
           />
@@ -177,7 +177,7 @@ const Login = (props: any) => {
         ) : (
           <>
             <img
-              src="src/assets/avatar.jpeg"
+              src="https://www.unstoppable840.cn/assets/avatar.jpeg"
               alt=""
               className="tw-object-contain"
             />
