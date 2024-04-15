@@ -796,7 +796,7 @@ test('点击测试完成', async () => {
       <div className="tw-h-16 tw-rounded-lg tw-bg-chatRelationActive tw-flex tw-p-3 tw-gap-3 tw-items-center">
         <div className="tw-w-10 tw-h-10 tw-rounded-full tw-overflow-hidden">
           <img
-            src="http://8.130.54.105/assets/avatar.jpeg"
+            src="https://www.unstoppable840.cn/assets/avatar.jpeg"
             alt=""
             className="tw-w-full tw-h-full tw-object-contain"
           />
