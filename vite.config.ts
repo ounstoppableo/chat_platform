@@ -38,7 +38,7 @@ export default defineConfig({
       cert: './cert/server.crt'
     },
     proxy: {
-      '/socket/': {
+      '/socket.io/': {
         secure: false,
         target: 'https://localhost:4000',
         changeOrigin: true,
