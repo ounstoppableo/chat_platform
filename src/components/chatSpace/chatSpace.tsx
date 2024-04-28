@@ -43,6 +43,7 @@ import useOpenImgLogic from './hooks/useOpenImgLogic.tsx';
 import usePictureLoadLogic from './hooks/usePictureLoadLogic.tsx';
 import { getMsgs } from '@/service/msgControl.ts';
 import loginFlagContext from '@/context/loginFlagContext.ts';
+import smallSizeContext from '@/context/smallSizeContext.ts';
 
 const ChatSpace = React.forwardRef((props: any, mentions) => {
   const socket = useContext(socketContext);
@@ -52,14 +53,14 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const loginControl = useContext(loginFlagContext);
-  const { selectedGroup, at, switchGroup } = props;
+  const { selectedGroup, at, switchGroup, toOpenGroupMember } = props;
   const chatSpaceRef = useRef<any>(null);
   const groups = useSelector((state: any) => state.userInfo.groups);
   const currentGroup = groups.find(
     (item: any) => item.groupId === selectedGroup.groupId
   );
   const [openEditGroupName, setOpenEditGroupName] = useState(false);
-
+  const { smallSize, setSmallSize } = useContext(smallSizeContext);
   const [newGroupName, setNewGroupName] = useState('');
   const scrollToBottomTimer = useRef<any>(null);
   const hadNewMsg = useRef(false);
@@ -233,29 +234,49 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
       init.current = true;
     }
   }, [historyMsg]);
-  //自己发消息则滚动到底部
+
+  const scrollToBottomSmooth = () => {
+    chatSpaceRef.current
+      ? chatSpaceRef.current.scrollTo({
+          top: chatSpaceRef.current.scrollHeight,
+          behavior: 'smooth'
+        })
+      : null;
+  };
   useEffect(() => {
-    if (
-      newMsg[selectedGroup.groupId] &&
-      newMsg[selectedGroup.groupId].length !== 0 &&
-      newMsg[selectedGroup.groupId][newMsg[selectedGroup.groupId].length - 1]
-        .username === userInfo.username
-    ) {
-      hadNewMsg.current = true;
-    }
+    /**
+     * 自己发消息则滚动到底部
+     * 别人发的消息如果自己在底部则也滚动到底部
+     */
     if (
       historyMsg[selectedGroup.groupId] &&
       historyMsg[selectedGroup.groupId].length !== 0 &&
-      historyMsg[selectedGroup.groupId][
-        historyMsg[selectedGroup.groupId].length - 1
-      ].username === userInfo.username &&
       hadNewMsg.current
     ) {
-      requestAnimationFrame(() => {
+      if (
+        historyMsg[selectedGroup.groupId][
+          historyMsg[selectedGroup.groupId].length - 1
+        ].username === userInfo.username ||
+        (chatSpaceRef.current &&
+          chatSpaceRef.current.scrollTop >=
+            chatSpaceRef.current.scrollHeight -
+              chatSpaceRef.current.offsetHeight -
+              140)
+      ) {
+        requestAnimationFrame(() => {
+          hadNewMsg.current = false;
+          clearUnReadMsg();
+          scrollToBottomSmooth();
+        });
+      } else {
         hadNewMsg.current = false;
-        clearUnReadMsg();
-        scrollToBottom();
-      });
+      }
+    }
+    if (
+      newMsg[selectedGroup.groupId] &&
+      newMsg[selectedGroup.groupId].length !== 0
+    ) {
+      hadNewMsg.current = true;
     }
   }, [newMsg, historyMsg]);
 
@@ -859,7 +880,20 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
             <></>
           )}
         </span>
-        <div>
+        <div className="tw-flex tw-gap-2">
+          {currentGroup && currentGroup.type === 'group' && smallSize ? (
+            <>
+              <button
+                title="展开群成员"
+                className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#323644] tw-flex tw-justify-center tw-items-center"
+                onClick={toOpenGroupMember}
+              >
+                <span className="iconfont icon-Shankar"></span>
+              </button>
+            </>
+          ) : (
+            <></>
+          )}
           {currentGroup &&
           userInfo.username &&
           currentGroup.type === 'group' &&
@@ -874,7 +908,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
               >
                 <button
                   title="删除群聊"
-                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#ff4d4f]"
+                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#ff4d4f] tw-flex tw-justify-center tw-items-center"
                 >
                   <DeleteOutlined />
                 </button>
@@ -889,7 +923,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
               >
                 <button
                   title="退出群聊"
-                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#f69220]"
+                  className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-[#f69220] tw-flex tw-justify-center tw-items-center"
                 >
                   <LogoutOutlined />
                 </button>

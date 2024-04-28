@@ -1,3 +1,4 @@
+import smallSizeContext from '@/context/smallSizeContext';
 import socketContext from '@/context/socketContext';
 import { getFriends } from '@/service/addRelationLogic';
 import { Modal, Transfer } from 'antd';
@@ -10,6 +11,7 @@ const useRelationCtrl = (props: any) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const socket = useContext(socketContext);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const { smallSize } = useContext(smallSizeContext);
   const onChange = (nextTargetKeys: any) => {
     setTargetKeys(nextTargetKeys);
   };
@@ -54,7 +56,7 @@ const useRelationCtrl = (props: any) => {
         targetKeys={targetKeys}
         selectedKeys={selectedKeys}
         listStyle={{
-          width: 250,
+          width: smallSize ? '43%' : 250,
           height: 300,
           backgroundColor: '#1d1e1f'
         }}

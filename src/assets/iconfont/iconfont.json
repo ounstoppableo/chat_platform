@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "25225103",
+      "name": "展开",
+      "font_class": "Shankar",
+      "unicode": "e6a9",
+      "unicode_decimal": 59049
+    },
+    {
+      "icon_id": "1964087",
+      "name": "联系人",
+      "font_class": "lianxiren",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "2571148",
+      "name": "消息",
+      "font_class": "xiaoxi",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "8508831",
+      "name": "个人信息",
+      "font_class": "gerenxinxi",
+      "unicode": "e847",
+      "unicode_decimal": 59463
+    },
+    {
       "icon_id": "6151361",
       "name": "arrow-to-top",
       "font_class": "arrow-to-top",

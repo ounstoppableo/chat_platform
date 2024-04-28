@@ -14,9 +14,11 @@ html {overflow-y: scroll;}
 .clearfix:after {content: "."; display: block; height:0; clear:both; visibility: hidden;}
 .clearfix { *zoom:1; }
 
+
 /* 设置滚动条轨道的样式 */
 ::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
   
   /* 设置滚动条滑块的样式 */

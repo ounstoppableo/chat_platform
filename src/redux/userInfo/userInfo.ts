@@ -15,6 +15,9 @@ export const userInfoSlice = createSlice({
     setUserInfo: (state, action: { payload: UserInfo }) => {
       state.data = action.payload;
     },
+    setUserRegion: (state, action: { payload: string }) => {
+      state.data.region = action.payload;
+    },
     setGroups: (state, action) => {
       state.groups = action.payload;
     },
@@ -264,7 +267,8 @@ export const {
   setEditGroupName,
   setWithdrawMsg,
   setDelMsg,
-  setSystemInfo
+  setSystemInfo,
+  setUserRegion
 } = userInfoSlice.actions;
 
 export default userInfoSlice.reducer;

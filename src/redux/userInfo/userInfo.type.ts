@@ -4,7 +4,7 @@ export interface UserInfo {
   username: string;
   isLogin?: boolean;
   isOnline?: boolean;
-  region?: boolean;
+  region?: string;
 }
 
 export interface SystemInfo {

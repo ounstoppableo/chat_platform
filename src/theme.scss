@@ -133,6 +133,11 @@
         }
     }
 }
+.customDrawer {
+    &>.ant-drawer-body{
+        padding: 0;
+    }
+}
 
 //激活态阴影
 //rgba(22, 119, 255,0.1)

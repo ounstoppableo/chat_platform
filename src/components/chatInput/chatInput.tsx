@@ -149,9 +149,9 @@ const ChatInput = React.forwardRef((props: any, mentions) => {
     action: '/api/uploadFile',
     showUploadList: false,
     beforeUpload: (file: RcFile) => {
-      const isLt2M = file.size < 1024 * 1024 * 10;
+      const isLt2M = file.size < 1024 * 1024 * 5;
       if (!isLt2M) {
-        message.error('文件大小不能超过10MB!');
+        message.error('文件大小不能超过5MB!');
       }
       return isLt2M;
     },

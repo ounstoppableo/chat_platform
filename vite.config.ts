@@ -42,7 +42,6 @@ export default defineConfig({
         secure: false,
         target: 'https://localhost:4000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/socket\//, '/'),
         ws: true
       },
       '/api': {

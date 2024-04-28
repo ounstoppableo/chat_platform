@@ -56,7 +56,7 @@ export default {
         temple: "url('@/assets/background.jpeg')"
       },
       minWidth: {
-        minChatSpace: '450px',
+        minChatSpace: '400px',
         '100px': '100px'
       }
     }

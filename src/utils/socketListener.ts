@@ -15,7 +15,8 @@ import {
   setEditGroupName,
   setWithdrawMsg,
   setSystemInfo,
-  setGroups
+  setGroups,
+  setUserRegion
 } from '@/redux/userInfo/userInfo';
 import { Msg } from '@/redux/userInfo/userInfo.type';
 import { getFriends } from '@/service/addRelationLogic';
@@ -58,6 +59,9 @@ const socketListener = (
     //设置最新组显示
     dispatch(setNewGroupMsg(msg));
     dispatch(setHadNewMsg({ groupId: msg.room, hadNewMsg: true }));
+    if (msg.username === userData.username) {
+      dispatch(setUserRegion(msg.region));
+    }
   });
 
   //某人点赞了消息

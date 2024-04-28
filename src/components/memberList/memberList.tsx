@@ -1,4 +1,5 @@
 import loginFlagContext from '@/context/loginFlagContext';
+import smallSizeContext from '@/context/smallSizeContext';
 import socketContext from '@/context/socketContext';
 import useRelationCtrl from '@/hooks/relationCtrl.tsx';
 import { setGroupMember } from '@/redux/userInfo/userInfo';
@@ -19,6 +20,7 @@ const MemberList = (props: any) => {
   const socket = useContext(socketContext);
   const friends = useSelector((state: any) => state.userInfo.friends);
   const loginControl = useContext(loginFlagContext);
+  const { smallSize, setSmallSize } = useContext(smallSizeContext);
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember
@@ -33,13 +35,11 @@ const MemberList = (props: any) => {
   );
   const dispatch = useDispatch();
   useEffect(() => {
-    if (userInfo.isLogin) {
-      getGroupMember(selectedGroup.groupId).then((res) => {
-        if (res.code === 200) {
-          dispatch(setGroupMember(res.data));
-        }
-      });
-    }
+    getGroupMember(selectedGroup.groupId).then((res) => {
+      if (res.code === 200) {
+        dispatch(setGroupMember(res.data));
+      }
+    });
   }, [selectedGroup]);
 
   //踢出群聊
@@ -73,7 +73,7 @@ const MemberList = (props: any) => {
     };
     setMenu(
       <div
-        className={`tw-text-xs tw-absolute tw-w-24 tw-h-fit tw-rounded-lg tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
+        className={`tw-text-xs tw-absolute tw-w-24 tw-h-fit tw-rounded-lg tw-z-max tw-bg-chatSpaceFooter tw-flex tw-flex-col tw-gap-1 tw-p-1`}
         style={{ top: e.clientY + 'px', left: e.clientX + 'px' }}
         id="memberListMenu"
       >
@@ -129,6 +129,7 @@ const MemberList = (props: any) => {
       </div>
     );
   };
+
   //清除菜单
   useEffect(() => {
     const cb = (e: any) => {
@@ -154,7 +155,7 @@ const MemberList = (props: any) => {
     memberArr.push(
       <div
         key={item.uid}
-        className="hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded"
+        className={`hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded`}
         onContextMenu={(e) => contextMenuCb(e, item.username)}
       >
         <div
@@ -189,11 +190,15 @@ const MemberList = (props: any) => {
   };
 
   return (
-    <div className="tw-w-full tw-h-full tw-bg-lightGray tw-rounded-lg tw-text-base tw-px-2.5 tw-py-2 tw-flex tw-flex-col tw-gap-4">
+    <div
+      className={`tw-relative tw-w-full tw-h-full tw-bg-lightGray ${
+        smallSize ? '' : 'tw-rounded-lg'
+      } tw-text-base tw-px-2.5 tw-py-2 tw-flex tw-flex-col tw-gap-4`}
+    >
       <div>在线人数：{onlineNum}</div>
       <button
         onClick={addMember}
-        className="tw-bg-[#409eff] tw-text-white tw-rounded-full tw-w-6 tw-h-6 tw-absolute tw-right-8"
+        className="tw-bg-[#409eff] tw-text-white tw-rounded-full tw-w-6 tw-h-6 tw-absolute tw-right-2"
       >
         <PlusOutlined />
       </button>

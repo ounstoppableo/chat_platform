@@ -1,4 +1,5 @@
 import loginFlagContext from '@/context/loginFlagContext';
+import { message } from 'antd';
 import { useContext, useEffect, useRef } from 'react';
 
 const useOperaLogic = (props: any) => {
@@ -7,6 +8,7 @@ const useOperaLogic = (props: any) => {
   const timer = useRef<any>({});
   const timer2 = useRef<any>({});
   const currentMsgItem = useRef<any>(null);
+  const likeTimer = useRef<any>(null);
   //位置计算
   const positionCalculate = () => {
     const operaEle: any = chatSpaceRef.current.querySelector(
@@ -113,6 +115,11 @@ const useOperaLogic = (props: any) => {
   //点赞逻辑
   const like = (item: any) => {
     if (!userInfo.isLogin) return loginControl.showLoginForm();
+    if (likeTimer.current) return message.warning('请不要频繁操作！');
+    likeTimer.current = setTimeout(() => {
+      clearTimeout(likeTimer.current);
+      likeTimer.current = null;
+    }, 3000);
     const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
     const dislikeList = JSON.parse(localStorage.getItem('dislikeList') || '{}');
     if (likeList[item.id]) {
@@ -143,6 +150,11 @@ const useOperaLogic = (props: any) => {
   };
   const dislike = (item: any) => {
     if (!userInfo.isLogin) return loginControl.showLoginForm();
+    if (likeTimer.current) return message.warning('请不要频繁操作！');
+    likeTimer.current = setTimeout(() => {
+      clearTimeout(likeTimer.current);
+      likeTimer.current = null;
+    }, 3000);
     const likeList = JSON.parse(localStorage.getItem('likeList') || '{}');
     const dislikeList = JSON.parse(localStorage.getItem('dislikeList') || '{}');
     if (dislikeList[item.id]) {
