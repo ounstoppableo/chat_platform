@@ -60,7 +60,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     (item: any) => item.groupId === selectedGroup.groupId
   );
   const [openEditGroupName, setOpenEditGroupName] = useState(false);
-  const { smallSize, setSmallSize } = useContext(smallSizeContext);
+  const { smallSize } = useContext(smallSizeContext);
   const [newGroupName, setNewGroupName] = useState('');
   const scrollToBottomTimer = useRef<any>(null);
   const hadNewMsg = useRef(false);
@@ -248,6 +248,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
      * 自己发消息则滚动到底部
      * 别人发的消息如果自己在底部则也滚动到底部
      */
+
     if (
       historyMsg[selectedGroup.groupId] &&
       historyMsg[selectedGroup.groupId].length !== 0 &&
@@ -260,7 +261,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
         (chatSpaceRef.current &&
           chatSpaceRef.current.scrollTop >=
             chatSpaceRef.current.scrollHeight -
-              chatSpaceRef.current.offsetHeight -
+              chatSpaceRef.current.clientHeight -
               140)
       ) {
         requestAnimationFrame(() => {

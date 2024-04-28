@@ -11,7 +11,7 @@ const UserInfo = (prop: any) => {
     projectDoc = ''
   }
 
-  const { smallSize, setSmallSize } = useContext(smallSizeContext);
+  const { smallSize } = useContext(smallSizeContext);
   const changeMsgOrRelation = (type: 'msg' | 'relation') => {
     setMsgOrRelation(type);
     type === 'msg'

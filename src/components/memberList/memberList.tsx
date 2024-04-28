@@ -20,7 +20,7 @@ const MemberList = (props: any) => {
   const socket = useContext(socketContext);
   const friends = useSelector((state: any) => state.userInfo.friends);
   const loginControl = useContext(loginFlagContext);
-  const { smallSize, setSmallSize } = useContext(smallSizeContext);
+  const { smallSize } = useContext(smallSizeContext);
   const memberArr: any = [];
   const groupMember: UserInfo[] = useSelector(
     (state: any) => state.userInfo.groupMember

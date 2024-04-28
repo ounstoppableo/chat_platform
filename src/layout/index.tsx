@@ -235,7 +235,7 @@ const Layout = () => {
                   className={`${
                     smallSize
                       ? 'tw-w-full tw-h-[calc(100%-50px)]'
-                      : 'tw-max-w-[600px] tw-min-w-[400px]'
+                      : 'tw-max-w-[600px] tw-min-w-[512px]'
                   } tw-overflow-hidden`}
                 >
                   <ChatSpace
