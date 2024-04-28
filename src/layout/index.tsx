@@ -263,9 +263,11 @@ const Layout = () => {
                     open={openGroupMember}
                     onClose={toCloseGroupMember}
                     closable={false}
+                    width="80%"
                     className="customDrawer"
                   >
                     <MemberList
+                      toCloseGroupMember={toCloseGroupMember}
                       selectedGroup={selectedGroup}
                       switchGroup={switchGroup}
                       at={at}

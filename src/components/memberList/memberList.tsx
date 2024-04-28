@@ -16,7 +16,7 @@ import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 const MemberList = (props: any) => {
-  const { selectedGroup, at, switchGroup } = props;
+  const { selectedGroup, at, switchGroup, toCloseGroupMember } = props;
   const socket = useContext(socketContext);
   const friends = useSelector((state: any) => state.userInfo.friends);
   const loginControl = useContext(loginFlagContext);
@@ -58,6 +58,12 @@ const MemberList = (props: any) => {
       toAvatar: friendInfo.avatar,
       groupId: friendInfo.groupId
     });
+    smallSize ? (toCloseGroupMember(), setMenu(<></>)) : null;
+  };
+
+  const smallSizeAt = (username: string) => {
+    toCloseGroupMember();
+    at(username);
   };
 
   //鼠标右键事件的回调
@@ -78,7 +84,7 @@ const MemberList = (props: any) => {
         id="memberListMenu"
       >
         <div
-          onClick={() => at(username)}
+          onClick={() => (smallSize ? smallSizeAt(username) : at(username))}
           className="tw-cursor-pointer tw-pl-1 tw-py-1 tw-gap-1 tw-items-center tw-flex tw-rounded tw-flex-1 tw-self-start hover:tw-bg-messageBackground tw-w-full"
         >
           <span>@</span>
