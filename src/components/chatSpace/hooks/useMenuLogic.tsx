@@ -20,9 +20,12 @@ const useMenuLogic = (props: any) => {
   const [menu, setMenu] = useState(<></>);
   const loginControl = useContext(loginFlagContext);
   const dispatch = useDispatch();
-  const contextMenuCb = (e: any, msg: Msg) => {
+  const contextMenuCb = (e: any, msg: Msg, smallSize?: any) => {
     e.preventDefault();
     e.stopPropagation();
+    if (smallSize) {
+      e = e.touches[0];
+    }
     const copyMsg = () => {
       navigator.clipboard.writeText(msg.msg).then(() => {
         message.success('复制成功！');

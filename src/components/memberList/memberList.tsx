@@ -11,7 +11,7 @@ import {
   UserDeleteOutlined
 } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -33,6 +33,7 @@ const MemberList = (props: any) => {
   const currentGroup: Group = groups.find(
     (item: any) => item.groupId === selectedGroup.groupId
   );
+  const menuTimer = useRef<any>(null);
   const dispatch = useDispatch();
   useEffect(() => {
     getGroupMember(selectedGroup.groupId).then((res) => {
@@ -68,9 +69,12 @@ const MemberList = (props: any) => {
 
   //鼠标右键事件的回调
   const [menu, setMenu] = useState(<></>);
-  const contextMenuCb = (e: any, username: any) => {
+  const contextMenuCb = (e: any, username: any, smallSize?: any) => {
     e.preventDefault();
     e.stopPropagation();
+    if (smallSize) {
+      e = e.touches[0];
+    }
     if (username === userInfo.username) return;
     if (!userInfo.isLogin) return;
     const toAddFriend = () => {
@@ -154,6 +158,21 @@ const MemberList = (props: any) => {
     };
   }, []);
 
+  //移动端菜单控制
+  const touchStartCb = (e: any, username: any) => {
+    if (menuTimer.current) {
+      clearTimeout(menuTimer.current);
+    }
+    menuTimer.current = setTimeout(() => {
+      contextMenuCb(e, username, true);
+      menuTimer.current = null;
+    }, 500);
+  };
+  const touchEndCb = () => {
+    clearTimeout(menuTimer.current);
+    menuTimer.current = null;
+  };
+
   const sorted = [...groupMember].sort((a: any, b: any) => {
     return b.isOnline - a.isOnline;
   });
@@ -161,8 +180,10 @@ const MemberList = (props: any) => {
     memberArr.push(
       <div
         key={item.uid}
-        className={`hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded`}
+        className={`hover:tw-bg-chatSpaceHeader tw-flex tw-gap-2 tw-items-center tw-px-0.5 tw-py-1.5 tw-rounded tw-select-none`}
         onContextMenu={(e) => contextMenuCb(e, item.username)}
+        onTouchStart={(e) => touchStartCb(e, item.username)}
+        onTouchEnd={() => touchEndCb()}
       >
         <div
           className={`tw-w-6 tw-rounded-full tw-relative 

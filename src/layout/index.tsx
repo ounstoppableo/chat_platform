@@ -68,7 +68,8 @@ const Layout = () => {
   };
   const userInfo = useSelector((state: any) => state.userInfo.data);
   const [openGroupMember, setOpenGroupMember] = useState(false);
-
+  const smallSizeHeight = useRef(innerHeight);
+  const [pcHeight, setPcHeight] = useState(innerHeight);
   const socket = useRef<Socket<ServerToClientEvents, ClientToServerEvents>>(
     {} as Socket<ServerToClientEvents, ClientToServerEvents>
   );
@@ -112,6 +113,7 @@ const Layout = () => {
         setSmallSize(true);
       } else {
         setSmallSize(false);
+        setPcHeight(innerHeight > 650 ? innerHeight : 650);
       }
     };
     window.addEventListener('resize', callback);
@@ -159,9 +161,12 @@ const Layout = () => {
       <loginFlagContext.Provider value={{ showLoginForm, closeLoginForm }}>
         <InputLogicContext.Provider value={{ inputValue, setInputValue }}>
           <div
-            className={`tw-h-screen tw-transition-all tw-w-full tw-flex tw-flex-col tw-items-center ${
+            className={`tw-transition-all tw-w-full tw-flex tw-flex-col tw-items-center ${
               smallSize ? '' : 'tw-py-20'
-            } tw-min-h-[640px] tw-relative tw-bg-temple tw-bg-cover`}
+            } tw-relative tw-bg-temple tw-bg-cover`}
+            style={{
+              height: smallSize ? smallSizeHeight.current : pcHeight + 'px'
+            }}
           >
             <div
               className={`tw-h-full ${

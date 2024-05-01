@@ -67,6 +67,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
   const [userInfoBg, setUserInfoBg] = useState<string>('');
   const groupMember = useSelector((state: any) => state.userInfo.groupMember);
   const friends = useSelector((state: any) => state.userInfo.friends);
+  const menuTimer = useRef<any>(null);
 
   //记录加载新消息前的位置
   const preScrollOffset = useRef<number>(0);
@@ -398,6 +399,21 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
     });
   };
 
+  //移动端菜单控制
+  const touchStartCb = (e: any, item: any) => {
+    if (menuTimer.current) {
+      clearTimeout(menuTimer.current);
+    }
+    menuTimer.current = setTimeout(() => {
+      contextMenuCb(e, item, true);
+      menuTimer.current = null;
+    }, 500);
+  };
+  const touchEndCb = () => {
+    clearTimeout(menuTimer.current);
+    menuTimer.current = null;
+  };
+
   //添加聊天记录
   if (historyMsg[selectedGroup.groupId]) {
     msgArr = historyMsg[selectedGroup.groupId].map(
@@ -483,7 +499,7 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                       </>
                     )}
                   </div>
-                  <div className="tw-ml-2 tw-mr-8 tw-text-lg">
+                  <div className="tw-ml-2 tw-mr-8 tw-text-lg tw-max-w-[250px] tw-breal-all">
                     {groupMemberItem?.username}
                     <span className="tw-text-[#919191]">
                       #{groupMemberItem?.uid}
@@ -562,6 +578,8 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                     onMouseEnter={(e) => userOperaControl(e, item)}
                     onMouseLeave={(e) => userOperaControlForLeave(e, item)}
                     onContextMenu={(e) => contextMenuCb(e, item)}
+                    onTouchStart={(e) => touchStartCb(e, item)}
+                    onTouchEnd={() => touchEndCb()}
                   >
                     {item.type === 'picture' ? (
                       <div className="tw-w-full">
@@ -615,7 +633,9 @@ const ChatSpace = React.forwardRef((props: any, mentions) => {
                         </div>
                       </div>
                     ) : (
-                      msgOpera(item)
+                      <div className={`${smallSize ? 'tw-select-none' : ''}`}>
+                        {msgOpera(item)}
+                      </div>
                     )}
                     {selectedGroup.type === 'group' ? (
                       <div
