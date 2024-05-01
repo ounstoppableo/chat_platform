@@ -14,6 +14,7 @@
 > 启动之前需要先配置好后端环境哦~~，[后端地址](https://github.com/ounstoppableo/chat-platform-nodets)
 
 ~~~sh
+pnpm i
 pnpm run dev
 ~~~
 
