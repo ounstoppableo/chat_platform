@@ -1,13 +1,14 @@
-import TestView from '@/view/testView/test.tsx';
 // import ErrorPage from '@/view/errorPage/errorPage.tsx';
 import Layout from '@/layout/index.tsx';
+import { Navigate } from 'react-router-dom';
+
 export default [
   {
     path: '/',
     element: <Layout />
   },
   {
-    path: '/test',
-    element: <TestView />
+    path: '*',
+    element: <Navigate to="/" />
   }
 ];
