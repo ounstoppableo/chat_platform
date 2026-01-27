@@ -12,9 +12,14 @@ export default tseslint.config(
       '**/.git',
       '**/.svn',
       '**/.hg',
-      '**/node_modules',
-      '**/__tests__',
-      '**/iconfont'
+      'node_modules',
+      '**/__tests__/**',
+      '**/iconfont/**',
+      'dist',
+      '.commitlintrc.cjs',
+      '.prettierrc.cjs',
+      'eslint.config.js',
+      'test'
     ]
   },
 
@@ -24,8 +29,8 @@ export default tseslint.config(
 
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended, // React 推荐规则（flat 版）
-  pluginReact.configs.flat['jsx-runtime'], // 如果用 React 17+ 的新 JSX Transform
+  pluginReact.configs.flat.recommended,
+  pluginReact.configs.flat['jsx-runtime'],
 
   {
     plugins: {
@@ -38,9 +43,25 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true }
       ],
-      // 你原来的自定义规则放这里
       'react/jsx-uses-react': 'off',
-      'react/react-in-jsx-scope': 'off'
+      'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'arrow-body-style': 'off',
+      'prefer-arrow-callback': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-filename-extension': [
+        1,
+        { extensions: ['.js', '.jsx', '.ts', '.tsx'] }
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { varsIgnorePattern: 'VARIABLE_NAME' }
+      ],
+      '@typescript-eslint/no-explicit-any': ['off'],
+      'consistent-return': 'error',
+      'react/no-unknown-property': ['off'],
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'react-hooks/exhaustive-deps': 'off'
       // ...
     },
     settings: {
