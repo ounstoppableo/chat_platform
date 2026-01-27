@@ -52,7 +52,7 @@ const useRelationCtrl = (props: any) => {
         rowKey={(record) => record.username}
         titles={['Source', 'Target']}
         onChange={onChange}
-        onSelectChange={onSelectChange}
+        onSelectChange={onSelectChange as any}
         targetKeys={targetKeys}
         selectedKeys={selectedKeys}
         listStyle={{
